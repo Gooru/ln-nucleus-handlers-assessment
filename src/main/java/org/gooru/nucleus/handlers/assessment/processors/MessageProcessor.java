@@ -63,14 +63,14 @@ class MessageProcessor implements Processor {
 
   private JsonObject processAssessmentUpdate() {
     // TODO Auto-generated method stub
-    String resourceId = message.headers().get(MessageConstants.ASSESSMENT_ID);
+    String assessmentId = message.headers().get(MessageConstants.ASSESSMENT_ID);
     
     return null;    
   }
 
   private JsonObject processAssessmentGet() {
     // TODO Auto-generated method stub
-    String resourceId = message.headers().get(MessageConstants.ASSESSMENT_ID);
+    String assessmentId = message.headers().get(MessageConstants.ASSESSMENT_ID);
     
     return null;
   }
