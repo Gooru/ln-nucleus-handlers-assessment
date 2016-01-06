@@ -12,6 +12,7 @@ import org.gooru.nucleus.handlers.assessment.bootstrap.startup.Initializers;
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.constants.MessagebusEndpoints;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorBuilder;
+import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,14 +44,13 @@ public class AssessmentVerticle extends AbstractVerticle {
       LOGGER.debug("Received message: " + message.body());
 
       vertx.executeBlocking(future -> {
-        JsonObject result = new ProcessorBuilder(message).build().process();
+        MessageResponse result = new ProcessorBuilder(message).build().process();
         future.complete(result);
       }, res -> {
-        JsonObject result = (JsonObject) res.result();
-        DeliveryOptions options = new DeliveryOptions().addHeader(MessageConstants.MSG_OP_STATUS, result.getString(MessageConstants.MSG_OP_STATUS));
-        message.reply(result.getJsonObject(MessageConstants.RESP_CONTAINER_MBUS), options);
+        MessageResponse result = (MessageResponse) res.result();
+        message.reply(result.reply(), result.deliveryOptions());
 
-        JsonObject eventData = result.getJsonObject(MessageConstants.RESP_CONTAINER_EVENT);
+        JsonObject eventData = result.event();
         if (eventData != null) {
           eb.publish(MessagebusEndpoints.MBEP_EVENT, eventData);
         }
