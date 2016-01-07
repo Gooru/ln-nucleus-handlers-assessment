@@ -3,8 +3,6 @@ package org.gooru.nucleus.handlers.assessment.processors;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
-import org.gooru.nucleus.handlers.assessment.processors.exceptions.InvalidRequestException;
-import org.gooru.nucleus.handlers.assessment.processors.exceptions.InvalidUserException;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
