@@ -43,11 +43,22 @@ class MessageProcessor implements Processor {
         result = processAssessmentUpdate();
         break;
       case MessageConstants.MSG_OP_ASSESSMENT_DELETE:
+        result = processAssessmentDelete();
+        break;
       case MessageConstants.MSG_OP_ASSESSMENT_ADD_QUESTION:
+        result = processAssessmentAddQuestion();
+        break;
       case MessageConstants.MSG_OP_ASSESSMENT_COPY_QUESTION:
+        result = processAssessmentCopyQuestion();
+        break;
       case MessageConstants.MSG_OP_ASSESSMENT_REMOVE_QUESTION:
+        result = processAssessmentRemoveQuestion();
+        break;
       case MessageConstants.MSG_OP_ASSESSMENT_COLLABORATOR_GET:
+        result = processAssessmentCollaboratorGet();
+        break;
       case MessageConstants.MSG_OP_ASSESSMENT_COLLABORATOR_UPDATE:
+        result = processAssessmentCollaboratorUpdate();
         break;
       default:
         LOGGER.error("Invalid operation type passed in, not able to handle");
@@ -55,8 +66,40 @@ class MessageProcessor implements Processor {
       }
       return result;
     } catch (Throwable e) {
+      LOGGER.error("Unhandled exception in processing", e);
       return MessageResponseFactory.createInternalErrorResponse();
     }
+  }
+
+  private MessageResponse processAssessmentCopyQuestion() {
+    // TODO: Provide a concrete implementation
+    throw new IllegalStateException("Not implemented yet");
+
+  }
+
+  private MessageResponse processAssessmentCollaboratorUpdate() {
+    // TODO: Provide a concrete implementation
+    throw new IllegalStateException("Not implemented yet");
+  }
+
+  private MessageResponse processAssessmentCollaboratorGet() {
+    // TODO: Provide a concrete implementation
+    throw new IllegalStateException("Not implemented yet");
+  }
+
+  private MessageResponse processAssessmentRemoveQuestion() {
+    // TODO: Provide a concrete implementation
+    throw new IllegalStateException("Not implemented yet");
+  }
+
+  private MessageResponse processAssessmentAddQuestion() {
+    // TODO: Provide a concrete implementation
+    throw new IllegalStateException("Not implemented yet");
+  }
+
+  private MessageResponse processAssessmentDelete() {
+    // TODO: Provide a concrete implementation
+    throw new IllegalStateException("Not implemented yet");
   }
 
   private MessageResponse processAssessmentUpdate() {
