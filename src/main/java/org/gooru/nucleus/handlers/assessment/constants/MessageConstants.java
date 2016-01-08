@@ -27,6 +27,7 @@ public class MessageConstants {
   public static final String MSG_OP_ASSESSMENT_COLLABORATOR_GET = "assessment.collaborator.get";
   public static final String MSG_OP_ASSESSMENT_COLLABORATOR_UPDATE = "assessment.collaborator.update";
   public static final String MSG_OP_ASSESSMENT_QUESTION_REMOVE = "assessment.question.remove";
+  public static final String MSG_OP_ASSESSMENT_QUESTION_UPDATE = "assessment.question.update";
   public static final String MSG_OP_ASSESSMENT_QUESTION_COPY = "assessment.question.copy";
   public static final String MSG_OP_ASSESSMENT_QUESTION_ADD = "assessment.question.add";
   public static final String MSG_OP_ASSESSMENT_QUESTION_REORDER = "assessment.question.reorder";

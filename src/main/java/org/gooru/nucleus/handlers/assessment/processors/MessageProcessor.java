@@ -48,6 +48,9 @@ class MessageProcessor implements Processor {
       case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_ADD:
         result = processAssessmentAddQuestion();
         break;
+      case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_UPDATE:
+          result = processAssessmentUpdateQuestion();
+          break;
       case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_REMOVE:
         result = processAssessmentRemoveQuestion();
         break;
@@ -72,6 +75,11 @@ class MessageProcessor implements Processor {
       LOGGER.error("Unhandled exception in processing", e);
       return MessageResponseFactory.createInternalErrorResponse();
     }
+  }
+
+  private MessageResponse processAssessmentUpdateQuestion() {
+    // TODO: Provide a concrete implementation
+    throw new IllegalStateException("Not implemented yet");
   }
 
   private MessageResponse processAssessmentQuestionReorder() {
