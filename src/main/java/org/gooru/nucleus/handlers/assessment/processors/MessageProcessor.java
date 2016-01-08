@@ -3,6 +3,7 @@ package org.gooru.nucleus.handlers.assessment.processors;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.RepoBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
@@ -83,8 +84,8 @@ class MessageProcessor implements Processor {
       LOGGER.error("Invalid request, either assessment id or question id not available. Aborting");
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment/question id");
     }
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+
+    return new RepoBuilder().buildAssessmentQuestionRepo(context).updateQuestionInAssessment();
   }
 
   private MessageResponse processAssessmentQuestionReorder() {
@@ -94,8 +95,7 @@ class MessageProcessor implements Processor {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
 
     }
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new RepoBuilder().buildAssessmentRepo(context).reorderQuestionInAssessment();
   }
 
   private MessageResponse processAssessmentCopyQuestion() {
@@ -104,8 +104,7 @@ class MessageProcessor implements Processor {
       LOGGER.error("Invalid request, assessment id not available. Aborting");
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new RepoBuilder().buildAssessmentQuestionRepo(context).copyQuestionToAssessment();
   }
 
   private MessageResponse processAssessmentCollaboratorUpdate() {
@@ -114,8 +113,7 @@ class MessageProcessor implements Processor {
       LOGGER.error("Invalid request, assessment id not available. Aborting");
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new RepoBuilder().buildAssessmentCollaboratorRepo(context).updateCollaborator();
   }
 
   private MessageResponse processAssessmentCollaboratorGet() {
@@ -124,8 +122,7 @@ class MessageProcessor implements Processor {
       LOGGER.error("Invalid request, assessment id not available. Aborting");
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new RepoBuilder().buildAssessmentCollaboratorRepo(context).fetchCollaborator();
   }
 
   private MessageResponse processAssessmentRemoveQuestion() {
@@ -134,8 +131,7 @@ class MessageProcessor implements Processor {
       LOGGER.error("Invalid request, either assessment id or question id not available. Aborting");
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment/question id");
     }
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new RepoBuilder().buildAssessmentQuestionRepo(context).removeQuestionFromAssessment();
   }
 
   private MessageResponse processAssessmentAddQuestion() {
@@ -144,8 +140,7 @@ class MessageProcessor implements Processor {
       LOGGER.error("Invalid request, assessment id not available. Aborting");
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new RepoBuilder().buildAssessmentQuestionRepo(context).addQuestionToAssessment();
   }
 
   private MessageResponse processAssessmentDelete() {
@@ -154,8 +149,7 @@ class MessageProcessor implements Processor {
       LOGGER.error("Invalid request, assessment id not available. Aborting");
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new RepoBuilder().buildAssessmentRepo(context).deleteAssessment();
   }
 
   private MessageResponse processAssessmentUpdate() {
@@ -164,26 +158,22 @@ class MessageProcessor implements Processor {
       LOGGER.error("Invalid request, assessment id not available. Aborting");
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    // TODO Auto-generated method stub
-    String assessmentId = message.headers().get(MessageConstants.ASSESSMENT_ID);
-
-    return null;
+    return new RepoBuilder().buildAssessmentRepo(context).updateAssessment();
   }
 
   private MessageResponse processAssessmentGet() {
     ProcessorContext context = createContext();
     if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
-
+      LOGGER.error("Invalid request, assessment id not available. Aborting");
+      return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    // TODO: Provide a concrete implementation
-
-    throw new IllegalStateException("Not implemented yet");
+    return new RepoBuilder().buildAssessmentRepo(context).fetchAssessment();
   }
 
   private MessageResponse processAssessmentCreate() {
-    // TODO: Provide a concrete implementation
+    ProcessorContext context = createContext();
 
-    throw new IllegalStateException("Not implemented yet");
+    return new RepoBuilder().buildAssessmentRepo(context).createAssessment();
   }
 
   private ProcessorContext createContext() {

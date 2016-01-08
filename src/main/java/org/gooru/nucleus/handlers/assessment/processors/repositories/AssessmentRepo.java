@@ -11,5 +11,5 @@ public interface AssessmentRepo {
   public MessageResponse updateAssessment();
   public MessageResponse deleteAssessment();
   public MessageResponse fetchAssessment();
-
+  public MessageResponse reorderQuestionInAssessment();
 }

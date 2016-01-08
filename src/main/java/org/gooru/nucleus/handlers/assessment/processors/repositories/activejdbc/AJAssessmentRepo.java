@@ -38,4 +38,9 @@ public class AJAssessmentRepo implements AssessmentRepo {
     // TODO: Provide a concrete implementation
     throw new IllegalStateException("Not implemented yet");
   }
+
+  @Override
+  public MessageResponse reorderQuestionInAssessment() {
+    // TODO: Provide a concrete implementation
+    throw new IllegalStateException("Not implemented yet");  }
 }

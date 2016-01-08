@@ -9,4 +9,5 @@ public interface AssessmentQuestionRepo {
   public MessageResponse addQuestionToAssessment();
   public MessageResponse removeQuestionFromAssessment();
   public MessageResponse copyQuestionToAssessment();
+  public MessageResponse updateQuestionInAssessment();
 }
