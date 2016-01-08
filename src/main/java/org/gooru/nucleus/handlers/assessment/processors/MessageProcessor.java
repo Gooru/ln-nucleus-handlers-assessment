@@ -33,11 +33,11 @@ class MessageProcessor implements Processor {
 
       final String msgOp = message.headers().get(MessageConstants.MSG_HEADER_OP);
       switch (msgOp) {
-      case MessageConstants.MSG_OP_ASSESSMENT_CREATE:
+        case MessageConstants.MSG_OP_ASSESSMENT_GET:
+          result = processAssessmentGet();
+          break;
+        case MessageConstants.MSG_OP_ASSESSMENT_CREATE:
         result = processAssessmentCreate();
-        break;
-      case MessageConstants.MSG_OP_ASSESSMENT_GET:
-        result = processAssessmentGet();
         break;
       case MessageConstants.MSG_OP_ASSESSMENT_UPDATE:
         result = processAssessmentUpdate();
@@ -45,15 +45,18 @@ class MessageProcessor implements Processor {
       case MessageConstants.MSG_OP_ASSESSMENT_DELETE:
         result = processAssessmentDelete();
         break;
-      case MessageConstants.MSG_OP_ASSESSMENT_ADD_QUESTION:
+      case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_ADD:
         result = processAssessmentAddQuestion();
         break;
-      case MessageConstants.MSG_OP_ASSESSMENT_COPY_QUESTION:
-        result = processAssessmentCopyQuestion();
-        break;
-      case MessageConstants.MSG_OP_ASSESSMENT_REMOVE_QUESTION:
+      case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_REMOVE:
         result = processAssessmentRemoveQuestion();
         break;
+      case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_COPY:
+        result = processAssessmentCopyQuestion();
+        break;
+      case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_REORDER:
+          result = processAssessmentQuestionReorder();
+          break;
       case MessageConstants.MSG_OP_ASSESSMENT_COLLABORATOR_GET:
         result = processAssessmentCollaboratorGet();
         break;
@@ -69,6 +72,11 @@ class MessageProcessor implements Processor {
       LOGGER.error("Unhandled exception in processing", e);
       return MessageResponseFactory.createInternalErrorResponse();
     }
+  }
+
+  private MessageResponse processAssessmentQuestionReorder() {
+    // TODO: Provide a concrete implementation
+    throw new IllegalStateException("Not implemented yet");
   }
 
   private MessageResponse processAssessmentCopyQuestion() {
