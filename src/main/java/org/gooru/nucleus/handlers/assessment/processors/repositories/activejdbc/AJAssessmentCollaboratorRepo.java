@@ -2,6 +2,8 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.AssessmentCollaboratorRepo;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.DBHandlerBuilder;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.transactions.TransactionExecutor;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 
 /**
@@ -16,14 +18,12 @@ public class AJAssessmentCollaboratorRepo implements AssessmentCollaboratorRepo 
 
   @Override
   public MessageResponse fetchCollaborator() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildFetchCollaboratorHandler(context));
 
   }
 
   @Override
   public MessageResponse updateCollaborator() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildUpdateCollaboratorHandler(context));
   }
 }

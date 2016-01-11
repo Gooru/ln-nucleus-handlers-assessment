@@ -2,6 +2,8 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.AssessmentQuestionRepo;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.DBHandlerBuilder;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.transactions.TransactionExecutor;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 
 /**
@@ -16,25 +18,25 @@ public class AJAssessmentQuestionRepo implements AssessmentQuestionRepo {
 
   @Override
   public MessageResponse addQuestionToAssessment() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildAddQuestionToAssessmentHandler(context));
 
   }
 
   @Override
   public MessageResponse removeQuestionFromAssessment() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildRemoveQuestionFromAssessmentHandler(context));
+
   }
 
   @Override
   public MessageResponse copyQuestionToAssessment() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildCopyQuestionToAssessmentHandler(context));
+
   }
 
   @Override
   public MessageResponse updateQuestionInAssessment() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");  }
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildUpdateQuestionInAssessmentHandler(context));
+
+  }
 }

@@ -2,6 +2,9 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.AssessmentRepo;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.DBHandler;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.DBHandlerBuilder;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.transactions.TransactionExecutor;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 
 /**
@@ -16,31 +19,28 @@ public class AJAssessmentRepo implements AssessmentRepo {
 
   @Override
   public MessageResponse createAssessment() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
-
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildCreateAssessmentHandler(context));
   }
 
   @Override
   public MessageResponse updateAssessment() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildUpdateAssessmentHandler(context));
   }
 
   @Override
   public MessageResponse deleteAssessment() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildDeleteAssessmentHandler(context));
   }
 
   @Override
   public MessageResponse fetchAssessment() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildFetchAssessmentHandler(context));
+
   }
 
   @Override
   public MessageResponse reorderQuestionInAssessment() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");  }
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildReorderAssessmentHandler(context));
+  }
+
 }
