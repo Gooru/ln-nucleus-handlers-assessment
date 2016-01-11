@@ -8,6 +8,5 @@ import org.javalite.activejdbc.annotations.Table;
  * Created by ashish on 7/1/16.
  */
 @Table("content")
-@IdName("content_id")
 public class AJEntityQuestion {
 }
