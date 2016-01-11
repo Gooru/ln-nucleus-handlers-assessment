@@ -7,8 +7,8 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
  * Created by ashish on 11/1/16.
  */
 public interface DBHandler {
-  ExecutionResult<MessageResponse> validateRequestWithoutDb();
-  ExecutionResult<MessageResponse> validateRequestWithDb();
+  ExecutionResult<MessageResponse> checkSanity();
+  ExecutionResult<MessageResponse> validateRequest();
   ExecutionResult<MessageResponse> executeRequest();
   boolean handlerReadOnly();
 }

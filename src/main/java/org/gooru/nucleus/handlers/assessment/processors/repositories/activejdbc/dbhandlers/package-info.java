@@ -2,9 +2,9 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 
 /**
  * This package provides housing of DBHandlers. DBHandler is convenience interface which provides behavior for
- * 1. Non DB validation
- * 2. DB validation
- * 3. DB Operation execution
+ * 1. Non DB validation - Done via DBHandler#checkSanity
+ * 2. DB validation - Done via DBHandler#validateRequest
+ * 3. DB Operation execution - Done via DBHandler#executeRequest
  * In addition it also provides a way to specify what kind of transaction (readonly or not) is not be used. Based
  * on this, the connection property would be set before the transaction begins.
  *

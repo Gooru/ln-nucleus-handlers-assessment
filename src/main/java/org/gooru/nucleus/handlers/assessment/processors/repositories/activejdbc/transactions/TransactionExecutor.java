@@ -20,7 +20,7 @@ public class TransactionExecutor {
 
   public MessageResponse executeTransaction(DBHandler handler) {
     // First validations without any DB
-    ExecutionResult<MessageResponse> executionResult = handler.validateRequestWithoutDb();
+    ExecutionResult<MessageResponse> executionResult = handler.checkSanity();
     // Now we need to run with transaction, if we are going to continue
     if (executionResult.continueProcessing()) {
       executionResult = executeWithTransaction(handler);
@@ -39,7 +39,7 @@ public class TransactionExecutor {
         Base.connection().setReadOnly(true);
       }
       Base.openTransaction();
-      executionResult = handler.validateRequestWithDb();
+      executionResult = handler.validateRequest();
       if (executionResult.continueProcessing()) {
         executionResult = handler.executeRequest();
         Base.commitTransaction();

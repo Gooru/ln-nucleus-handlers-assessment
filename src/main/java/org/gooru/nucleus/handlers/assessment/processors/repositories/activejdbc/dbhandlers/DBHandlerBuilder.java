@@ -7,57 +7,55 @@ import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
  */
 public class DBHandlerBuilder {
   public DBHandler buildReorderAssessmentHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new ReorderAssessmentHandler(context);
   }
 
   public DBHandler buildFetchAssessmentHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new FetchAssessmentHandler(context);
+
   }
 
   public DBHandler buildDeleteAssessmentHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new DeleteAssessmentHandler(context);
   }
 
   public DBHandler buildUpdateAssessmentHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new UpdateAssessmentHandler(context);
+
   }
 
   public DBHandler buildCreateAssessmentHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new CreateAssessmentHandler(context);
+
   }
 
   public DBHandler buildAddQuestionToAssessmentHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new AddQuestionToAssessmentHandler(context);
+
   }
 
   public DBHandler buildRemoveQuestionFromAssessmentHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new RemoveQuestionFromAssessmentHandler(context);
+
   }
 
   public DBHandler buildCopyQuestionToAssessmentHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new CopyQuestionToAssessmentHandler(context);
+
   }
 
   public DBHandler buildUpdateQuestionInAssessmentHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new UpdateQuestionInAssessmentHandler(context);
+
   }
 
   public DBHandler buildUpdateCollaboratorHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new UpdateCollaboratorHandler(context);
+
   }
 
   public DBHandler buildFetchCollaboratorHandler(ProcessorContext context) {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    return new FetchCollaboratorHandler(context);
+
   }
 }
