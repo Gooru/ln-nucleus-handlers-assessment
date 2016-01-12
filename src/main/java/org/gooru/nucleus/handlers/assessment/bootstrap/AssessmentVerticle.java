@@ -2,14 +2,12 @@ package org.gooru.nucleus.handlers.assessment.bootstrap;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import org.gooru.nucleus.handlers.assessment.bootstrap.shutdown.Finalizer;
 import org.gooru.nucleus.handlers.assessment.bootstrap.shutdown.Finalizers;
 import org.gooru.nucleus.handlers.assessment.bootstrap.startup.Initializer;
 import org.gooru.nucleus.handlers.assessment.bootstrap.startup.Initializers;
-import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.constants.MessagebusEndpoints;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
@@ -21,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AssessmentVerticle extends AbstractVerticle {
 
-  static final Logger LOGGER = LoggerFactory.getLogger(AssessmentVerticle.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AssessmentVerticle.class);
 
   @Override
   public void start(Future<Void> voidFuture) throws Exception {
