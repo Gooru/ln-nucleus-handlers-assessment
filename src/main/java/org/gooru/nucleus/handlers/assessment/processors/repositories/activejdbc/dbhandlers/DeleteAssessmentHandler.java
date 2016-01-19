@@ -3,6 +3,7 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 import io.vertx.core.json.JsonObject;
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
+import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityCULC;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
@@ -118,7 +119,9 @@ class DeleteAssessmentHandler implements DBHandler {
       // Nothing to do. We do not have a live record.
       LOGGER.debug("No record in CULC for assessment '{}' to be deleted", context.assessmentId());
     }
-    return new ExecutionResult<>(MessageResponseFactory.createNoContentResponse("Deleted"), ExecutionResult.ExecutionStatus.SUCCESSFUL);
+    return new ExecutionResult<>(
+      MessageResponseFactory.createNoContentResponse("Deleted", EventBuilderFactory.getDeleteAssessmentEventBuilder(context.assessmentId())),
+      ExecutionResult.ExecutionStatus.SUCCESSFUL);
   }
 
   @Override
