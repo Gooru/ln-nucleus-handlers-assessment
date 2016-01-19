@@ -23,6 +23,17 @@ class FetchCollaboratorHandler implements DBHandler {
 
   @Override
   public ExecutionResult<MessageResponse> checkSanity() {
+    // There should be an assessment id present
+    if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
+      LOGGER.warn("Missing assessment id");
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Missing assessment id"),
+        ExecutionResult.ExecutionStatus.FAILED);
+    }
+    return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
+  }
+
+  @Override
+  public ExecutionResult<MessageResponse> validateRequest() {
     // Fetch the assessment where type is assessment and it is not deleted already and id is specified id
 
     LazyList<AJEntityAssessment> assessments = AJEntityAssessment
@@ -36,12 +47,6 @@ class FetchCollaboratorHandler implements DBHandler {
       return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse("assessment id: " + context.assessmentId()),
         ExecutionResult.ExecutionStatus.FAILED);
     }
-    return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
-  }
-
-  @Override
-  public ExecutionResult<MessageResponse> validateRequest() {
-    // Nothing to validate, so we are all set
     return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
   }
 
