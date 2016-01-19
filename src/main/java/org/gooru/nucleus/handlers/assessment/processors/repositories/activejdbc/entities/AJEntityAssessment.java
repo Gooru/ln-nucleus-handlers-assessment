@@ -7,7 +7,7 @@ import org.javalite.activejdbc.annotations.Table;
  * Created by ashish on 7/1/16.
  */
 @Table("collection")
-public class AJEntityAssessment extends Model  {
+public class AJEntityAssessment extends Model {
 
   // Queries used
   public static final String SELECT_FOR_VALIDATE =

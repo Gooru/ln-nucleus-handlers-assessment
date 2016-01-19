@@ -10,7 +10,13 @@ public class Initializers implements Iterable<Initializer> {
 
 
   private final Iterator<Initializer> internalIterator;
-  
+
+  public Initializers() {
+    List<Initializer> initializers = new ArrayList<>();
+    initializers.add(DataSourceRegistry.getInstance());
+    internalIterator = initializers.iterator();
+  }
+
   @Override
   public Iterator<Initializer> iterator() {
     return new Iterator<Initializer>() {
@@ -26,12 +32,6 @@ public class Initializers implements Iterable<Initializer> {
       }
 
     };
-  }
-  
-  public Initializers() {
-    List<Initializer> initializers = new ArrayList<>();
-    initializers.add(DataSourceRegistry.getInstance());    
-    internalIterator = initializers.iterator();
   }
 
 

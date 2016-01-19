@@ -7,7 +7,10 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
  */
 public interface AssessmentQuestionRepo {
   MessageResponse addQuestionToAssessment();
+
   MessageResponse removeQuestionFromAssessment();
+
   MessageResponse copyQuestionToAssessment();
+
   MessageResponse updateQuestionInAssessment();
 }

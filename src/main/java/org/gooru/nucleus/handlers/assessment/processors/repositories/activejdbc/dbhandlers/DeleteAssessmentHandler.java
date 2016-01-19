@@ -19,8 +19,8 @@ import java.util.Map;
  * Created by ashish on 11/1/16.
  */
 class DeleteAssessmentHandler implements DBHandler {
-  private final ProcessorContext context;
   private static final Logger LOGGER = LoggerFactory.getLogger(DeleteAssessmentHandler.class);
+  private final ProcessorContext context;
 
   public DeleteAssessmentHandler(ProcessorContext context) {
     this.context = context;

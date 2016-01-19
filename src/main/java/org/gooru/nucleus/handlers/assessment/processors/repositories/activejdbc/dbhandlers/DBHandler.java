@@ -8,7 +8,10 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
  */
 public interface DBHandler {
   ExecutionResult<MessageResponse> checkSanity();
+
   ExecutionResult<MessageResponse> validateRequest();
+
   ExecutionResult<MessageResponse> executeRequest();
+
   boolean handlerReadOnly();
 }

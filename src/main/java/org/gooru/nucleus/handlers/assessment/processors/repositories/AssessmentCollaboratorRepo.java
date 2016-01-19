@@ -8,5 +8,6 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
 public interface AssessmentCollaboratorRepo {
 
   MessageResponse fetchCollaborator();
+
   MessageResponse updateCollaborator();
 }
