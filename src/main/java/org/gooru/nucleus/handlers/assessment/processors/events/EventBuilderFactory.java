@@ -16,38 +16,18 @@ public class EventBuilderFactory {
   private static final String ASSESSMENT_ID = "id";
 
   public static EventBuilder getDeleteAssessmentEventBuilder(String assessmentId) {
-    return new EventBuilder() {
-      @Override
-      public JsonObject build() {
-        return new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_DELETE).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
-      }
-    };
+    return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_DELETE).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 
   public static EventBuilder getCreateAssessmentEventBuilder(String assessmentId) {
-    return new EventBuilder() {
-      @Override
-      public JsonObject build() {
-        return new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_CREATE).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
-      }
-    };
+    return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_CREATE).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 
   public static EventBuilder getUpdateAssessmentEventBuilder(String assessmentId) {
-    return new EventBuilder() {
-      @Override
-      public JsonObject build() {
-        return new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_UPDATE).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
-      }
-    };
+    return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_UPDATE).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 
   public static EventBuilder getCopyAssessmentEventBuilder(String assessmentId) {
-    return new EventBuilder() {
-      @Override
-      public JsonObject build() {
-        return new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_COPY).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
-      }
-    };
+    return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_COPY).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 }
