@@ -61,6 +61,7 @@ class DeleteAssessmentHandler implements DBHandler {
     }
     AJEntityAssessment assessmentToDelete = assessments.get(0);
     // The user should be owner of the assessment, collaborator will not do
+    // FIXME: 21/1/16 : Need to verify if the user is part of collaborator or owner of course where this assessment may be contained
     if (!(assessmentToDelete.getString(AJEntityAssessment.CREATOR_ID)).equalsIgnoreCase(context.userId())) {
       LOGGER.warn("User: '{}' is not owner of assessment", context.userId());
       return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
