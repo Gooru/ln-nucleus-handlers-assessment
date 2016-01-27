@@ -49,20 +49,8 @@ class MessageProcessor implements Processor {
         case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_ADD:
           result = processAssessmentAddQuestion();
           break;
-        case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_UPDATE:
-          result = processAssessmentUpdateQuestion();
-          break;
-        case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_REMOVE:
-          result = processAssessmentRemoveQuestion();
-          break;
-        case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_COPY:
-          result = processAssessmentCopyQuestion();
-          break;
         case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_REORDER:
           result = processAssessmentQuestionReorder();
-          break;
-        case MessageConstants.MSG_OP_ASSESSMENT_COLLABORATOR_GET:
-          result = processAssessmentCollaboratorGet();
           break;
         case MessageConstants.MSG_OP_ASSESSMENT_COLLABORATOR_UPDATE:
           result = processAssessmentCollaboratorUpdate();
@@ -78,16 +66,6 @@ class MessageProcessor implements Processor {
     }
   }
 
-  private MessageResponse processAssessmentUpdateQuestion() {
-    ProcessorContext context = createContext();
-    if (context.assessmentId() == null || context.assessmentId().isEmpty() || context.questionId() == null || context.questionId().isEmpty()) {
-      LOGGER.error("Invalid request, either assessment id or question id not available. Aborting");
-      return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment/question id");
-    }
-
-    return new RepoBuilder().buildAssessmentQuestionRepo(context).updateQuestionInAssessment();
-  }
-
   private MessageResponse processAssessmentQuestionReorder() {
     ProcessorContext context = createContext();
     if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
@@ -98,40 +76,13 @@ class MessageProcessor implements Processor {
     return new RepoBuilder().buildAssessmentRepo(context).reorderQuestionInAssessment();
   }
 
-  private MessageResponse processAssessmentCopyQuestion() {
-    ProcessorContext context = createContext();
-    if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
-      LOGGER.error("Invalid request, assessment id not available. Aborting");
-      return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
-    }
-    return new RepoBuilder().buildAssessmentQuestionRepo(context).copyQuestionToAssessment();
-  }
-
   private MessageResponse processAssessmentCollaboratorUpdate() {
     ProcessorContext context = createContext();
     if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
       LOGGER.error("Invalid request, assessment id not available. Aborting");
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    return new RepoBuilder().buildAssessmentCollaboratorRepo(context).updateCollaborator();
-  }
-
-  private MessageResponse processAssessmentCollaboratorGet() {
-    ProcessorContext context = createContext();
-    if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
-      LOGGER.error("Invalid request, assessment id not available. Aborting");
-      return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
-    }
-    return new RepoBuilder().buildAssessmentCollaboratorRepo(context).fetchCollaborator();
-  }
-
-  private MessageResponse processAssessmentRemoveQuestion() {
-    ProcessorContext context = createContext();
-    if (context.assessmentId() == null || context.assessmentId().isEmpty() || context.questionId() == null || context.questionId().isEmpty()) {
-      LOGGER.error("Invalid request, either assessment id or question id not available. Aborting");
-      return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment/question id");
-    }
-    return new RepoBuilder().buildAssessmentQuestionRepo(context).removeQuestionFromAssessment();
+    return new RepoBuilder().buildAssessmentRepo(context).updateCollaborator();
   }
 
   private MessageResponse processAssessmentAddQuestion() {
@@ -140,7 +91,7 @@ class MessageProcessor implements Processor {
       LOGGER.error("Invalid request, assessment id not available. Aborting");
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    return new RepoBuilder().buildAssessmentQuestionRepo(context).addQuestionToAssessment();
+    return new RepoBuilder().buildAssessmentRepo(context).addQuestionToAssessment();
   }
 
   private MessageResponse processAssessmentDelete() {

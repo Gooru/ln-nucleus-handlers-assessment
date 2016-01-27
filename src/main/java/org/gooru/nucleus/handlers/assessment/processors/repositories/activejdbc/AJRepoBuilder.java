@@ -1,8 +1,6 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc;
 
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
-import org.gooru.nucleus.handlers.assessment.processors.repositories.AssessmentCollaboratorRepo;
-import org.gooru.nucleus.handlers.assessment.processors.repositories.AssessmentQuestionRepo;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.AssessmentRepo;
 
 /**
@@ -14,12 +12,5 @@ public class AJRepoBuilder {
     return new AJAssessmentRepo(context);
   }
 
-  public AssessmentQuestionRepo buildAssessmentQuestionRepo(ProcessorContext context) {
-    return new AJAssessmentQuestionRepo(context);
-  }
-
-  public AssessmentCollaboratorRepo buildAssessmentCollaboratorRepo(ProcessorContext context) {
-    return new AJAssessmentCollaboratorRepo(context);
-  }
 
 }

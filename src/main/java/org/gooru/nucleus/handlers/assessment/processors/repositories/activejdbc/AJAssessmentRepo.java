@@ -42,4 +42,15 @@ public class AJAssessmentRepo implements AssessmentRepo {
     return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildReorderAssessmentHandler(context));
   }
 
+  @Override
+  public MessageResponse updateCollaborator() {
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildUpdateCollaboratorHandler(context));
+  }
+  
+  @Override
+  public MessageResponse addQuestionToAssessment() {
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildAddQuestionToAssessmentHandler(context));
+
+  }
+
 }

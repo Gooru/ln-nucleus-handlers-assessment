@@ -12,12 +12,4 @@ public class RepoBuilder {
     return new AJRepoBuilder().buildAssessmentRepo(context);
   }
 
-  public AssessmentQuestionRepo buildAssessmentQuestionRepo(ProcessorContext context) {
-    return new AJRepoBuilder().buildAssessmentQuestionRepo(context);
-  }
-
-  public AssessmentCollaboratorRepo buildAssessmentCollaboratorRepo(ProcessorContext context) {
-    return new AJRepoBuilder().buildAssessmentCollaboratorRepo(context);
-  }
-
 }

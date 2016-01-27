@@ -16,4 +16,9 @@ public interface AssessmentRepo {
   MessageResponse fetchAssessment();
 
   MessageResponse reorderQuestionInAssessment();
+
+  MessageResponse addQuestionToAssessment();
+
+  MessageResponse updateCollaborator();
+
 }

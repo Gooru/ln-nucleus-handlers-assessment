@@ -34,28 +34,9 @@ public class DBHandlerBuilder {
 
   }
 
-  public DBHandler buildRemoveQuestionFromAssessmentHandler(ProcessorContext context) {
-    return new RemoveQuestionFromAssessmentHandler(context);
-
-  }
-
-  public DBHandler buildCopyQuestionToAssessmentHandler(ProcessorContext context) {
-    return new CopyQuestionToAssessmentHandler(context);
-
-  }
-
-  public DBHandler buildUpdateQuestionInAssessmentHandler(ProcessorContext context) {
-    return new UpdateQuestionInAssessmentHandler(context);
-
-  }
-
   public DBHandler buildUpdateCollaboratorHandler(ProcessorContext context) {
     return new UpdateCollaboratorHandler(context);
 
   }
 
-  public DBHandler buildFetchCollaboratorHandler(ProcessorContext context) {
-    return new FetchCollaboratorHandler(context);
-
-  }
 }

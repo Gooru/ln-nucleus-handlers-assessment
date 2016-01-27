@@ -14,9 +14,11 @@ public class AJEntityAssessment extends Model {
 
   // Queries used
   public static final String SELECT_FOR_VALIDATE =
-    "select id, creator_id, publish_date, is_deleted from collection where format = ?::content_container_type and id = ? and is_deleted = ?";
+    "select id, creator_id, publish_date from collection where format = ?::content_container_type and id = ? and is_deleted = ?";
   public static final String SELECT_COLLABORATOR = "select collaborator from collection where id = ?";
-
+  public static final String SELECT_FOR_VALIDATE_AND_AUTH =
+    "select id from collection where format = ?::content_container_type and id = ? and is_deleted = ? and (creator_id = ? or collaborator ?? ?)";
+  //  "select id, creator_id, publish_date, is_deleted, collaborator from collection where format = ?::content_container_type and id = ? and is_deleted = ?";
   // Fields and table name
   public static final String ASSESSMENT = "assessment";
   public static final String CREATOR_ID = "creator_id";
