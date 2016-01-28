@@ -5,7 +5,6 @@ import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
-import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityCULC;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
@@ -90,35 +89,6 @@ class DeleteAssessmentHandler implements DBHandler {
         map.forEach(errors::put);
         return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
       }
-    }
-    // If the assessment is present in CULC table, we do similar thing there, except for modifier_id as this field is not needed in CULC entity
-
-    LazyList<AJEntityCULC> culcToDeleteList = AJEntityCULC.findBySQL(
-      AJEntityCULC.SELECT_FOR_DELETE,
-      context.assessmentId(), false);
-    int numberOfEntries = culcToDeleteList.size();
-    if (numberOfEntries == 1) {
-      AJEntityCULC entityCULC = culcToDeleteList.get(0);
-      // We have a record and we have to delete it
-      entityCULC.setBoolean("is_deleted", true);
-      result = assessmentToDelete.save();
-      if (!result) {
-        LOGGER.error("Failed to delete CULC record for assessment '{}'", context.assessmentId());
-        if (entityCULC.hasErrors()) {
-          Map<String, String> map = entityCULC.errors();
-          JsonObject errors = new JsonObject();
-          map.forEach(errors::put);
-          return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
-        }
-      }
-    } else if (numberOfEntries > 1) {
-      // There are multiple records. Not sure which one we want to delete
-      LOGGER.error("Multiple CULC record for assessment '{}'", context.assessmentId());
-      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Multiple child records found. Cannot delete"),
-        ExecutionResult.ExecutionStatus.FAILED);
-    } else {
-      // Nothing to do. We do not have a live record.
-      LOGGER.debug("No record in CULC for assessment '{}' to be deleted", context.assessmentId());
     }
     return new ExecutionResult<>(
       MessageResponseFactory.createNoContentResponse("Deleted", EventBuilderFactory.getDeleteAssessmentEventBuilder(context.assessmentId())),
