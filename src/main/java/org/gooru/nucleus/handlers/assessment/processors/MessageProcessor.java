@@ -10,6 +10,8 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
+
 class MessageProcessor implements Processor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Processor.class);
@@ -68,18 +70,15 @@ class MessageProcessor implements Processor {
 
   private MessageResponse processAssessmentQuestionReorder() {
     ProcessorContext context = createContext();
-    if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
-      LOGGER.error("Invalid request, assessment id not available. Aborting");
+    if (!validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
-
     }
     return new RepoBuilder().buildAssessmentRepo(context).reorderQuestionInAssessment();
   }
 
   private MessageResponse processAssessmentCollaboratorUpdate() {
     ProcessorContext context = createContext();
-    if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
-      LOGGER.error("Invalid request, assessment id not available. Aborting");
+    if (!validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
     return new RepoBuilder().buildAssessmentRepo(context).updateCollaborator();
@@ -87,17 +86,15 @@ class MessageProcessor implements Processor {
 
   private MessageResponse processAssessmentAddQuestion() {
     ProcessorContext context = createContext();
-    if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
-      LOGGER.error("Invalid request, assessment id not available. Aborting");
-      return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
+    if (!validateContext(context, true)) {
+      return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment/question id");
     }
     return new RepoBuilder().buildAssessmentRepo(context).addQuestionToAssessment();
   }
 
   private MessageResponse processAssessmentDelete() {
     ProcessorContext context = createContext();
-    if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
-      LOGGER.error("Invalid request, assessment id not available. Aborting");
+    if (!validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
     return new RepoBuilder().buildAssessmentRepo(context).deleteAssessment();
@@ -105,8 +102,7 @@ class MessageProcessor implements Processor {
 
   private MessageResponse processAssessmentUpdate() {
     ProcessorContext context = createContext();
-    if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
-      LOGGER.error("Invalid request, assessment id not available. Aborting");
+    if (!validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
     return new RepoBuilder().buildAssessmentRepo(context).updateAssessment();
@@ -114,8 +110,7 @@ class MessageProcessor implements Processor {
 
   private MessageResponse processAssessmentGet() {
     ProcessorContext context = createContext();
-    if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
-      LOGGER.error("Invalid request, assessment id not available. Aborting");
+    if (validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
     return new RepoBuilder().buildAssessmentRepo(context).fetchAssessment();
@@ -141,10 +136,11 @@ class MessageProcessor implements Processor {
     }
 
     userId = ((JsonObject) message.body()).getString(MessageConstants.MSG_USER_ID);
-    if (userId == null) {
+    if (!validateUser(userId)) {
       LOGGER.error("Invalid user id passed. Not authorized.");
       return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse(), ExecutionResult.ExecutionStatus.FAILED);
     }
+
     prefs = ((JsonObject) message.body()).getJsonObject(MessageConstants.MSG_KEY_PREFS);
     request = ((JsonObject) message.body()).getJsonObject(MessageConstants.MSG_HTTP_BODY);
 
@@ -161,4 +157,54 @@ class MessageProcessor implements Processor {
     // All is well, continue processing
     return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
   }
+
+
+  private boolean validateContext(ProcessorContext context) {
+    return validateContext(context, false);
+  }
+
+  private boolean validateContext(ProcessorContext context, boolean shouldHaveQuestion) {
+    if (!validateId(context.assessmentId())) {
+      LOGGER.error("Invalid request, assessment id not available/incorrect format. Aborting");
+      return false;
+    }
+    if (shouldHaveQuestion) {
+      if (!validateId(context.questionId())) {
+        LOGGER.error("Invalid request, question id not available/incorrect format. Aborting");
+        return false;
+      }
+    }
+    return true;
+  }
+
+
+  private boolean validateUser(String userId) {
+    if (userId == null || userId.isEmpty()) {
+      return false;
+    } else if (userId.equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
+      return true;
+    } else {
+      return validateUuid(userId);
+    }
+  }
+
+  private boolean validateId(String id) {
+    if (id == null || id.isEmpty()) {
+      return false;
+    } else {
+      return validateUuid(userId);
+    }
+  }
+
+  private boolean validateUuid(String uuidString) {
+    try {
+      UUID uuid = UUID.fromString(uuidString);
+      return true;
+    } catch (IllegalArgumentException e) {
+      return false;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
 }
