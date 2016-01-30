@@ -181,19 +181,13 @@ class MessageProcessor implements Processor {
   private boolean validateUser(String userId) {
     if (userId == null || userId.isEmpty()) {
       return false;
-    } else if (userId.equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
-      return true;
     } else {
-      return validateUuid(userId);
+      return userId.equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS) || validateUuid(userId);
     }
   }
 
   private boolean validateId(String id) {
-    if (id == null || id.isEmpty()) {
-      return false;
-    } else {
-      return validateUuid(userId);
-    }
+    return !(id == null || id.isEmpty()) && validateUuid(id);
   }
 
   private boolean validateUuid(String uuidString) {
