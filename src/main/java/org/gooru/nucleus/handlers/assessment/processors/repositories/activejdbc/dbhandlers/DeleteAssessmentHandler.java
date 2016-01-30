@@ -50,7 +50,7 @@ class DeleteAssessmentHandler implements DBHandler {
     // Fetch the assessment where type is assessment and it is not deleted already and id is specified id
 
     LazyList<AJEntityAssessment> assessments =
-      AJEntityAssessment.findBySQL(AJEntityAssessment.VALIDATE_FOR_DELETE, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
+      AJEntityAssessment.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {
       LOGGER.warn("Assessment id: {} not present in DB", context.assessmentId());
@@ -101,7 +101,7 @@ class DeleteAssessmentHandler implements DBHandler {
 
   private boolean deleteContents() {
     try {
-      long deletedContentCount = Base.exec(AJEntityAssessment.DELETE_QUESTIONS, this.context.userId(), this.context.assessmentId());
+      long deletedContentCount = Base.exec(AJEntityAssessment.DELETE_CONTENTS_QUERY, this.context.userId(), this.context.assessmentId());
       LOGGER.info("Assessment '{}' deleted along with '{}' questions", context.assessmentId(), deletedContentCount);
       return true;
     } catch (DBException e) {

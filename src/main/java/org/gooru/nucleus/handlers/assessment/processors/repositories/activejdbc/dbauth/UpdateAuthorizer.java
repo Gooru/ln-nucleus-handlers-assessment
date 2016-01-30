@@ -43,7 +43,7 @@ class UpdateAuthorizer implements Authorizer<AJEntityAssessment> {
         return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
       } else {
         String collaborators = assessment.getString(AJEntityAssessment.COLLABORATOR);
-        if (collaborators != null && collaborators.isEmpty()) {
+        if (collaborators != null && !collaborators.isEmpty()) {
           JsonArray collaboratorsArray = new JsonArray(collaborators);
           if (collaboratorsArray.contains(context.userId())) {
             return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);

@@ -7,8 +7,6 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.ValidatorRegistry;
 import org.javalite.activejdbc.Model;
 import org.javalite.activejdbc.annotations.Table;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -42,22 +40,20 @@ public class AJEntityAssessment extends Model {
   public static final String UUID_TYPE = "uuid";
   public static final String JSONB_TYPE = "jsonb";
   // Queries used
-  public static final String VALIDATE_FOR_DELETE=
+  public static final String AUTHORIZER_QUERY =
     "select id, course_id, owner_id, creator_id, publish_date, collaborator from collection where format = ?::content_container_type and id = " +
       "?::uuid and is_deleted = ?";
-  public static final String DELETE_QUESTIONS =
-    "update content set is_deleted = true, modifier_id = ?::uuid where content_format = 'question'::content_format_type and collection_id = ?::uuid " +
-      "and is_deleted = false";
+  public static final String DELETE_CONTENTS_QUERY =
+    "update content set is_deleted = true, modifier_id = ?::uuid where content_format = 'question'::content_format_type and collection_id = ?::uuid" +
+      " and is_deleted = false";
   public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
-  public static final String SELECT_FOR_VALIDATE_AND_AUTH =
-    "select id from collection where format = ?::content_container_type and id = ?::uuid and is_deleted = ? and (creator_id = ?::uuid or " +
-      "collaborator ?? ?)";
+
   public static final Set<String> EDITABLE_FIELDS = new HashSet<>(
     Arrays.asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, AUDIENCE, METADATA, TAXONOMY, ORIENTATION, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE));
   public static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
   public static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(TITLE));
   public static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
-  private static final Logger LOGGER = LoggerFactory.getLogger(AJEntityAssessment.class);
+
   private static final Map<String, FieldValidator> validatorRegistry;
   private static final Map<String, FieldConverter> converterRegistry;
 

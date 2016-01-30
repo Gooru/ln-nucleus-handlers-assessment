@@ -44,7 +44,7 @@ class ReorderAssessmentHandler implements DBHandler {
     // Fetch the assessment where type is assessment and it is not deleted already and id is specified id
     LazyList<AJEntityAssessment> assessments = AJEntityAssessment
       .findBySQL(
-        AJEntityAssessment.SELECT_FOR_VALIDATE_AND_AUTH,
+        AJEntityAssessment.AUTHORIZER_QUERY,
         AJEntityAssessment.ASSESSMENT,
         context.assessmentId(), false, context.userId(),context.userId());
     // Assessment should be present in DB

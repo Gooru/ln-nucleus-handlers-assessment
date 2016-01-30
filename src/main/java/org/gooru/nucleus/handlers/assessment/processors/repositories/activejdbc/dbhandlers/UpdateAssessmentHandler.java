@@ -1,19 +1,21 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers;
 
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
+import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entitybuilders.EntityBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
-import org.javalite.activejdbc.Base;
 import org.javalite.activejdbc.LazyList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  * Created by ashish on 11/1/16.
@@ -61,7 +63,7 @@ class UpdateAssessmentHandler implements DBHandler {
     // Fetch the assessment where type is assessment and it is not deleted already and id is specified id
 
     LazyList<AJEntityAssessment> assessments =
-      AJEntityAssessment.findBySQL(AJEntityAssessment.VALIDATE_FOR_DELETE, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
+      AJEntityAssessment.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {
       LOGGER.warn("Assessment id: {} not present in DB", context.assessmentId());
@@ -74,8 +76,28 @@ class UpdateAssessmentHandler implements DBHandler {
 
   @Override
   public ExecutionResult<MessageResponse> executeRequest() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    // Update assessment, we need to set the provided values and user who is deleting it
+    AJEntityAssessment assessment = new AJEntityAssessment();
+    assessment.setId(context.assessmentId());
+    assessment.setModifierId(context.userId());
+    // Now auto populate is done, we need to setup the converter machinery
+    // FIXME: 30/1/16 : provide concrete implementation
+    new EntityBuilder<AJEntityAssessment>() {
+    }.build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
+
+    boolean result = assessment.save();
+    if (!result) {
+      LOGGER.error("Assessment with id '{}' failed to save", context.assessmentId());
+      if (assessment.hasErrors()) {
+        Map<String, String> map = assessment.errors();
+        JsonObject errors = new JsonObject();
+        map.forEach(errors::put);
+        return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
+      }
+    }
+    return new ExecutionResult<>(
+      MessageResponseFactory.createNoContentResponse("Updated", EventBuilderFactory.getDeleteAssessmentEventBuilder(context.assessmentId())),
+      ExecutionResult.ExecutionStatus.SUCCESSFUL);
   }
 
   @Override
@@ -83,33 +105,4 @@ class UpdateAssessmentHandler implements DBHandler {
     return false;
   }
 
-  private boolean authorized() {
-    String owner_id = assessment.getString(AJEntityAssessment.OWNER_ID);
-    String course_id = assessment.getString(AJEntityAssessment.COURSE_ID);
-    long authRecordCount;
-    // If this assessment is not part of course, then user should be either owner or collaborator on course
-    if (course_id != null) {
-      authRecordCount = Base.count(AJEntityAssessment.TABLE_COURSE, AJEntityAssessment.AUTH_FILTER, course_id, context.userId(), context.userId());
-      if (authRecordCount >= 1) {
-        return true;
-      }
-    } else {
-      // Assessment is not part of course, hence we need user to be either owner or collaborator on assessment
-      if (context.userId().equalsIgnoreCase(owner_id)) {
-        // Owner is fine
-        return true;
-      } else {
-        String collaborators = assessment.getString(AJEntityAssessment.COLLABORATOR);
-        if (collaborators == null || collaborators.isEmpty()) {
-          return false;
-        } else {
-          JsonArray collaboratorsArray = new JsonArray(collaborators);
-          if (collaboratorsArray.contains(context.userId())) {
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  }
 }
