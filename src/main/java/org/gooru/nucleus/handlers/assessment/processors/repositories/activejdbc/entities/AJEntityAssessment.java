@@ -26,6 +26,7 @@ public class AJEntityAssessment extends Model {
   public static final String TITLE = "title";
   public static final String THUMBNAIL = "thumbnail";
   public static final String LEARNING_OBJECTIVE = "learning_objective";
+  public static final String FORMAT = "format";
   public static final String AUDIENCE = "audience";
   public static final String METADATA = "metadata";
   public static final String TAXONOMY = "taxonomy";
@@ -39,6 +40,9 @@ public class AJEntityAssessment extends Model {
   public static final String TABLE_COURSE = "course";
   public static final String UUID_TYPE = "uuid";
   public static final String JSONB_TYPE = "jsonb";
+  public static final String ASSESSMENT_TYPE_NAME = "content_container_type";
+  public static final String ASSESSMENT_TYPE_VALUE = "assessment";
+  public static final String ORIENTATION_TYPE_NAME = "orientation_type";
   // Queries used
   public static final String AUTHORIZER_QUERY =
     "select id, course_id, owner_id, creator_id, publish_date, collaborator from collection where format = ?::content_container_type and id = " +
@@ -74,6 +78,8 @@ public class AJEntityAssessment extends Model {
     converterMap.put(CREATOR_ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
     converterMap.put(MODIFIER_ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
     converterMap.put(OWNER_ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
+    converterMap.put(FORMAT, (fieldValue -> FieldConverter.convertFieldToNamedType((String) fieldValue, ASSESSMENT_TYPE_NAME)));
+    converterMap.put(ORIENTATION, (fieldValue -> FieldConverter.convertFieldToNamedType((String) fieldValue, ORIENTATION_TYPE_NAME)));
 
     return Collections.unmodifiableMap(converterMap);
   }
@@ -86,7 +92,6 @@ public class AJEntityAssessment extends Model {
     validatorMap.put(AUDIENCE, FieldValidator::validateJsonIfPresent);
     validatorMap.put(METADATA, FieldValidator::validateJsonIfPresent);
     validatorMap.put(TAXONOMY, FieldValidator::validateJsonIfPresent);
-    // FIXME: 29/1/16 Orientation validator needs fixing
     validatorMap.put(ORIENTATION, (value) -> (value != null && value instanceof String &&
       (ORIENTATION_STUDENT.equalsIgnoreCase((String) value) || ORIENTATION_TEACHER.equalsIgnoreCase((String) value))));
     validatorMap.put(URL, (value) -> FieldValidator.validateStringIfPresent(value, 2000));
@@ -170,6 +175,15 @@ public class AJEntityAssessment extends Model {
       this.set(ID, fc.convertField(id));
     } else {
       this.set(ID, id);
+    }
+  }
+
+  public void setTypeAssessment() {
+    FieldConverter fc = converterRegistry.get(FORMAT);
+    if (fc != null) {
+      this.set(FORMAT, fc.convertField(ASSESSMENT_TYPE_VALUE));
+    } else {
+      this.set(FORMAT, ASSESSMENT_TYPE_VALUE);
     }
   }
 

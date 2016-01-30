@@ -76,12 +76,10 @@ class UpdateAssessmentHandler implements DBHandler {
 
   @Override
   public ExecutionResult<MessageResponse> executeRequest() {
-    // Update assessment, we need to set the provided values and user who is deleting it
     AJEntityAssessment assessment = new AJEntityAssessment();
     assessment.setId(context.assessmentId());
     assessment.setModifierId(context.userId());
     // Now auto populate is done, we need to setup the converter machinery
-    // FIXME: 30/1/16 : provide concrete implementation
     new EntityBuilder<AJEntityAssessment>() {
     }.build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
 

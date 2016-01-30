@@ -33,4 +33,15 @@ public interface FieldConverter {
       return null;
     }
   }
+
+  static PGobject convertFieldToNamedType(String value, String type) {
+    PGobject pgObject = new PGobject();
+    pgObject.setType(type);
+    try {
+      pgObject.setValue(value);
+      return pgObject;
+    } catch (SQLException e) {
+      return null;
+    }
+  }
 }
