@@ -39,7 +39,7 @@ public interface FieldValidator {
   static boolean validateDeepJsonArrayIfPresent(Object o, FieldValidator fv) {
     if (o == null) {
       return true;
-    } else if (!(o instanceof JsonArray) || !((JsonArray) o).isEmpty()) {
+    } else if (!(o instanceof JsonArray) || ((JsonArray) o).isEmpty()) {
       return false;
     } else {
       JsonArray array = (JsonArray) o;

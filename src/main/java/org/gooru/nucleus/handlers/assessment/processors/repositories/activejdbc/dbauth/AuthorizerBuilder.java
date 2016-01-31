@@ -3,7 +3,6 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
-import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 
 /**
  * Created by ashish on 29/1/16.
@@ -16,6 +15,10 @@ public class AuthorizerBuilder {
 
   public Authorizer<AJEntityAssessment> buildDeleteAuthorizer(ProcessorContext context) {
     return new DeleteAuthorizer(context);
+  }
+
+  public Authorizer<AJEntityAssessment> buildUpdateCollaboratorAuthorizer(ProcessorContext context) {
+    return new UpdateCollaboratorAuthorizer(context);
   }
 
   // Creation is only allowed outside of any context and hence it has got no bearing on course container, which does not exist as our API call for

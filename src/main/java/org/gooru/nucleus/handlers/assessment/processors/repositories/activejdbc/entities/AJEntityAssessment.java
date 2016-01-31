@@ -80,6 +80,7 @@ public class AJEntityAssessment extends Model {
     converterMap.put(OWNER_ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
     converterMap.put(FORMAT, (fieldValue -> FieldConverter.convertFieldToNamedType((String) fieldValue, ASSESSMENT_TYPE_NAME)));
     converterMap.put(ORIENTATION, (fieldValue -> FieldConverter.convertFieldToNamedType((String) fieldValue, ORIENTATION_TYPE_NAME)));
+    converterMap.put(COLLABORATOR, (fieldValue -> FieldConverter.convertFieldToJson(fieldValue.toString())));
 
     return Collections.unmodifiableMap(converterMap);
   }

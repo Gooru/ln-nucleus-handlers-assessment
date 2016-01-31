@@ -1,6 +1,5 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth;
 
-import io.vertx.core.json.JsonArray;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
@@ -12,9 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by ashish on 29/1/16.
+ * Created by ashish on 31/1/16.
  */
-class UpdateAuthorizer implements Authorizer<AJEntityAssessment> {
+public class UpdateCollaboratorAuthorizer  implements Authorizer<AJEntityAssessment> {
 
   private final ProcessorContext context;
   private final Logger LOGGER = LoggerFactory.getLogger(Authorizer.class);
@@ -37,26 +36,18 @@ class UpdateAuthorizer implements Authorizer<AJEntityAssessment> {
           ExecutionResult.ExecutionStatus.FAILED);
       }
     } else {
-      // Assessment is not part of course, hence we need user to be either owner or collaborator on assessment
+      // Assessment is not part of course, hence we need user to be owner, collaborator on assessment will not help
       if (context.userId().equalsIgnoreCase(owner_id)) {
         // Owner is fine
         return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
-      } else {
-        String collaborators = assessment.getString(AJEntityAssessment.COLLABORATOR);
-        if (collaborators != null && !collaborators.isEmpty()) {
-          JsonArray collaboratorsArray = new JsonArray(collaborators);
-          if (collaboratorsArray.contains(context.userId())) {
-            return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
-          }
-        }
       }
     }
-    LOGGER.warn("User: '{}' is not owner/collaborator of assessment: '{}' or owner/collaborator on course", context.userId(), context.assessmentId());
+    LOGGER.warn("User: '{}' is not owner of assessment: '{}' or owner/collaborator on course", context.userId(), context.assessmentId());
     return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
   }
 
 
-  UpdateAuthorizer(ProcessorContext context) {
+  UpdateCollaboratorAuthorizer(ProcessorContext context) {
     this.context = context;
   }
 }
