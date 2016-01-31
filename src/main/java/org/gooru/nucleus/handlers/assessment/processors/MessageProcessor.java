@@ -124,7 +124,7 @@ class MessageProcessor implements Processor {
 
   private ProcessorContext createContext() {
     String assessmentId = message.headers().get(MessageConstants.ASSESSMENT_ID);
-    String questionId = message.headers().get(MessageConstants.QUESTION_ID);
+    String questionId = request.getString(MessageConstants.ID);
 
     return new ProcessorContext(userId, prefs, request, assessmentId, questionId);
   }
@@ -179,11 +179,7 @@ class MessageProcessor implements Processor {
 
 
   private boolean validateUser(String userId) {
-    if (userId == null || userId.isEmpty()) {
-      return false;
-    } else {
-      return userId.equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS) || validateUuid(userId);
-    }
+    return !(userId == null || userId.isEmpty()) && (userId.equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS) || validateUuid(userId));
   }
 
   private boolean validateId(String id) {

@@ -17,6 +17,10 @@ class DeleteAuthorizer implements Authorizer<AJEntityAssessment> {
   private final ProcessorContext context;
   private final Logger LOGGER = LoggerFactory.getLogger(Authorizer.class);
 
+  DeleteAuthorizer(ProcessorContext context) {
+    this.context = context;
+  }
+
   @Override
   public ExecutionResult<MessageResponse> authorize(AJEntityAssessment assessment) {
     String owner_id = assessment.getString(AJEntityAssessment.OWNER_ID);
@@ -43,9 +47,5 @@ class DeleteAuthorizer implements Authorizer<AJEntityAssessment> {
     }
     LOGGER.warn("User: '{}' is not owner of assessment: '{}' or owner/collaborator on course", context.userId(), context.assessmentId());
     return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
-  }
-
-  DeleteAuthorizer(ProcessorContext context) {
-    this.context = context;
   }
 }

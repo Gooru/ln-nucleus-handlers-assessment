@@ -43,14 +43,14 @@ public class AJAssessmentRepo implements AssessmentRepo {
   }
 
   @Override
-  public MessageResponse updateCollaborator() {
-    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildUpdateCollaboratorHandler(context));
-  }
-  
-  @Override
   public MessageResponse addQuestionToAssessment() {
     return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildAddQuestionToAssessmentHandler(context));
 
+  }
+
+  @Override
+  public MessageResponse updateCollaborator() {
+    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildUpdateCollaboratorHandler(context));
   }
 
 }

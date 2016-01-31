@@ -21,8 +21,8 @@ import java.util.Map;
  * Created by ashish on 11/1/16.
  */
 class UpdateCollaboratorHandler implements DBHandler {
-  private final ProcessorContext context;
   private static final Logger LOGGER = LoggerFactory.getLogger(UpdateCollaboratorHandler.class);
+  private final ProcessorContext context;
 
   public UpdateCollaboratorHandler(ProcessorContext context) {
     this.context = context;

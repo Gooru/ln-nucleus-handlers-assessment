@@ -7,10 +7,10 @@ public interface ValidatorRegistry {
   FieldValidator lookupValidator(String fieldName);
 
   default FieldValidator noopSuccessValidator(String fieldName) {
-    return (n) -> { return true; };
+    return (n) -> true;
   }
 
   default FieldValidator noopFailedValidator(String fieldName) {
-    return (n) -> { return false; };
+    return (n) -> false;
   }
 }

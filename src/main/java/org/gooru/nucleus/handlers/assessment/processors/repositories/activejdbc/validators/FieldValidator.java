@@ -9,8 +9,6 @@ import java.util.UUID;
  * Created by ashish on 28/1/16.
  */
 public interface FieldValidator {
-  boolean validateField(Object value);
-
   static boolean validateStringIfPresent(Object o, int len) {
     return o == null || o instanceof String && !((String) o).isEmpty() && ((String) o).length() < len;
   }
@@ -26,7 +24,6 @@ public interface FieldValidator {
   static boolean validateJson(Object o) {
     return !(o == null || !(o instanceof JsonObject) || ((JsonObject) o).isEmpty());
   }
-
 
   static boolean validateJsonArrayIfPresent(Object o) {
     return o == null || o instanceof JsonArray && !((JsonArray) o).isEmpty();
@@ -85,4 +82,6 @@ public interface FieldValidator {
   static boolean validateUuidIfPresent(String o) {
     return o == null || validateUuid(o);
   }
+
+  boolean validateField(Object value);
 }

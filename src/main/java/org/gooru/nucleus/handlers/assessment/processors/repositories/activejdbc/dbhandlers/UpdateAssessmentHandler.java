@@ -21,8 +21,8 @@ import java.util.Map;
  * Created by ashish on 11/1/16.
  */
 class UpdateAssessmentHandler implements DBHandler {
-  private final ProcessorContext context;
   private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAssessmentHandler.class);
+  private final ProcessorContext context;
   private AJEntityAssessment assessment;
 
   public UpdateAssessmentHandler(ProcessorContext context) {
@@ -44,7 +44,7 @@ class UpdateAssessmentHandler implements DBHandler {
     }
     // Payload should not be empty
     if (context.request() == null || context.request().isEmpty()) {
-      LOGGER.warn("Empty payload supplied to upload assessment");
+      LOGGER.warn("Empty payload supplied to edit assessment");
       return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
     }
     // Our validators should certify this

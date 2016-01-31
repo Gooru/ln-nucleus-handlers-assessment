@@ -20,8 +20,8 @@ import java.util.Map;
  * Created by ashish on 11/1/16.
  */
 class CreateAssessmentHandler implements DBHandler {
-  private final ProcessorContext context;
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateAssessmentHandler.class);
+  private final ProcessorContext context;
   private AJEntityAssessment assessment;
 
 

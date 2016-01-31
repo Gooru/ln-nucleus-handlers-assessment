@@ -38,6 +38,7 @@ public class AJEntityAssessment extends Model {
   public static final String QUESTION = "question";
   public static final String COURSE_ID = "course_id";
   public static final String TABLE_COURSE = "course";
+  public static final String TABLE_QUESTION = "content";
   public static final String UUID_TYPE = "uuid";
   public static final String JSONB_TYPE = "jsonb";
   public static final String ASSESSMENT_TYPE_NAME = "content_container_type";
@@ -51,11 +52,19 @@ public class AJEntityAssessment extends Model {
     "update content set is_deleted = true, modifier_id = ?::uuid where content_format = 'question'::content_format_type and collection_id = ?::uuid" +
       " and is_deleted = false";
   public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
+  public static final String QUESTION_FOR_ADD_FILTER =
+    "id = ?::uuid and is_deleted = false and content_format = 'question'::content_format_type and course_id is null and collection_id is null and " +
+      "creator_id = ?::uuid";
+  public static final String ADD_QUESTION_QUERY =
+    "update content set collection_id = ?::uuid, modifier_id = ?::uuid, updated_at = now(), sequence_id = ? where id = ?::uuid and is_deleted = " +
+      "false and content_format = 'question'::content_format_type and course_id is null and collection_id is null and creator_id = ?::uuid";
+  public static final String MAX_QUESTION_SEQUENCE_QUERY = "select max(sequence_id) from content where collection_id = ?::uuid";
 
   public static final Set<String> EDITABLE_FIELDS = new HashSet<>(
     Arrays.asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, AUDIENCE, METADATA, TAXONOMY, ORIENTATION, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE));
   public static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
   public static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(TITLE));
+  public static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Arrays.asList(ID));
   public static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
 
   private static final Map<String, FieldValidator> validatorRegistry;
@@ -87,6 +96,7 @@ public class AJEntityAssessment extends Model {
 
   private static Map<String, FieldValidator> initializeValidators() {
     Map<String, FieldValidator> validatorMap = new HashMap<>();
+    validatorMap.put(ID, (FieldValidator::validateUuid));
     validatorMap.put(TITLE, (value) -> FieldValidator.validateString(value, 5000));
     validatorMap.put(THUMBNAIL, (value) -> FieldValidator.validateStringIfPresent(value, 2000));
     validatorMap.put(LEARNING_OBJECTIVE, (value) -> FieldValidator.validateStringIfPresent(value, 20000));
@@ -109,17 +119,16 @@ public class AJEntityAssessment extends Model {
   public static FieldSelector createFieldSelector() {
     return new FieldSelector() {
       @Override
+      public Set<String> allowedFields() {
+        return Collections.unmodifiableSet(CREATABLE_FIELDS);
+      }      @Override
       public Set<String> mandatoryFields() {
         return Collections.unmodifiableSet(MANDATORY_FIELDS);
       }
 
-      @Override
-      public Set<String> allowedFields() {
-        return Collections.unmodifiableSet(CREATABLE_FIELDS);
-      }
+
     };
   }
-
 
   public static FieldSelector editCollaboratorFieldSelector() {
     return new FieldSelector() {
@@ -133,6 +142,10 @@ public class AJEntityAssessment extends Model {
         return Collections.unmodifiableSet(COLLABORATOR_FIELDS);
       }
     };
+  }
+
+  public static FieldSelector addQuestionFieldSelector() {
+    return () -> Collections.unmodifiableSet(ADD_QUESTION_FIELDS);
   }
 
   public static ValidatorRegistry getValidatorRegistry() {

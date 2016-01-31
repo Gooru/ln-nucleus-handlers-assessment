@@ -12,14 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by ashish on 29/1/16.
+ * Created by ashish on 31/1/16.
  */
-class UpdateAuthorizer implements Authorizer<AJEntityAssessment> {
-
+public class AddQuestionToAssessmentAuthorizer implements Authorizer<AJEntityAssessment> {
   private final ProcessorContext context;
   private final Logger LOGGER = LoggerFactory.getLogger(Authorizer.class);
 
-  UpdateAuthorizer(ProcessorContext context) {
+  public AddQuestionToAssessmentAuthorizer(ProcessorContext context) {
     this.context = context;
   }
 
@@ -33,29 +32,44 @@ class UpdateAuthorizer implements Authorizer<AJEntityAssessment> {
       try {
         authRecordCount = Base.count(AJEntityAssessment.TABLE_COURSE, AJEntityAssessment.AUTH_FILTER, course_id, context.userId(), context.userId());
         if (authRecordCount >= 1) {
-          return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
+          return authorizeForQuestion(assessment);
         }
       } catch (DBException e) {
         LOGGER.error("Error checking authorization for update for Assessment '{}' for course '{}'", context.assessmentId(), course_id, e);
-        return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse("Not able to delete questions for this assessment"),
+        return new ExecutionResult<>(
+          MessageResponseFactory.createInternalErrorResponse("Not able to authorize user for adding question to this assessment"),
           ExecutionResult.ExecutionStatus.FAILED);
       }
     } else {
       // Assessment is not part of course, hence we need user to be either owner or collaborator on assessment
       if (context.userId().equalsIgnoreCase(owner_id)) {
         // Owner is fine
-        return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
+        return authorizeForQuestion(assessment);
       } else {
         String collaborators = assessment.getString(AJEntityAssessment.COLLABORATOR);
         if (collaborators != null && !collaborators.isEmpty()) {
           JsonArray collaboratorsArray = new JsonArray(collaborators);
           if (collaboratorsArray.contains(context.userId())) {
-            return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
+            return authorizeForQuestion(assessment);
           }
         }
       }
     }
     LOGGER.warn("User: '{}' is not owner/collaborator of assessment: '{}' or owner/collaborator on course", context.userId(), context.assessmentId());
     return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
+  }
+
+  private ExecutionResult<MessageResponse> authorizeForQuestion(AJEntityAssessment assessment) {
+    //           return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
+    try {
+      long count = Base.count(AJEntityAssessment.TABLE_QUESTION, AJEntityAssessment.QUESTION_FOR_ADD_FILTER, context.questionId(), context.userId());
+      if (count == 1) {
+        return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
+      }
+    } catch (DBException e) {
+      LOGGER.error("Error querying question '{}' availability for associating in assessment '{}'", context.questionId(), context.assessmentId(), e);
+    }
+    return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Question not available for association"),
+      ExecutionResult.ExecutionStatus.FAILED);
   }
 }

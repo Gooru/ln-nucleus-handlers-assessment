@@ -13,10 +13,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by ashish on 31/1/16.
  */
-public class UpdateCollaboratorAuthorizer  implements Authorizer<AJEntityAssessment> {
+public class UpdateCollaboratorAuthorizer implements Authorizer<AJEntityAssessment> {
 
   private final ProcessorContext context;
   private final Logger LOGGER = LoggerFactory.getLogger(Authorizer.class);
+
+  UpdateCollaboratorAuthorizer(ProcessorContext context) {
+    this.context = context;
+  }
 
   @Override
   public ExecutionResult<MessageResponse> authorize(AJEntityAssessment assessment) {
@@ -44,10 +48,5 @@ public class UpdateCollaboratorAuthorizer  implements Authorizer<AJEntityAssessm
     }
     LOGGER.warn("User: '{}' is not owner of assessment: '{}' or owner/collaborator on course", context.userId(), context.assessmentId());
     return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
-  }
-
-
-  UpdateCollaboratorAuthorizer(ProcessorContext context) {
-    this.context = context;
   }
 }

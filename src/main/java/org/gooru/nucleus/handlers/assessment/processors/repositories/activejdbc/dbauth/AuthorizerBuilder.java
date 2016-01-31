@@ -27,4 +27,8 @@ public class AuthorizerBuilder {
   public Authorizer<AJEntityAssessment> buildCreateAuthorizer(ProcessorContext context) {
     return model -> new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
   }
+
+  public Authorizer<AJEntityAssessment> buildAddQuestionToAssessmentAuthorizer(ProcessorContext context) {
+    return new AddQuestionToAssessmentAuthorizer(context);
+  }
 }

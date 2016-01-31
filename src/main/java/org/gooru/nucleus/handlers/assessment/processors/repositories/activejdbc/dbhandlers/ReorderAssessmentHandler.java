@@ -1,8 +1,11 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers;
 
+import io.vertx.core.json.JsonObject;
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
@@ -14,8 +17,9 @@ import org.slf4j.LoggerFactory;
  * Created by ashish on 11/1/16.
  */
 class ReorderAssessmentHandler implements DBHandler {
-  private final ProcessorContext context;
   private static final Logger LOGGER = LoggerFactory.getLogger(ReorderAssessmentHandler.class);
+  private final ProcessorContext context;
+  private AJEntityAssessment assessment;
 
   public ReorderAssessmentHandler(ProcessorContext context) {
     this.context = context;
@@ -31,10 +35,22 @@ class ReorderAssessmentHandler implements DBHandler {
     }
     // The user should not be anonymous
     if (context.userId() == null || context.userId().isEmpty() || context.userId().equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
-      LOGGER.warn("Anonymous user attempting to delete assessment");
+      LOGGER.warn("Anonymous user attempting to reorder assessment");
       return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
     }
-
+    // Payload should not be empty
+    if (context.request() == null || context.request().isEmpty()) {
+      LOGGER.warn("Empty payload supplied to reorder assessment");
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
+    }
+    // Our validators should certify this
+    // FIXME: 31/1/16 The validator needs to be fixed for the reorder payload
+    JsonObject errors = new PayloadValidator() {
+    }.validatePayload(context.request(), AJEntityAssessment.editFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+    if (errors != null && !errors.isEmpty()) {
+      LOGGER.warn("Validation errors for request");
+      return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
+    }
     return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
 
   }
@@ -42,11 +58,9 @@ class ReorderAssessmentHandler implements DBHandler {
   @Override
   public ExecutionResult<MessageResponse> validateRequest() {
     // Fetch the assessment where type is assessment and it is not deleted already and id is specified id
-    LazyList<AJEntityAssessment> assessments = AJEntityAssessment
-      .findBySQL(
-        AJEntityAssessment.AUTHORIZER_QUERY,
-        AJEntityAssessment.ASSESSMENT,
-        context.assessmentId(), false, context.userId(),context.userId());
+
+    LazyList<AJEntityAssessment> assessments =
+      AJEntityAssessment.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {
       LOGGER.warn("Assessment id: {} not present in DB", context.assessmentId());
@@ -54,23 +68,10 @@ class ReorderAssessmentHandler implements DBHandler {
         ExecutionResult.ExecutionStatus.FAILED);
     }
     AJEntityAssessment assessment = assessments.get(0);
-    if (true) return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse("This is awesome"),
-      ExecutionResult.ExecutionStatus.FAILED);
-    // The user should be owner or collaborator of the assessment
-    // FIXME: 21/1/16 : Need to verify if the user is part of collaborator or owner of course where this assessment may be contained
-    // PGobject pGobject =  (PGobject) assessment.get(AJEntityAssessment.COLLABORATOR);
-    // JsonArray array = new JsonArray(pGobject.getValue());
-    // System.out.println(array);
-    if (!(assessment.getString(AJEntityAssessment.CREATOR_ID)).equalsIgnoreCase(context.userId())) {
-      LOGGER.warn("User: '{}' is not owner of assessment", context.userId());
-      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
-    }
-    // This should not be published
-    if (assessment.getDate(AJEntityAssessment.PUBLISH_DATE) != null) {
-      LOGGER.warn("Assessment with id '{}' is published assessment so should not be deleted", context.assessmentId());
-      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Assessment is published"), ExecutionResult.ExecutionStatus.FAILED);
-    }
-    return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
+    // TODO: 31/1/16 : Validate the questions sent in payload are existing in DB
+
+
+    return new AuthorizerBuilder().buildUpdateAuthorizer(this.context).authorize(assessment);
   }
 
   @Override

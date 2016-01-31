@@ -8,8 +8,6 @@ import java.sql.SQLException;
  * Created by ashish on 28/1/16.
  */
 public interface FieldConverter {
-  PGobject convertField(Object fieldValue);
-
   static PGobject convertFieldToJson(String value) {
     String JSONB_TYPE = "jsonb";
     PGobject pgObject = new PGobject();
@@ -44,4 +42,6 @@ public interface FieldConverter {
       return null;
     }
   }
+
+  PGobject convertField(Object fieldValue);
 }

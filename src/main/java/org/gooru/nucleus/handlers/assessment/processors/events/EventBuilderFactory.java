@@ -10,7 +10,7 @@ public class EventBuilderFactory {
   private static final String EVT_ASSESSMENT_CREATE = "event.assessment.create";
   private static final String EVT_ASSESSMENT_UPDATE = "event.assessment.update";
   private static final String EVT_ASSESSMENT_DELETE = "event.assessment.delete";
-  private static final String EVT_ASSESSMENT_COPY = "event.assessment.copy";
+  private static final String EVT_ASSESSMENT_QUESTION_ADD = "event.assessment.question.add";
   private static final String EVENT_NAME = "event.name";
   private static final String EVENT_BODY = "event.body";
   private static final String ASSESSMENT_ID = "id";
@@ -27,7 +27,7 @@ public class EventBuilderFactory {
     return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_UPDATE).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 
-  public static EventBuilder getCopyAssessmentEventBuilder(String assessmentId) {
-    return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_COPY).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
+  public static EventBuilder getAddQuestionToAssessmentEventBuilder(String assessmentId) {
+    return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_QUESTION_ADD).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 }
