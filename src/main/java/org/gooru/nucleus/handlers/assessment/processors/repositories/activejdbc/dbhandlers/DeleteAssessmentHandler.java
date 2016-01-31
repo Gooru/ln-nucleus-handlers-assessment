@@ -6,6 +6,7 @@ import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
@@ -101,7 +102,7 @@ class DeleteAssessmentHandler implements DBHandler {
 
   private boolean deleteContents() {
     try {
-      long deletedContentCount = Base.exec(AJEntityAssessment.DELETE_CONTENTS_QUERY, this.context.userId(), this.context.assessmentId());
+      long deletedContentCount = Base.exec(AJEntityQuestion.DELETE_CONTENTS_QUERY, this.context.userId(), this.context.assessmentId());
       LOGGER.info("Assessment '{}' deleted along with '{}' questions", context.assessmentId(), deletedContentCount);
       return true;
     } catch (DBException e) {

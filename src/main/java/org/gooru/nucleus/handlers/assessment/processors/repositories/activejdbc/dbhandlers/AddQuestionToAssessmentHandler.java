@@ -6,6 +6,7 @@ import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
@@ -15,6 +16,8 @@ import org.javalite.activejdbc.DBException;
 import org.javalite.activejdbc.LazyList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  * Created by ashish on 11/1/16.
@@ -70,27 +73,25 @@ class AddQuestionToAssessmentHandler implements DBHandler {
       return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse("assessment id: " + context.assessmentId()),
         ExecutionResult.ExecutionStatus.FAILED);
     }
-    AJEntityAssessment assessment = assessments.get(0);
-    return new AuthorizerBuilder().buildAddQuestionToAssessmentAuthorizer(this.context).authorize(assessment);
+    this.assessment = assessments.get(0);
+    return new AuthorizerBuilder().buildAddQuestionToAssessmentAuthorizer(this.context).authorize(this.assessment);
   }
 
   @Override
   public ExecutionResult<MessageResponse> executeRequest() {
     try {
-      Object sequence = Base.firstCell(AJEntityAssessment.MAX_QUESTION_SEQUENCE_QUERY, this.context.assessmentId());
+      Object sequence = Base.firstCell(AJEntityQuestion.MAX_QUESTION_SEQUENCE_QUERY, this.context.assessmentId());
       int sequenceId = 1;
       if (sequence != null) {
         int currentSequence = Integer.valueOf(sequence.toString());
         sequenceId = currentSequence + 1;
       }
       long count = Base
-        .exec(AJEntityAssessment.ADD_QUESTION_QUERY, this.context.assessmentId(), this.context.userId(), sequenceId, this.context.questionId(),
+        .exec(AJEntityQuestion.ADD_QUESTION_QUERY, this.context.assessmentId(), this.context.userId(), sequenceId, this.context.questionId(),
           this.context.userId());
 
       if (count == 1) {
-        return new ExecutionResult<>(MessageResponseFactory
-          .createNoContentResponse("Question added", EventBuilderFactory.getAddQuestionToAssessmentEventBuilder(context.assessmentId())),
-          ExecutionResult.ExecutionStatus.SUCCESSFUL);
+        return updateGrading();
       }
       LOGGER.error("Something is wrong. Adding question '{}' to assessment '{}' updated '{}' rows", this.context.questionId(),
         this.context.assessmentId(), count);
@@ -105,5 +106,35 @@ class AddQuestionToAssessmentHandler implements DBHandler {
   @Override
   public boolean handlerReadOnly() {
     return false;
+  }
+
+  private ExecutionResult<MessageResponse> updateGrading() {
+    String currentGrading = this.assessment.getString(AJEntityAssessment.GRADING);
+    if (!currentGrading.equalsIgnoreCase(AJEntityAssessment.GRADING_TYPE_TEACHER)) {
+      try {
+        long count = Base.count(AJEntityQuestion.TABLE_QUESTION, AJEntityQuestion.OPEN_ENDED_QUESTION_FILTER, this.context.assessmentId());
+        if (count > 0) {
+          this.assessment.setGrading(AJEntityAssessment.GRADING_TYPE_TEACHER);
+          if (!this.assessment.save()) {
+            LOGGER.error("Assessment '{}' grading type change failed", this.context.assessmentId());
+            if (this.assessment.hasErrors()) {
+              Map<String, String> map = assessment.errors();
+              JsonObject errors = new JsonObject();
+              map.forEach(errors::put);
+              return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
+            }
+          }
+        }
+      } catch (DBException e) {
+        LOGGER.error("Assessment '{}' grading type change lookup failed", this.context.assessmentId(), e);
+        return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse("Assessment grade change failed"),
+          ExecutionResult.ExecutionStatus.FAILED);
+      }
+    }
+
+    return new ExecutionResult<>(MessageResponseFactory
+      .createNoContentResponse("Question added", EventBuilderFactory.getAddQuestionToAssessmentEventBuilder(context.assessmentId())),
+      ExecutionResult.ExecutionStatus.SUCCESSFUL);
+
   }
 }

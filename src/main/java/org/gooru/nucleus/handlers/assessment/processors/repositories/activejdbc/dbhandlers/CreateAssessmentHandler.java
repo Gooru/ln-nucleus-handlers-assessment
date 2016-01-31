@@ -65,6 +65,7 @@ class CreateAssessmentHandler implements DBHandler {
     assessment.setOwnerId(context.userId());
     assessment.setCreatorId(context.userId());
     assessment.setTypeAssessment();
+    assessment.setGrading(AJEntityAssessment.GRADING_TYPE_SYSTEM);
     // Now auto populate is done, we need to setup the converter machinery
     new EntityBuilder<AJEntityAssessment>() {
     }.build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());

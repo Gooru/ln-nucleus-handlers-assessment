@@ -3,6 +3,7 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 import io.vertx.core.json.JsonArray;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
@@ -62,7 +63,7 @@ public class AddQuestionToAssessmentAuthorizer implements Authorizer<AJEntityAss
   private ExecutionResult<MessageResponse> authorizeForQuestion(AJEntityAssessment assessment) {
     //           return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
     try {
-      long count = Base.count(AJEntityAssessment.TABLE_QUESTION, AJEntityAssessment.QUESTION_FOR_ADD_FILTER, context.questionId(), context.userId());
+      long count = Base.count(AJEntityQuestion.TABLE_QUESTION, AJEntityQuestion.QUESTION_FOR_ADD_FILTER, context.questionId(), context.userId());
       if (count == 1) {
         return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
       }

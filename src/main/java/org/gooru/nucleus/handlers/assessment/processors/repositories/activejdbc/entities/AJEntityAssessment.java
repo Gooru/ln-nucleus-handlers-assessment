@@ -35,30 +35,24 @@ public class AJEntityAssessment extends Model {
   public static final String LOGIN_REQUIRED = "login_required";
   public static final String VISIBLE_ON_PROFILE = "visible_on_profile";
   public static final String COLLABORATOR = "collaborator";
-  public static final String QUESTION = "question";
   public static final String COURSE_ID = "course_id";
+  public static final String GRADING = "grading";
   public static final String TABLE_COURSE = "course";
-  public static final String TABLE_QUESTION = "content";
   public static final String UUID_TYPE = "uuid";
   public static final String JSONB_TYPE = "jsonb";
   public static final String ASSESSMENT_TYPE_NAME = "content_container_type";
   public static final String ASSESSMENT_TYPE_VALUE = "assessment";
   public static final String ORIENTATION_TYPE_NAME = "orientation_type";
+  public static final String GRADING_TYPE_NAME = "grading_type";
+  public static final String GRADING_TYPE_TEACHER = "teacher";
+  public static final String GRADING_TYPE_SYSTEM = "system";
+
   // Queries used
   public static final String AUTHORIZER_QUERY =
-    "select id, course_id, owner_id, creator_id, publish_date, collaborator from collection where format = ?::content_container_type and id = " +
-      "?::uuid and is_deleted = ?";
-  public static final String DELETE_CONTENTS_QUERY =
-    "update content set is_deleted = true, modifier_id = ?::uuid where content_format = 'question'::content_format_type and collection_id = ?::uuid" +
-      " and is_deleted = false";
+    "select id, course_id, owner_id, creator_id, publish_date, collaborator, grading from collection where format = ?::content_container_type and " +
+      "id = ?::uuid and is_deleted = ?";
+
   public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
-  public static final String QUESTION_FOR_ADD_FILTER =
-    "id = ?::uuid and is_deleted = false and content_format = 'question'::content_format_type and course_id is null and collection_id is null and " +
-      "creator_id = ?::uuid";
-  public static final String ADD_QUESTION_QUERY =
-    "update content set collection_id = ?::uuid, modifier_id = ?::uuid, updated_at = now(), sequence_id = ? where id = ?::uuid and is_deleted = " +
-      "false and content_format = 'question'::content_format_type and course_id is null and collection_id is null and creator_id = ?::uuid";
-  public static final String MAX_QUESTION_SEQUENCE_QUERY = "select max(sequence_id) from content where collection_id = ?::uuid";
 
   public static final Set<String> EDITABLE_FIELDS = new HashSet<>(
     Arrays.asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, AUDIENCE, METADATA, TAXONOMY, ORIENTATION, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE));
@@ -90,6 +84,7 @@ public class AJEntityAssessment extends Model {
     converterMap.put(FORMAT, (fieldValue -> FieldConverter.convertFieldToNamedType((String) fieldValue, ASSESSMENT_TYPE_NAME)));
     converterMap.put(ORIENTATION, (fieldValue -> FieldConverter.convertFieldToNamedType((String) fieldValue, ORIENTATION_TYPE_NAME)));
     converterMap.put(COLLABORATOR, (fieldValue -> FieldConverter.convertFieldToJson(fieldValue.toString())));
+    converterMap.put(GRADING, (fieldValue -> FieldConverter.convertFieldToNamedType((String) fieldValue, GRADING_TYPE_NAME)));
 
     return Collections.unmodifiableMap(converterMap);
   }
@@ -189,6 +184,15 @@ public class AJEntityAssessment extends Model {
       this.set(ID, fc.convertField(id));
     } else {
       this.set(ID, id);
+    }
+  }
+
+  public void setGrading(String grading) {
+    FieldConverter fc = converterRegistry.get(GRADING);
+    if (fc != null) {
+      this.set(GRADING, fc.convertField(grading));
+    } else {
+      this.set(ID, grading);
     }
   }
 
