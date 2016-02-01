@@ -60,7 +60,7 @@ class FetchAssessmentHandler implements DBHandler {
     JsonObject response =
       new JsonObject(new JsonFormatterBuilder().buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST).toJson(this.assessment));
     // Now query questions and populate them
-    LazyList<AJEntityQuestion> questions = AJEntityQuestion.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY, context.assessmentId());
+    LazyList<AJEntityQuestion> questions = AJEntityQuestion.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, context.assessmentId());
     if (questions.size() > 0) {
       response.put(AJEntityQuestion.QUESTION,
         new JsonArray(new JsonFormatterBuilder().buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS).toJson(questions)));

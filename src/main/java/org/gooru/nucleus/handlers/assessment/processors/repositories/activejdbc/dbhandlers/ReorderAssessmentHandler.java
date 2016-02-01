@@ -1,17 +1,26 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
+import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
+import org.javalite.activejdbc.Base;
+import org.javalite.activejdbc.DBException;
 import org.javalite.activejdbc.LazyList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.PreparedStatement;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by ashish on 11/1/16.
@@ -20,6 +29,7 @@ class ReorderAssessmentHandler implements DBHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReorderAssessmentHandler.class);
   private final ProcessorContext context;
   private AJEntityAssessment assessment;
+  private JsonArray input;
 
   public ReorderAssessmentHandler(ProcessorContext context) {
     this.context = context;
@@ -43,10 +53,8 @@ class ReorderAssessmentHandler implements DBHandler {
       LOGGER.warn("Empty payload supplied to reorder assessment");
       return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
     }
-    // Our validators should certify this
-    // FIXME: 31/1/16 The validator needs to be fixed for the reorder payload
     JsonObject errors = new PayloadValidator() {
-    }.validatePayload(context.request(), AJEntityAssessment.editFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+    }.validatePayload(context.request(), AJEntityAssessment.reorderFieldSelector(), AJEntityAssessment.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
@@ -58,7 +66,6 @@ class ReorderAssessmentHandler implements DBHandler {
   @Override
   public ExecutionResult<MessageResponse> validateRequest() {
     // Fetch the assessment where type is assessment and it is not deleted already and id is specified id
-
     LazyList<AJEntityAssessment> assessments =
       AJEntityAssessment.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
@@ -68,16 +75,49 @@ class ReorderAssessmentHandler implements DBHandler {
         ExecutionResult.ExecutionStatus.FAILED);
     }
     AJEntityAssessment assessment = assessments.get(0);
-    // TODO: 31/1/16 : Validate the questions sent in payload are existing in DB
-
+    try {
+      List idList = Base.firstColumn(AJEntityQuestion.QUESTIONS_FOR_ASSESSMENT_QUERY, this.context.assessmentId());
+      this.input = this.context.request().getJsonArray(AJEntityAssessment.REORDER_PAYLOAD_KEY);
+      if (idList.size() != input.size()) {
+        return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Question count mismatch"),
+          ExecutionResult.ExecutionStatus.FAILED);
+      }
+      for (Object entry : input) {
+        String payloadId = ((JsonObject) entry).getString(AJEntityAssessment.ID);
+        if (!idList.contains(UUID.fromString(payloadId))) {
+          return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Missing question(s)"),
+            ExecutionResult.ExecutionStatus.FAILED);
+        }
+      }
+    } catch (DBException | ClassCastException e) {
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Incorrect payload data types"),
+        ExecutionResult.ExecutionStatus.FAILED);
+    }
 
     return new AuthorizerBuilder().buildUpdateAuthorizer(this.context).authorize(assessment);
   }
 
   @Override
   public ExecutionResult<MessageResponse> executeRequest() {
-    // TODO: Provide a concrete implementation
-    throw new IllegalStateException("Not implemented yet");
+    try {
+      PreparedStatement ps = Base.startBatch(AJEntityQuestion.REORDER_QUERY);
+      for (Object entry : input) {
+        String payloadId = ((JsonObject) entry).getString(AJEntityAssessment.ID);
+        int sequenceId = ((JsonObject) entry).getInteger(AJEntityQuestion.SEQUENCE_ID);
+        Base.addBatch(ps, sequenceId, this.context.userId(), payloadId, context.assessmentId());
+      }
+      Base.executeBatch(ps);
+    } catch (DBException | ClassCastException e) {
+      // No special handling for CCE as this could have been thrown in the validation itself
+      LOGGER.error("Not able to update the sequences for assessment '{}'", context.assessmentId(), e);
+      return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse("Not able to update sequences"),
+        ExecutionResult.ExecutionStatus.FAILED);
+    }
+
+    return new ExecutionResult<>(
+      MessageResponseFactory.createNoContentResponse("Updated", EventBuilderFactory.getUpdateAssessmentEventBuilder(context.assessmentId())),
+      ExecutionResult.ExecutionStatus.SUCCESSFUL);
+
   }
 
   @Override

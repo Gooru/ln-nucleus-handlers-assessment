@@ -25,11 +25,18 @@ public class AJEntityQuestion extends Model {
       " and is_deleted = false";
   public static final String OPEN_ENDED_QUESTION_FILTER =
     "collection_id = ?::uuid and content_subformat = 'open_ended_question'::content_subformat_type and is_deleted = false";
-  public static final String FETCH_QUESTION_SUMMARY =
+  public static final String FETCH_QUESTION_SUMMARY_QUERY =
     "select id, title, creator_id, original_creator_id, publish_date, short_title, content_subformat, answer, metadata, taxonomy, " +
       "depth_of_knowledge, hint_explanation_detail, thumbnail, sequence_id, visible_on_profile from content where collection_id = ?::uuid and " +
       " is_deleted = false order by sequence_id asc";
+
+  public static final String QUESTIONS_FOR_ASSESSMENT_QUERY = "select id from content where collection_id = ?::uuid and is_deleted = false";
+  public static final String REORDER_QUERY =
+    "update content set sequence_id = ?, modifier_id = ?::uuid, updated_at = now() where id = ?::uuid and collection_id = ?::uuid and is_deleted = " +
+      "false";
+
   public static final List<String> FETCH_QUESTION_SUMMARY_FIELDS = Arrays
     .asList("id", "title", "creator_id", "original_creator_id", "publish_date", "short_title", "content_subformat", "answer", "metadata", "taxonomy",
       "depth_of_knowledge", "hint_explanation_detail", "thumbnail", "sequence_id", "visible_on_profile");
+  public static final String SEQUENCE_ID = "sequence_id";
 }

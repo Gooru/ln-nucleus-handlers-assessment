@@ -4,6 +4,7 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.converters.FieldConverter;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.FieldSelector;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.FieldValidator;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.ReorderFieldValidator;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.ValidatorRegistry;
 import org.javalite.activejdbc.Model;
 import org.javalite.activejdbc.annotations.Table;
@@ -46,6 +47,7 @@ public class AJEntityAssessment extends Model {
   public static final String GRADING_TYPE_NAME = "grading_type";
   public static final String GRADING_TYPE_TEACHER = "teacher";
   public static final String GRADING_TYPE_SYSTEM = "system";
+  public static final String REORDER_PAYLOAD_KEY = "order";
 
   // Queries used
   public static final String AUTHORIZER_QUERY =
@@ -68,6 +70,7 @@ public class AJEntityAssessment extends Model {
   public static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(TITLE));
   public static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Arrays.asList(ID));
   public static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
+  public static final Set<String> REORDER_FIELDS = new HashSet<>(Arrays.asList(REORDER_PAYLOAD_KEY));
 
   private static final Map<String, FieldValidator> validatorRegistry;
   private static final Map<String, FieldConverter> converterRegistry;
@@ -112,11 +115,26 @@ public class AJEntityAssessment extends Model {
     validatorMap.put(LOGIN_REQUIRED, FieldValidator::validateBooleanIfPresent);
     validatorMap.put(VISIBLE_ON_PROFILE, FieldValidator::validateBooleanIfPresent);
     validatorMap.put(COLLABORATOR, (value) -> FieldValidator.validateDeepJsonArrayIfPresent(value, FieldValidator::validateUuid));
+    validatorMap.put(REORDER_PAYLOAD_KEY, new ReorderFieldValidator());
     return Collections.unmodifiableMap(validatorMap);
   }
 
   public static FieldSelector editFieldSelector() {
     return () -> Collections.unmodifiableSet(EDITABLE_FIELDS);
+  }
+
+  public static FieldSelector reorderFieldSelector() {
+    return new FieldSelector() {
+      @Override
+      public Set<String> allowedFields() {
+        return Collections.unmodifiableSet(REORDER_FIELDS);
+      }
+
+      @Override
+      public Set<String> mandatoryFields() {
+        return Collections.unmodifiableSet(REORDER_FIELDS);
+      }
+    };
   }
 
   public static FieldSelector createFieldSelector() {
@@ -130,8 +148,6 @@ public class AJEntityAssessment extends Model {
       public Set<String> mandatoryFields() {
         return Collections.unmodifiableSet(MANDATORY_FIELDS);
       }
-
-
     };
   }
 
