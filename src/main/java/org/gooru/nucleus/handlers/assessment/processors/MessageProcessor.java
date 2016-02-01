@@ -110,7 +110,7 @@ class MessageProcessor implements Processor {
 
   private MessageResponse processAssessmentGet() {
     ProcessorContext context = createContext();
-    if (validateContext(context)) {
+    if (!validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
     return new RepoBuilder().buildAssessmentRepo(context).fetchAssessment();

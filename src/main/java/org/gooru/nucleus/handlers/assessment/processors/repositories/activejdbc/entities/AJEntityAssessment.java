@@ -53,6 +53,14 @@ public class AJEntityAssessment extends Model {
       "id = ?::uuid and is_deleted = ?";
 
   public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
+  public static final String FETCH_QUERY =
+    "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, thumbnail, learning_objective, audience, " +
+      "metadata, taxonomy, orientation, setting, grading, visible_on_profile, collaborator, course_id from collection where id = ?::uuid and format" +
+      " = 'assessment'::content_container_type and is_deleted = false";
+  public static final String COURSE_COLLABORATOR_QUERY = "select collaborator from course where id = ?::uuid and is_deleted = false";
+  public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays
+    .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id", "publish_date", "thumbnail",
+      "learning_objective", "audience", "metadata", "taxonomy", "orientation", "setting", "grading", "visible_on_profile");
 
   public static final Set<String> EDITABLE_FIELDS = new HashSet<>(
     Arrays.asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, AUDIENCE, METADATA, TAXONOMY, ORIENTATION, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE));
@@ -116,7 +124,9 @@ public class AJEntityAssessment extends Model {
       @Override
       public Set<String> allowedFields() {
         return Collections.unmodifiableSet(CREATABLE_FIELDS);
-      }      @Override
+      }
+
+      @Override
       public Set<String> mandatoryFields() {
         return Collections.unmodifiableSet(MANDATORY_FIELDS);
       }
