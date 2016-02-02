@@ -79,9 +79,9 @@ class FetchAssessmentHandler implements DBHandler {
     } else {
       try {
         // Need to fetch collaborators
-        Object courseCollabObject = Base.firstCell(AJEntityAssessment.COURSE_COLLABORATOR_QUERY, course_id);
-        if (courseCollabObject != null) {
-          response.put(AJEntityAssessment.COLLABORATOR, new JsonArray(courseCollabObject.toString()));
+        Object courseCollaboratorObject = Base.firstCell(AJEntityAssessment.COURSE_COLLABORATOR_QUERY, course_id);
+        if (courseCollaboratorObject != null) {
+          response.put(AJEntityAssessment.COLLABORATOR, new JsonArray(courseCollaboratorObject.toString()));
         } else {
           response.put(AJEntityAssessment.COLLABORATOR, new JsonArray());
         }

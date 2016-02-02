@@ -22,7 +22,6 @@ import java.util.Map;
 class CreateAssessmentHandler implements DBHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateAssessmentHandler.class);
   private final ProcessorContext context;
-  private AJEntityAssessment assessment;
 
 
   public CreateAssessmentHandler(ProcessorContext context) {
@@ -54,7 +53,7 @@ class CreateAssessmentHandler implements DBHandler {
   @Override
   public ExecutionResult<MessageResponse> validateRequest() {
     // Only thing to do here is to authorize
-    return new AuthorizerBuilder().buildCreateAuthorizer(context).authorize(this.assessment);
+    return new AuthorizerBuilder().buildCreateAuthorizer(context).authorize(null);
   }
 
   @Override

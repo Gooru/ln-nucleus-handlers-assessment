@@ -28,7 +28,6 @@ import java.util.UUID;
 class ReorderAssessmentHandler implements DBHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReorderAssessmentHandler.class);
   private final ProcessorContext context;
-  private AJEntityAssessment assessment;
   private JsonArray input;
 
   public ReorderAssessmentHandler(ProcessorContext context) {

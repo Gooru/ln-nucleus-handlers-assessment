@@ -23,7 +23,6 @@ import java.util.Map;
 class UpdateAssessmentHandler implements DBHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAssessmentHandler.class);
   private final ProcessorContext context;
-  private AJEntityAssessment assessment;
 
   public UpdateAssessmentHandler(ProcessorContext context) {
     this.context = context;
