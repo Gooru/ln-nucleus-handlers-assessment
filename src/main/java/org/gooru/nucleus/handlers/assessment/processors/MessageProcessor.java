@@ -73,7 +73,7 @@ class MessageProcessor implements Processor {
     if (!validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    return new RepoBuilder().buildAssessmentRepo(context).reorderQuestionInAssessment();
+    return RepoBuilder.buildAssessmentRepo(context).reorderQuestionInAssessment();
   }
 
   private MessageResponse processAssessmentCollaboratorUpdate() {
@@ -81,7 +81,7 @@ class MessageProcessor implements Processor {
     if (!validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    return new RepoBuilder().buildAssessmentRepo(context).updateCollaborator();
+    return RepoBuilder.buildAssessmentRepo(context).updateCollaborator();
   }
 
   private MessageResponse processAssessmentAddQuestion() {
@@ -89,7 +89,7 @@ class MessageProcessor implements Processor {
     if (!validateContext(context, true)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment/question id");
     }
-    return new RepoBuilder().buildAssessmentRepo(context).addQuestionToAssessment();
+    return RepoBuilder.buildAssessmentRepo(context).addQuestionToAssessment();
   }
 
   private MessageResponse processAssessmentDelete() {
@@ -97,7 +97,7 @@ class MessageProcessor implements Processor {
     if (!validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    return new RepoBuilder().buildAssessmentRepo(context).deleteAssessment();
+    return RepoBuilder.buildAssessmentRepo(context).deleteAssessment();
   }
 
   private MessageResponse processAssessmentUpdate() {
@@ -105,7 +105,7 @@ class MessageProcessor implements Processor {
     if (!validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    return new RepoBuilder().buildAssessmentRepo(context).updateAssessment();
+    return RepoBuilder.buildAssessmentRepo(context).updateAssessment();
   }
 
   private MessageResponse processAssessmentGet() {
@@ -113,13 +113,13 @@ class MessageProcessor implements Processor {
     if (!validateContext(context)) {
       return MessageResponseFactory.createInvalidRequestResponse("Invalid assessment id");
     }
-    return new RepoBuilder().buildAssessmentRepo(context).fetchAssessment();
+    return RepoBuilder.buildAssessmentRepo(context).fetchAssessment();
   }
 
   private MessageResponse processAssessmentCreate() {
     ProcessorContext context = createContext();
 
-    return new RepoBuilder().buildAssessmentRepo(context).createAssessment();
+    return RepoBuilder.buildAssessmentRepo(context).createAssessment();
   }
 
   private ProcessorContext createContext() {

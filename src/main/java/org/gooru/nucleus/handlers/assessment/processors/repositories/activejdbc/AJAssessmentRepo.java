@@ -18,39 +18,39 @@ public class AJAssessmentRepo implements AssessmentRepo {
 
   @Override
   public MessageResponse createAssessment() {
-    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildCreateAssessmentHandler(context));
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildCreateAssessmentHandler(context));
   }
 
   @Override
   public MessageResponse updateAssessment() {
-    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildUpdateAssessmentHandler(context));
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildUpdateAssessmentHandler(context));
   }
 
   @Override
   public MessageResponse deleteAssessment() {
-    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildDeleteAssessmentHandler(context));
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildDeleteAssessmentHandler(context));
   }
 
   @Override
   public MessageResponse fetchAssessment() {
-    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildFetchAssessmentHandler(context));
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildFetchAssessmentHandler(context));
 
   }
 
   @Override
   public MessageResponse reorderQuestionInAssessment() {
-    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildReorderAssessmentHandler(context));
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildReorderAssessmentHandler(context));
   }
 
   @Override
   public MessageResponse addQuestionToAssessment() {
-    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildAddQuestionToAssessmentHandler(context));
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildAddQuestionToAssessmentHandler(context));
 
   }
 
   @Override
   public MessageResponse updateCollaborator() {
-    return new TransactionExecutor().executeTransaction(new DBHandlerBuilder().buildUpdateCollaboratorHandler(context));
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildUpdateCollaboratorHandler(context));
   }
 
 }

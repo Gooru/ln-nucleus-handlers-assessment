@@ -46,7 +46,7 @@ class FetchAssessmentHandler implements DBHandler {
   @Override
   public ExecutionResult<MessageResponse> validateRequest() {
     LazyList<AJEntityAssessment> assessments = AJEntityAssessment.findBySQL(AJEntityAssessment.FETCH_QUERY, context.assessmentId());
-    if (assessments.size() == 0) {
+    if (assessments.isEmpty()) {
       LOGGER.warn("Not able to find assessment '{}'", this.context.assessmentId());
       return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse("Not found"), ExecutionResult.ExecutionStatus.FAILED);
     }
@@ -58,12 +58,12 @@ class FetchAssessmentHandler implements DBHandler {
   public ExecutionResult<MessageResponse> executeRequest() {
     // First create response from Assessment
     JsonObject response =
-      new JsonObject(new JsonFormatterBuilder().buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST).toJson(this.assessment));
+      new JsonObject(JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST).toJson(this.assessment));
     // Now query questions and populate them
     LazyList<AJEntityQuestion> questions = AJEntityQuestion.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, context.assessmentId());
-    if (questions.size() > 0) {
+    if (!questions.isEmpty()) {
       response.put(AJEntityQuestion.QUESTION,
-        new JsonArray(new JsonFormatterBuilder().buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS).toJson(questions)));
+        new JsonArray(JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS).toJson(questions)));
     } else {
       response.put(AJEntityQuestion.QUESTION, new JsonArray());
     }

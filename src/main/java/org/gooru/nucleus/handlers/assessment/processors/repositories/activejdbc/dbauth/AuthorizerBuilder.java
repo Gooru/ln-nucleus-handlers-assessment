@@ -7,28 +7,31 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResul
 /**
  * Created by ashish on 29/1/16.
  */
-public class AuthorizerBuilder {
+public final class AuthorizerBuilder {
 
-  public Authorizer<AJEntityAssessment> buildUpdateAuthorizer(ProcessorContext context) {
+  private AuthorizerBuilder() {
+  }
+
+  public static Authorizer<AJEntityAssessment> buildUpdateAuthorizer(ProcessorContext context) {
     return new UpdateAuthorizer(context);
   }
 
-  public Authorizer<AJEntityAssessment> buildDeleteAuthorizer(ProcessorContext context) {
+  public static Authorizer<AJEntityAssessment> buildDeleteAuthorizer(ProcessorContext context) {
     return new DeleteAuthorizer(context);
   }
 
-  public Authorizer<AJEntityAssessment> buildUpdateCollaboratorAuthorizer(ProcessorContext context) {
+  public static Authorizer<AJEntityAssessment> buildUpdateCollaboratorAuthorizer(ProcessorContext context) {
     return new UpdateCollaboratorAuthorizer(context);
   }
 
   // Creation is only allowed outside of any context and hence it has got no bearing on course container, which does not exist as our API call for
   // association may be called after create call to set that up
   // As long as session token is valid and user is not anonymous, which is the case as we are, we should be fine
-  public Authorizer<AJEntityAssessment> buildCreateAuthorizer(ProcessorContext context) {
+  public static Authorizer<AJEntityAssessment> buildCreateAuthorizer(ProcessorContext context) {
     return model -> new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
   }
 
-  public Authorizer<AJEntityAssessment> buildAddQuestionToAssessmentAuthorizer(ProcessorContext context) {
+  public static Authorizer<AJEntityAssessment> buildAddQuestionToAssessmentAuthorizer(ProcessorContext context) {
     return new AddQuestionToAssessmentAuthorizer(context);
   }
 }

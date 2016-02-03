@@ -50,8 +50,8 @@ class AddQuestionToAssessmentHandler implements DBHandler {
       return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
     }
     // Our validators should certify this
-    JsonObject errors = new PayloadValidator() {
-    }.validatePayload(context.request(), AJEntityAssessment.addQuestionFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+    JsonObject errors = new DefaultPayloadValidator()
+      .validatePayload(context.request(), AJEntityAssessment.addQuestionFieldSelector(), AJEntityAssessment.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
@@ -74,7 +74,7 @@ class AddQuestionToAssessmentHandler implements DBHandler {
         ExecutionResult.ExecutionStatus.FAILED);
     }
     this.assessment = assessments.get(0);
-    return new AuthorizerBuilder().buildAddQuestionToAssessmentAuthorizer(this.context).authorize(this.assessment);
+    return AuthorizerBuilder.buildAddQuestionToAssessmentAuthorizer(this.context).authorize(this.assessment);
   }
 
   @Override
@@ -136,5 +136,8 @@ class AddQuestionToAssessmentHandler implements DBHandler {
       .createNoContentResponse("Question added", EventBuilderFactory.getAddQuestionToAssessmentEventBuilder(context.assessmentId())),
       ExecutionResult.ExecutionStatus.SUCCESSFUL);
 
+  }
+
+  private static class DefaultPayloadValidator implements PayloadValidator {
   }
 }

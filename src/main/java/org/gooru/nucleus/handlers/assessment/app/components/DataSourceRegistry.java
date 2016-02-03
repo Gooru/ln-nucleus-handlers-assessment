@@ -26,7 +26,7 @@ public class DataSourceRegistry implements Initializer, Finalizer {
   // that key
   private final List<String> datasources = Arrays.asList(DEFAULT_DATA_SOURCE);
   private final Map<String, DataSource> registry = new HashMap<>();
-  private volatile boolean initialized = false;
+  private volatile boolean initialized;
 
   private DataSourceRegistry() {
     // TODO Auto-generated constructor stub
@@ -184,7 +184,7 @@ public class DataSourceRegistry implements Initializer, Finalizer {
     }
   }
 
-  private static class Holder {
+  private static final class Holder {
     private static final DataSourceRegistry INSTANCE = new DataSourceRegistry();
   }
 

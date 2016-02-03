@@ -64,14 +64,14 @@ class DeleteAssessmentHandler implements DBHandler {
       LOGGER.warn("Assessment with id '{}' is published assessment so should not be deleted", context.assessmentId());
       return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Assessment is published"), ExecutionResult.ExecutionStatus.FAILED);
     }
-    return new AuthorizerBuilder().buildDeleteAuthorizer(this.context).authorize(assessment);
+    return AuthorizerBuilder.buildDeleteAuthorizer(this.context).authorize(assessment);
   }
 
   @Override
   public ExecutionResult<MessageResponse> executeRequest() {
     // Update assessment, we need to set the deleted flag and user who is deleting it but We do not reset the sequence id right now
     AJEntityAssessment assessmentToDelete = new AJEntityAssessment();
-    assessmentToDelete.setId(context.assessmentId());
+    assessmentToDelete.setIdWithConverter(context.assessmentId());
     assessmentToDelete.setBoolean(AJEntityAssessment.IS_DELETED, true);
     assessmentToDelete.setModifierId(context.userId());
 

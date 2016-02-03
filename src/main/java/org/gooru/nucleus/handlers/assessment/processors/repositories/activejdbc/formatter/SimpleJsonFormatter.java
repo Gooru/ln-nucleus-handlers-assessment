@@ -23,7 +23,7 @@ class SimpleJsonFormatter implements JsonFormatter {
 
   public SimpleJsonFormatter(boolean pretty, List<String> attributes) {
     this.pretty = pretty;
-    this.attributes = (attributes != null && attributes.size() > 0) ? lowerCased(attributes) : null;
+    this.attributes = (attributes != null && !attributes.isEmpty()) ? lowerCased(attributes) : null;
   }
 
   @Override

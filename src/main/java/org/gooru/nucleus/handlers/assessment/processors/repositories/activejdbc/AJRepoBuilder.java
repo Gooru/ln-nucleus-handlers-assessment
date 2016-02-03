@@ -6,9 +6,13 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.AssessmentR
 /**
  * Created by ashish on 7/1/16.
  */
-public class AJRepoBuilder {
+public final class AJRepoBuilder {
 
-  public AssessmentRepo buildAssessmentRepo(ProcessorContext context) {
+  private AJRepoBuilder() {
+    throw new AssertionError();
+  }
+
+  public static AssessmentRepo buildAssessmentRepo(ProcessorContext context) {
     return new AJAssessmentRepo(context);
   }
 

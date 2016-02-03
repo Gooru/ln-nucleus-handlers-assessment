@@ -7,11 +7,11 @@ import io.vertx.core.json.JsonObject;
  */
 public class ProcessorContext {
 
-  final private String userId;
-  final private JsonObject prefs;
-  final private JsonObject request;
-  final private String assessmentId;
-  final private String questionId;
+  private final String userId;
+  private final JsonObject prefs;
+  private final JsonObject request;
+  private final String assessmentId;
+  private final String questionId;
 
   public ProcessorContext(String userId, JsonObject prefs, JsonObject request, String assessmentId, String questionId) {
     if (prefs == null || userId == null || prefs.isEmpty()) {

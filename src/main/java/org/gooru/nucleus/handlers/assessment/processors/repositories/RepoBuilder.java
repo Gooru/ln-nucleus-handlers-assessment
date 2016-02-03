@@ -6,10 +6,14 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.
 /**
  * Created by ashish on 7/1/16.
  */
-public class RepoBuilder {
+public final class RepoBuilder {
 
-  public AssessmentRepo buildAssessmentRepo(ProcessorContext context) {
-    return new AJRepoBuilder().buildAssessmentRepo(context);
+  private RepoBuilder() {
+    throw new AssertionError();
+  }
+
+  public static AssessmentRepo buildAssessmentRepo(ProcessorContext context) {
+    return AJRepoBuilder.buildAssessmentRepo(context);
   }
 
 }

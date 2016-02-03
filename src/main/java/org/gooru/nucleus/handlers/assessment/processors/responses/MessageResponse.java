@@ -39,10 +39,10 @@ public class MessageResponse {
   // Public builder with validations
   public static class Builder {
     private String status;
-    private HttpConstants.HttpStatus httpStatus = null;
-    private JsonObject responseBody = null;
-    private JsonObject headers = null;
-    private JsonObject eventData = null;
+    private HttpConstants.HttpStatus httpStatus;
+    private JsonObject responseBody;
+    private final JsonObject headers;
+    private JsonObject eventData;
 
 
     public Builder() {

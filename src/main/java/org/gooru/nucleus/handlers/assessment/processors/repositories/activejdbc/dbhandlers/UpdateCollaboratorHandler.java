@@ -47,8 +47,8 @@ class UpdateCollaboratorHandler implements DBHandler {
       return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
     }
     // Our validators should certify this
-    JsonObject errors = new PayloadValidator() {
-    }.validatePayload(context.request(), AJEntityAssessment.editCollaboratorFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+    JsonObject errors = new DefaultPayloadValidator()
+      .validatePayload(context.request(), AJEntityAssessment.editCollaboratorFieldSelector(), AJEntityAssessment.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
@@ -75,17 +75,16 @@ class UpdateCollaboratorHandler implements DBHandler {
       return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Assessment is part of course"),
         ExecutionResult.ExecutionStatus.FAILED);
     }
-    return new AuthorizerBuilder().buildUpdateCollaboratorAuthorizer(this.context).authorize(assessment);
+    return AuthorizerBuilder.buildUpdateCollaboratorAuthorizer(this.context).authorize(assessment);
   }
 
   @Override
   public ExecutionResult<MessageResponse> executeRequest() {
     AJEntityAssessment assessment = new AJEntityAssessment();
-    assessment.setId(context.assessmentId());
+    assessment.setIdWithConverter(context.assessmentId());
     assessment.setModifierId(context.userId());
     // Now auto populate is done, we need to setup the converter machinery
-    new EntityBuilder<AJEntityAssessment>() {
-    }.build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
+    new DefaultAJEntityAssessmentEntityBuilder().build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
 
     boolean result = assessment.save();
     if (!result) {
@@ -105,5 +104,11 @@ class UpdateCollaboratorHandler implements DBHandler {
   @Override
   public boolean handlerReadOnly() {
     return false;
+  }
+
+  private static class DefaultPayloadValidator implements PayloadValidator {
+  }
+
+  private static class DefaultAJEntityAssessmentEntityBuilder implements EntityBuilder<AJEntityAssessment> {
   }
 }

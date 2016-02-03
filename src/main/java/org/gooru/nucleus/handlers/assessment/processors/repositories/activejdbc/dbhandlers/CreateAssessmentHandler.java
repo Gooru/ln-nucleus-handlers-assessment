@@ -41,8 +41,7 @@ class CreateAssessmentHandler implements DBHandler {
       return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
     }
     // Our validators should certify this
-    JsonObject errors = new PayloadValidator() {
-    }.validatePayload(context.request(), AJEntityAssessment.createFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+    JsonObject errors = new DefaultPayloadValidator().validatePayload(context.request(), AJEntityAssessment.createFieldSelector(), AJEntityAssessment.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
@@ -53,7 +52,7 @@ class CreateAssessmentHandler implements DBHandler {
   @Override
   public ExecutionResult<MessageResponse> validateRequest() {
     // Only thing to do here is to authorize
-    return new AuthorizerBuilder().buildCreateAuthorizer(context).authorize(null);
+    return AuthorizerBuilder.buildCreateAuthorizer(context).authorize(null);
   }
 
   @Override
@@ -66,8 +65,7 @@ class CreateAssessmentHandler implements DBHandler {
     assessment.setTypeAssessment();
     assessment.setGrading(AJEntityAssessment.GRADING_TYPE_SYSTEM);
     // Now auto populate is done, we need to setup the converter machinery
-    new EntityBuilder<AJEntityAssessment>() {
-    }.build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
+    new DefaultAJEntityAssessmentEntityBuilder().build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
 
     boolean result = assessment.save();
     if (!result) {
@@ -88,4 +86,9 @@ class CreateAssessmentHandler implements DBHandler {
     return false;
   }
 
+  private static class DefaultPayloadValidator implements PayloadValidator {
+  }
+
+  private static class DefaultAJEntityAssessmentEntityBuilder implements EntityBuilder<AJEntityAssessment> {
+  }
 }

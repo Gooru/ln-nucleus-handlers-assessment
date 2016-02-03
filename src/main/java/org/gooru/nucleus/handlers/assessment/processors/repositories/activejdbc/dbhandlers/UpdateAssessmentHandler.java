@@ -47,8 +47,7 @@ class UpdateAssessmentHandler implements DBHandler {
       return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
     }
     // Our validators should certify this
-    JsonObject errors = new PayloadValidator() {
-    }.validatePayload(context.request(), AJEntityAssessment.editFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+    JsonObject errors = new DefaultPayloadValidator().validatePayload(context.request(), AJEntityAssessment.editFieldSelector(), AJEntityAssessment.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
@@ -70,17 +69,16 @@ class UpdateAssessmentHandler implements DBHandler {
         ExecutionResult.ExecutionStatus.FAILED);
     }
     AJEntityAssessment assessment = assessments.get(0);
-    return new AuthorizerBuilder().buildUpdateAuthorizer(this.context).authorize(assessment);
+    return AuthorizerBuilder.buildUpdateAuthorizer(this.context).authorize(assessment);
   }
 
   @Override
   public ExecutionResult<MessageResponse> executeRequest() {
     AJEntityAssessment assessment = new AJEntityAssessment();
-    assessment.setId(context.assessmentId());
+    assessment.setIdWithConverter(context.assessmentId());
     assessment.setModifierId(context.userId());
     // Now auto populate is done, we need to setup the converter machinery
-    new EntityBuilder<AJEntityAssessment>() {
-    }.build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
+    new DefaultAJEntityAssessmentEntityBuilder().build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
 
     boolean result = assessment.save();
     if (!result) {
@@ -102,4 +100,9 @@ class UpdateAssessmentHandler implements DBHandler {
     return false;
   }
 
+  private static class DefaultPayloadValidator implements PayloadValidator {
+  }
+
+  private static class DefaultAJEntityAssessmentEntityBuilder implements EntityBuilder<AJEntityAssessment> {
+  }
 }

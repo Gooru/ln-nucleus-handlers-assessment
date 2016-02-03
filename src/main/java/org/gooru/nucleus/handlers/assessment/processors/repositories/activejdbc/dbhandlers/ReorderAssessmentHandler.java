@@ -52,8 +52,8 @@ class ReorderAssessmentHandler implements DBHandler {
       LOGGER.warn("Empty payload supplied to reorder assessment");
       return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
     }
-    JsonObject errors = new PayloadValidator() {
-    }.validatePayload(context.request(), AJEntityAssessment.reorderFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+    JsonObject errors = new DefaultPayloadValidator()
+      .validatePayload(context.request(), AJEntityAssessment.reorderFieldSelector(), AJEntityAssessment.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
@@ -93,7 +93,7 @@ class ReorderAssessmentHandler implements DBHandler {
         ExecutionResult.ExecutionStatus.FAILED);
     }
 
-    return new AuthorizerBuilder().buildUpdateAuthorizer(this.context).authorize(assessment);
+    return AuthorizerBuilder.buildUpdateAuthorizer(this.context).authorize(assessment);
   }
 
   @Override
@@ -124,4 +124,6 @@ class ReorderAssessmentHandler implements DBHandler {
     return false;
   }
 
+  private static class DefaultPayloadValidator implements PayloadValidator {
+  }
 }

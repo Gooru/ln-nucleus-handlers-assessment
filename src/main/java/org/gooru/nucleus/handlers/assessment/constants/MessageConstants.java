@@ -1,6 +1,6 @@
 package org.gooru.nucleus.handlers.assessment.constants;
 
-public class MessageConstants {
+public final class MessageConstants {
 
   public static final String MSG_HEADER_OP = "mb.operation";
   public static final String MSG_HEADER_TOKEN = "session.token";
@@ -36,4 +36,7 @@ public class MessageConstants {
   public static final String ASSESSMENT_ID = "assessmentId";
   public static final String ID = "id";
 
+  private MessageConstants() {
+    throw new AssertionError();
+  }
 }
