@@ -1,6 +1,7 @@
 package org.gooru.nucleus.handlers.assessment.processors.responses;
 
 import io.vertx.core.json.JsonObject;
+import org.gooru.nucleus.handlers.assessment.constants.HttpConstants;
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilder;
 
@@ -54,6 +55,15 @@ public class MessageResponseFactory {
 
   public static MessageResponse createNoContentResponse(String message, EventBuilder eventBuilder) {
     return new MessageResponse.Builder().successful().setStatusNoOutput().setResponseBody(new JsonObject().put(MessageConstants.MSG_MESSAGE, message))
+                                        .setEventData(eventBuilder.build()).build();
+  }
+
+  public static MessageResponse createCreatedResponse(String location) {
+    return new MessageResponse.Builder().successful().setStatusCreated().setHeader(HttpConstants.HEADER_LOCATION, location).build();
+  }
+
+  public static MessageResponse createCreatedResponse(String location, EventBuilder eventBuilder) {
+    return new MessageResponse.Builder().successful().setStatusCreated().setHeader(HttpConstants.HEADER_LOCATION, location)
                                         .setEventData(eventBuilder.build()).build();
   }
 

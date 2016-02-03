@@ -79,9 +79,8 @@ class CreateAssessmentHandler implements DBHandler {
         return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
       }
     }
-    return new ExecutionResult<>(MessageResponseFactory
-      .createNoContentResponse("Created", EventBuilderFactory.getCreateAssessmentEventBuilder(assessment.getString(AJEntityAssessment.ID))),
-      ExecutionResult.ExecutionStatus.SUCCESSFUL);
+    return new ExecutionResult<>(MessageResponseFactory.createCreatedResponse(assessment.getId().toString(),
+      EventBuilderFactory.getCreateAssessmentEventBuilder(assessment.getString(AJEntityAssessment.ID))), ExecutionResult.ExecutionStatus.SUCCESSFUL);
   }
 
   @Override
