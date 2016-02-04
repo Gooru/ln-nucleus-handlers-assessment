@@ -2,15 +2,13 @@ package org.gooru.nucleus.handlers.assessment.processors;
 
 import io.vertx.core.eventbus.Message;
 
-public class ProcessorBuilder {
+public final class ProcessorBuilder {
 
-  private final Message<Object> message;
-
-  public ProcessorBuilder(Message<Object> message) {
-    this.message = message;
+  private ProcessorBuilder() {
+    throw new AssertionError();
   }
 
-  public Processor build() {
+  public static Processor build(Message<Object> message) {
     return new MessageProcessor(message);
   }
 }

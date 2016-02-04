@@ -12,8 +12,11 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
 import org.javalite.activejdbc.Base;
 import org.javalite.activejdbc.DBException;
 import org.javalite.activejdbc.LazyList;
+import org.javalite.activejdbc.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ResourceBundle;
 
 /**
  * Created by ashish on 11/1/16.
@@ -21,6 +24,7 @@ import org.slf4j.LoggerFactory;
 class FetchAssessmentHandler implements DBHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FetchAssessmentHandler.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private final ProcessorContext context;
   private AJEntityAssessment assessment;
 
@@ -33,22 +37,25 @@ class FetchAssessmentHandler implements DBHandler {
     // There should be an assessment id present
     if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
       LOGGER.warn("Missing assessment");
-      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Missing assessment"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("missing.assessment.id")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
 
     if (context.userId() == null || context.userId().isEmpty()) {
       LOGGER.warn("Invalid user");
-      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
     return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
   }
 
   @Override
   public ExecutionResult<MessageResponse> validateRequest() {
-    LazyList<AJEntityAssessment> assessments = AJEntityAssessment.findBySQL(AJEntityAssessment.FETCH_QUERY, context.assessmentId());
+    LazyList<AJEntityAssessment> assessments = Model.findBySQL(AJEntityAssessment.FETCH_QUERY, context.assessmentId());
     if (assessments.isEmpty()) {
       LOGGER.warn("Not able to find assessment '{}'", this.context.assessmentId());
-      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse("Not found"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse(RESOURCE_BUNDLE.getString("not.found")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
     this.assessment = assessments.get(0);
     return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
@@ -60,7 +67,7 @@ class FetchAssessmentHandler implements DBHandler {
     JsonObject response =
       new JsonObject(JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST).toJson(this.assessment));
     // Now query questions and populate them
-    LazyList<AJEntityQuestion> questions = AJEntityQuestion.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, context.assessmentId());
+    LazyList<AJEntityQuestion> questions = Model.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, context.assessmentId());
     if (!questions.isEmpty()) {
       response.put(AJEntityQuestion.QUESTION,
         new JsonArray(JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS).toJson(questions)));

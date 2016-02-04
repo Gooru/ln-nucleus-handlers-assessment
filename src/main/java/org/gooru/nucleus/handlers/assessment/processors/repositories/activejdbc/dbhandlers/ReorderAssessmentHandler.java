@@ -15,11 +15,13 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
 import org.javalite.activejdbc.Base;
 import org.javalite.activejdbc.DBException;
 import org.javalite.activejdbc.LazyList;
+import org.javalite.activejdbc.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.UUID;
 
 /**
@@ -27,6 +29,7 @@ import java.util.UUID;
  */
 class ReorderAssessmentHandler implements DBHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReorderAssessmentHandler.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private final ProcessorContext context;
   private JsonArray input;
 
@@ -39,18 +42,20 @@ class ReorderAssessmentHandler implements DBHandler {
     // There should be an assessment id present
     if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
       LOGGER.warn("Missing assessment id");
-      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Missing assessment id"),
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("missing.assessment.id")),
         ExecutionResult.ExecutionStatus.FAILED);
     }
     // The user should not be anonymous
     if (context.userId() == null || context.userId().isEmpty() || context.userId().equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
       LOGGER.warn("Anonymous user attempting to reorder assessment");
-      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
     // Payload should not be empty
     if (context.request() == null || context.request().isEmpty()) {
       LOGGER.warn("Empty payload supplied to reorder assessment");
-      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("empty.payload")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
     JsonObject errors = new DefaultPayloadValidator()
       .validatePayload(context.request(), AJEntityAssessment.reorderFieldSelector(), AJEntityAssessment.getValidatorRegistry());
@@ -70,7 +75,7 @@ class ReorderAssessmentHandler implements DBHandler {
     // Assessment should be present in DB
     if (assessments.size() < 1) {
       LOGGER.warn("Assessment id: {} not present in DB", context.assessmentId());
-      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse("assessment id: " + context.assessmentId()),
+      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse(RESOURCE_BUNDLE.getString("assessment.id") + context.assessmentId()),
         ExecutionResult.ExecutionStatus.FAILED);
     }
     AJEntityAssessment assessment = assessments.get(0);
@@ -78,18 +83,18 @@ class ReorderAssessmentHandler implements DBHandler {
       List idList = Base.firstColumn(AJEntityQuestion.QUESTIONS_FOR_ASSESSMENT_QUERY, this.context.assessmentId());
       this.input = this.context.request().getJsonArray(AJEntityAssessment.REORDER_PAYLOAD_KEY);
       if (idList.size() != input.size()) {
-        return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Question count mismatch"),
+        return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("question.count.mismatch")),
           ExecutionResult.ExecutionStatus.FAILED);
       }
       for (Object entry : input) {
         String payloadId = ((JsonObject) entry).getString(AJEntityAssessment.ID);
         if (!idList.contains(UUID.fromString(payloadId))) {
-          return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Missing question(s)"),
+          return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("missing.questions")),
             ExecutionResult.ExecutionStatus.FAILED);
         }
       }
     } catch (DBException | ClassCastException e) {
-      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Incorrect payload data types"),
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("incorrect.payload.data.types")),
         ExecutionResult.ExecutionStatus.FAILED);
     }
 
@@ -109,12 +114,12 @@ class ReorderAssessmentHandler implements DBHandler {
     } catch (DBException | ClassCastException e) {
       // No special handling for CCE as this could have been thrown in the validation itself
       LOGGER.error("Not able to update the sequences for assessment '{}'", context.assessmentId(), e);
-      return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse("Not able to update sequences"),
+      return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
         ExecutionResult.ExecutionStatus.FAILED);
     }
 
-    return new ExecutionResult<>(
-      MessageResponseFactory.createNoContentResponse("Updated", EventBuilderFactory.getUpdateAssessmentEventBuilder(context.assessmentId())),
+    return new ExecutionResult<>(MessageResponseFactory
+      .createNoContentResponse(RESOURCE_BUNDLE.getString("updated"), EventBuilderFactory.getUpdateAssessmentEventBuilder(context.assessmentId())),
       ExecutionResult.ExecutionStatus.SUCCESSFUL);
 
   }

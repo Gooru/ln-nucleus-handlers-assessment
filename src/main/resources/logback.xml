@@ -20,9 +20,9 @@
         </encoder>
     </appender>
 
-    <logger name="org.gooru.nucleus" level="debug">
-           
-    </logger>
+    <logger name="org.gooru.nucleus" level="debug"></logger>
+    <logger name="com.zaxxer.hikari" level="debug"></logger>
+    <logger name="org.javalite" level="debug"></logger>
 
 
     <root level="info">

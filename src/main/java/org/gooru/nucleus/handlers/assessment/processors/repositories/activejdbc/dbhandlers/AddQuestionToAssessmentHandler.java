@@ -14,16 +14,19 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
 import org.javalite.activejdbc.Base;
 import org.javalite.activejdbc.DBException;
 import org.javalite.activejdbc.LazyList;
+import org.javalite.activejdbc.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * Created by ashish on 11/1/16.
  */
 class AddQuestionToAssessmentHandler implements DBHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAssessmentHandler.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private final ProcessorContext context;
   private AJEntityAssessment assessment;
 
@@ -36,18 +39,20 @@ class AddQuestionToAssessmentHandler implements DBHandler {
     // There should be an assessment id present
     if (context.assessmentId() == null || context.assessmentId().isEmpty() || context.questionId() == null || context.questionId().isEmpty()) {
       LOGGER.warn("Missing assessment/question id");
-      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Missing assessment/question id"),
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("missing.assessment.question.id")),
         ExecutionResult.ExecutionStatus.FAILED);
     }
     // The user should not be anonymous
     if (context.userId() == null || context.userId().isEmpty() || context.userId().equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
       LOGGER.warn("Anonymous user attempting to edit assessment");
-      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
     // Payload should not be empty
     if (context.request() == null || context.request().isEmpty()) {
       LOGGER.warn("Empty payload supplied to edit assessment");
-      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("empty.payload")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
     // Our validators should certify this
     JsonObject errors = new DefaultPayloadValidator()
@@ -66,11 +71,11 @@ class AddQuestionToAssessmentHandler implements DBHandler {
     // Fetch the assessment where type is assessment and it is not deleted already and id is specified id
 
     LazyList<AJEntityAssessment> assessments =
-      AJEntityAssessment.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
+      Model.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {
       LOGGER.warn("Assessment id: {} not present in DB", context.assessmentId());
-      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse("assessment id: " + context.assessmentId()),
+      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse(RESOURCE_BUNDLE.getString("assessment.id") + context.assessmentId()),
         ExecutionResult.ExecutionStatus.FAILED);
     }
     this.assessment = assessments.get(0);
@@ -95,12 +100,14 @@ class AddQuestionToAssessmentHandler implements DBHandler {
       }
       LOGGER.error("Something is wrong. Adding question '{}' to assessment '{}' updated '{}' rows", this.context.questionId(),
         this.context.assessmentId(), count);
+      return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("unexpected.count.updated.in.store")),
+        ExecutionResult.ExecutionStatus.FAILED);
 
     } catch (DBException e) {
       LOGGER.error("Not able to add question '{}' to assessment '{}'", this.context.questionId(), this.context.assessmentId(), e);
+      return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
-    return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse("Unable to add question"),
-      ExecutionResult.ExecutionStatus.FAILED);
   }
 
   @Override
@@ -127,7 +134,7 @@ class AddQuestionToAssessmentHandler implements DBHandler {
         }
       } catch (DBException e) {
         LOGGER.error("Assessment '{}' grading type change lookup failed", this.context.assessmentId(), e);
-        return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse("Assessment grade change failed"),
+        return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
           ExecutionResult.ExecutionStatus.FAILED);
       }
     }

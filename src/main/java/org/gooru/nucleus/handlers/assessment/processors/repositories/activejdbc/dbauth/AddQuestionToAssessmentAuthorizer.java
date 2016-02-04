@@ -12,12 +12,15 @@ import org.javalite.activejdbc.DBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ResourceBundle;
+
 /**
  * Created by ashish on 31/1/16.
  */
 public class AddQuestionToAssessmentAuthorizer implements Authorizer<AJEntityAssessment> {
   private final ProcessorContext context;
-  private final Logger LOGGER = LoggerFactory.getLogger(Authorizer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Authorizer.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
   public AddQuestionToAssessmentAuthorizer(ProcessorContext context) {
     this.context = context;
@@ -37,8 +40,7 @@ public class AddQuestionToAssessmentAuthorizer implements Authorizer<AJEntityAss
         }
       } catch (DBException e) {
         LOGGER.error("Error checking authorization for update for Assessment '{}' for course '{}'", context.assessmentId(), course_id, e);
-        return new ExecutionResult<>(
-          MessageResponseFactory.createInternalErrorResponse("Not able to authorize user for adding question to this assessment"),
+        return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
           ExecutionResult.ExecutionStatus.FAILED);
       }
     } else {
@@ -57,7 +59,8 @@ public class AddQuestionToAssessmentAuthorizer implements Authorizer<AJEntityAss
       }
     }
     LOGGER.warn("User: '{}' is not owner/collaborator of assessment: '{}' or owner/collaborator on course", context.userId(), context.assessmentId());
-    return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
+    return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")),
+      ExecutionResult.ExecutionStatus.FAILED);
   }
 
   private ExecutionResult<MessageResponse> authorizeForQuestion(AJEntityAssessment assessment) {
@@ -69,8 +72,11 @@ public class AddQuestionToAssessmentAuthorizer implements Authorizer<AJEntityAss
       }
     } catch (DBException e) {
       LOGGER.error("Error querying question '{}' availability for associating in assessment '{}'", context.questionId(), context.assessmentId(), e);
+      return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
-    return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Question not available for association"),
+    return new ExecutionResult<>(
+      MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("question.not.available.for.association")),
       ExecutionResult.ExecutionStatus.FAILED);
   }
 }

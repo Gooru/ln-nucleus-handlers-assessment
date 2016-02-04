@@ -13,16 +13,19 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
 import org.javalite.activejdbc.Base;
 import org.javalite.activejdbc.DBException;
 import org.javalite.activejdbc.LazyList;
+import org.javalite.activejdbc.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * Created by ashish on 11/1/16.
  */
 class DeleteAssessmentHandler implements DBHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(DeleteAssessmentHandler.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private final ProcessorContext context;
 
   public DeleteAssessmentHandler(ProcessorContext context) {
@@ -34,12 +37,14 @@ class DeleteAssessmentHandler implements DBHandler {
     // There should be an assessment id present
     if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
       LOGGER.warn("Missing assessment id");
-      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse("Missing assessment id"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse(RESOURCE_BUNDLE.getString("missing.assessment.id")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
     // The user should not be anonymous
     if (context.userId() == null || context.userId().isEmpty() || context.userId().equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
       LOGGER.warn("Anonymous user attempting to delete assessment");
-      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
 
     return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
@@ -51,18 +56,19 @@ class DeleteAssessmentHandler implements DBHandler {
     // Fetch the assessment where type is assessment and it is not deleted already and id is specified id
 
     LazyList<AJEntityAssessment> assessments =
-      AJEntityAssessment.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
+      Model.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {
       LOGGER.warn("Assessment id: {} not present in DB", context.assessmentId());
-      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse("assessment id: " + context.assessmentId()),
+      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse(RESOURCE_BUNDLE.getString("assessment.id") + context.assessmentId()),
         ExecutionResult.ExecutionStatus.FAILED);
     }
     AJEntityAssessment assessment = assessments.get(0);
     // This should not be published
     if (assessment.getDate(AJEntityAssessment.PUBLISH_DATE) != null) {
       LOGGER.warn("Assessment with id '{}' is published assessment so should not be deleted", context.assessmentId());
-      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Assessment is published"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("assessment.published")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
     return AuthorizerBuilder.buildDeleteAuthorizer(this.context).authorize(assessment);
   }
@@ -86,11 +92,11 @@ class DeleteAssessmentHandler implements DBHandler {
       }
     }
     if (!deleteContents()) {
-      return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse("Not able to delete questions"),
+      return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
         ExecutionResult.ExecutionStatus.FAILED);
     }
-    return new ExecutionResult<>(
-      MessageResponseFactory.createNoContentResponse("Deleted", EventBuilderFactory.getDeleteAssessmentEventBuilder(context.assessmentId())),
+    return new ExecutionResult<>(MessageResponseFactory
+      .createNoContentResponse(RESOURCE_BUNDLE.getString("deleted"), EventBuilderFactory.getDeleteAssessmentEventBuilder(context.assessmentId())),
       ExecutionResult.ExecutionStatus.SUCCESSFUL);
   }
 

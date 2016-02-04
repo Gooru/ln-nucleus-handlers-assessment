@@ -12,16 +12,19 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResul
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.javalite.activejdbc.LazyList;
+import org.javalite.activejdbc.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * Created by ashish on 11/1/16.
  */
 class UpdateCollaboratorHandler implements DBHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(UpdateCollaboratorHandler.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private final ProcessorContext context;
 
   public UpdateCollaboratorHandler(ProcessorContext context) {
@@ -33,18 +36,20 @@ class UpdateCollaboratorHandler implements DBHandler {
     // Assessment id is present
     if (context.assessmentId() == null || context.assessmentId().isEmpty()) {
       LOGGER.warn("Missing assessment id");
-      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Missing assessment id"),
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("missing.assessment.id")),
         ExecutionResult.ExecutionStatus.FAILED);
     }
     // The user should not be anonymous
     if (context.userId() == null || context.userId().isEmpty() || context.userId().equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
       LOGGER.warn("Anonymous user attempting to edit assessment");
-      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
     // Payload should not be empty
     if (context.request() == null || context.request().isEmpty()) {
       LOGGER.warn("Empty payload supplied to upload assessment");
-      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Empty payload"), ExecutionResult.ExecutionStatus.FAILED);
+      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("empty.payload")),
+        ExecutionResult.ExecutionStatus.FAILED);
     }
     // Our validators should certify this
     JsonObject errors = new DefaultPayloadValidator()
@@ -61,18 +66,19 @@ class UpdateCollaboratorHandler implements DBHandler {
   public ExecutionResult<MessageResponse> validateRequest() {
     // Fetch the assessment where type is assessment and it is not deleted already and id is specified id
     LazyList<AJEntityAssessment> assessments =
-      AJEntityAssessment.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
+      Model.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {
       LOGGER.warn("Assessment id: {} not present in DB", context.assessmentId());
-      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse("assessment id: " + context.assessmentId()),
+      return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse(RESOURCE_BUNDLE.getString("assessment.id") + context.assessmentId()),
         ExecutionResult.ExecutionStatus.FAILED);
     }
     AJEntityAssessment assessment = assessments.get(0);
     final String course = assessment.getString(AJEntityAssessment.COURSE_ID);
     if (course != null) {
       LOGGER.error("Cannot update collaborator for assessment '{}' as it is part of course '{}'", context.assessmentId(), course);
-      return new ExecutionResult<>(MessageResponseFactory.createInvalidRequestResponse("Assessment is part of course"),
+      return new ExecutionResult<>(
+        MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("assessment.associated.with.course")),
         ExecutionResult.ExecutionStatus.FAILED);
     }
     return AuthorizerBuilder.buildUpdateCollaboratorAuthorizer(this.context).authorize(assessment);
@@ -96,8 +102,8 @@ class UpdateCollaboratorHandler implements DBHandler {
         return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
       }
     }
-    return new ExecutionResult<>(
-      MessageResponseFactory.createNoContentResponse("Updated", EventBuilderFactory.getDeleteAssessmentEventBuilder(context.assessmentId())),
+    return new ExecutionResult<>(MessageResponseFactory
+      .createNoContentResponse(RESOURCE_BUNDLE.getString("updated"), EventBuilderFactory.getDeleteAssessmentEventBuilder(context.assessmentId())),
       ExecutionResult.ExecutionStatus.SUCCESSFUL);
   }
 

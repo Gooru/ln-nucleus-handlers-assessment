@@ -11,13 +11,16 @@ import org.javalite.activejdbc.DBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ResourceBundle;
+
 /**
  * Created by ashish on 29/1/16.
  */
 class UpdateAuthorizer implements Authorizer<AJEntityAssessment> {
 
   private final ProcessorContext context;
-  private final Logger LOGGER = LoggerFactory.getLogger(Authorizer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Authorizer.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
   UpdateAuthorizer(ProcessorContext context) {
     this.context = context;
@@ -37,7 +40,7 @@ class UpdateAuthorizer implements Authorizer<AJEntityAssessment> {
         }
       } catch (DBException e) {
         LOGGER.error("Error checking authorization for update for Assessment '{}' for course '{}'", context.assessmentId(), course_id, e);
-        return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse("Not able to delete questions for this assessment"),
+        return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
           ExecutionResult.ExecutionStatus.FAILED);
       }
     } else {
@@ -56,6 +59,7 @@ class UpdateAuthorizer implements Authorizer<AJEntityAssessment> {
       }
     }
     LOGGER.warn("User: '{}' is not owner/collaborator of assessment: '{}' or owner/collaborator on course", context.userId(), context.assessmentId());
-    return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse("Not allowed"), ExecutionResult.ExecutionStatus.FAILED);
+    return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")),
+      ExecutionResult.ExecutionStatus.FAILED);
   }
 }
