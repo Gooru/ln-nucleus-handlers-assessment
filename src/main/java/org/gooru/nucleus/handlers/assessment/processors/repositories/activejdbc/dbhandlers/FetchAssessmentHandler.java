@@ -12,7 +12,6 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
 import org.javalite.activejdbc.Base;
 import org.javalite.activejdbc.DBException;
 import org.javalite.activejdbc.LazyList;
-import org.javalite.activejdbc.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ class FetchAssessmentHandler implements DBHandler {
 
   @Override
   public ExecutionResult<MessageResponse> validateRequest() {
-    LazyList<AJEntityAssessment> assessments = Model.findBySQL(AJEntityAssessment.FETCH_QUERY, context.assessmentId());
+    LazyList<AJEntityAssessment> assessments = AJEntityAssessment.findBySQL(AJEntityAssessment.FETCH_QUERY, context.assessmentId());
     if (assessments.isEmpty()) {
       LOGGER.warn("Not able to find assessment '{}'", this.context.assessmentId());
       return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse(RESOURCE_BUNDLE.getString("not.found")),
@@ -67,7 +66,7 @@ class FetchAssessmentHandler implements DBHandler {
     JsonObject response =
       new JsonObject(JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST).toJson(this.assessment));
     // Now query questions and populate them
-    LazyList<AJEntityQuestion> questions = Model.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, context.assessmentId());
+    LazyList<AJEntityQuestion> questions = AJEntityAssessment.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, context.assessmentId());
     if (!questions.isEmpty()) {
       response.put(AJEntityQuestion.QUESTION,
         new JsonArray(JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS).toJson(questions)));
