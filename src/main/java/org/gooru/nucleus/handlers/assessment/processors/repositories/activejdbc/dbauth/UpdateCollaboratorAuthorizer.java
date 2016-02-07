@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
 /**
  * Created by ashish on 31/1/16.
  */
-public class UpdateCollaboratorAuthorizer implements Authorizer<AJEntityAssessment> {
+class UpdateCollaboratorAuthorizer implements Authorizer<AJEntityAssessment> {
 
   private final ProcessorContext context;
   private static final Logger LOGGER = LoggerFactory.getLogger(Authorizer.class);

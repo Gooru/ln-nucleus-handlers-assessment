@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 /**
  * Created by ashish on 31/1/16.
  */
-public class AddQuestionToAssessmentAuthorizer implements Authorizer<AJEntityAssessment> {
+class AddQuestionToAssessmentAuthorizer implements Authorizer<AJEntityAssessment> {
   private final ProcessorContext context;
   private static final Logger LOGGER = LoggerFactory.getLogger(Authorizer.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
