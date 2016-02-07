@@ -9,7 +9,7 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
 /**
  * Created by ashish on 7/1/16.
  */
-public class AJAssessmentRepo implements AssessmentRepo {
+class AJAssessmentRepo implements AssessmentRepo {
   private final ProcessorContext context;
 
   public AJAssessmentRepo(ProcessorContext context) {
