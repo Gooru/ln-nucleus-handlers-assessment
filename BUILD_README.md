@@ -1,4 +1,4 @@
-Building nucleus-resource
+Building nucleus-assessment
 ==============
 
 ## Prerequisites
