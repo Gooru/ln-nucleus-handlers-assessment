@@ -28,24 +28,24 @@ class UpdateAuthorizer implements Authorizer<AJEntityAssessment> {
 
   @Override
   public ExecutionResult<MessageResponse> authorize(AJEntityAssessment assessment) {
-    String owner_id = assessment.getString(AJEntityAssessment.OWNER_ID);
-    String course_id = assessment.getString(AJEntityAssessment.COURSE_ID);
+    String ownerId = assessment.getString(AJEntityAssessment.OWNER_ID);
+    String courseId = assessment.getString(AJEntityAssessment.COURSE_ID);
     long authRecordCount;
     // If this assessment is not part of course, then user should be either owner or collaborator on course
-    if (course_id != null) {
+    if (courseId != null) {
       try {
-        authRecordCount = Base.count(AJEntityAssessment.TABLE_COURSE, AJEntityAssessment.AUTH_FILTER, course_id, context.userId(), context.userId());
+        authRecordCount = Base.count(AJEntityAssessment.TABLE_COURSE, AJEntityAssessment.AUTH_FILTER, courseId, context.userId(), context.userId());
         if (authRecordCount >= 1) {
           return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
         }
       } catch (DBException e) {
-        LOGGER.error("Error checking authorization for update for Assessment '{}' for course '{}'", context.assessmentId(), course_id, e);
+        LOGGER.error("Error checking authorization for update for Assessment '{}' for course '{}'", context.assessmentId(), courseId, e);
         return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
           ExecutionResult.ExecutionStatus.FAILED);
       }
     } else {
       // Assessment is not part of course, hence we need user to be either owner or collaborator on assessment
-      if (context.userId().equalsIgnoreCase(owner_id)) {
+      if (context.userId().equalsIgnoreCase(ownerId)) {
         // Owner is fine
         return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
       } else {
