@@ -15,7 +15,6 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
 import org.javalite.activejdbc.Base;
 import org.javalite.activejdbc.DBException;
 import org.javalite.activejdbc.LazyList;
-import org.javalite.activejdbc.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

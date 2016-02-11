@@ -66,7 +66,7 @@ class FetchAssessmentHandler implements DBHandler {
     JsonObject response =
       new JsonObject(JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST).toJson(this.assessment));
     // Now query questions and populate them
-    LazyList<AJEntityQuestion> questions = AJEntityAssessment.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, context.assessmentId());
+    LazyList<AJEntityQuestion> questions = AJEntityQuestion.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, context.assessmentId());
     if (!questions.isEmpty()) {
       response.put(AJEntityQuestion.QUESTION,
         new JsonArray(JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS).toJson(questions)));
@@ -74,8 +74,8 @@ class FetchAssessmentHandler implements DBHandler {
       response.put(AJEntityQuestion.QUESTION, new JsonArray());
     }
     // Now collaborator, we need to know if we want to get it from course or whatever is in the collection would suffice
-    String course_id = this.assessment.getString(AJEntityAssessment.COURSE_ID);
-    if (course_id == null || course_id.isEmpty()) {
+    String courseId = this.assessment.getString(AJEntityAssessment.COURSE_ID);
+    if (courseId == null || courseId.isEmpty()) {
       String collaborators = this.assessment.getString(AJEntityAssessment.COLLABORATOR);
       if (collaborators == null || collaborators.isEmpty()) {
         response.put(AJEntityAssessment.COLLABORATOR, new JsonArray());
@@ -85,14 +85,14 @@ class FetchAssessmentHandler implements DBHandler {
     } else {
       try {
         // Need to fetch collaborators
-        Object courseCollaboratorObject = Base.firstCell(AJEntityAssessment.COURSE_COLLABORATOR_QUERY, course_id);
+        Object courseCollaboratorObject = Base.firstCell(AJEntityAssessment.COURSE_COLLABORATOR_QUERY, courseId);
         if (courseCollaboratorObject != null) {
           response.put(AJEntityAssessment.COLLABORATOR, new JsonArray(courseCollaboratorObject.toString()));
         } else {
           response.put(AJEntityAssessment.COLLABORATOR, new JsonArray());
         }
       } catch (DBException e) {
-        LOGGER.error("Error trying to get course collaborator for course '{}' to fetch assessment '{}'", course_id, this.context.assessmentId(), e);
+        LOGGER.error("Error trying to get course collaborator for course '{}' to fetch assessment '{}'", courseId, this.context.assessmentId(), e);
         return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(e.getMessage()), ExecutionResult.ExecutionStatus.FAILED);
       }
     }
