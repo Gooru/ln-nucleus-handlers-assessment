@@ -93,7 +93,8 @@ class FetchAssessmentHandler implements DBHandler {
         }
       } catch (DBException e) {
         LOGGER.error("Error trying to get course collaborator for course '{}' to fetch assessment '{}'", courseId, this.context.assessmentId(), e);
-        return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(e.getMessage()), ExecutionResult.ExecutionStatus.FAILED);
+        return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
+          ExecutionResult.ExecutionStatus.FAILED);
       }
     }
     return new ExecutionResult<>(MessageResponseFactory.createOkayResponse(response), ExecutionResult.ExecutionStatus.SUCCESSFUL);
