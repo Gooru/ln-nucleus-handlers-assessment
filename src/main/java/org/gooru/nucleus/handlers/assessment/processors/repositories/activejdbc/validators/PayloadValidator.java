@@ -2,12 +2,15 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 
 import io.vertx.core.json.JsonObject;
 
+import java.util.ResourceBundle;
 import java.util.Set;
 
 /**
  * Created by ashish on 28/1/16.
  */
 public interface PayloadValidator {
+
+  ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
   default JsonObject validatePayload(JsonObject input, FieldSelector selector, ValidatorRegistry registry) {
     JsonObject result = new JsonObject();
@@ -16,18 +19,18 @@ public interface PayloadValidator {
         FieldValidator validator = registry.lookupValidator(entry.getKey());
         if (validator != null) {
           if (!validator.validateField(entry.getValue())) {
-            result.put(entry.getKey(), "Invalid value");
+            result.put(entry.getKey(), RESOURCE_BUNDLE.getString("invalid.value"));
           }
         }
       } else {
-        result.put(entry.getKey(), "Field not allowed");
+        result.put(entry.getKey(), RESOURCE_BUNDLE.getString("field.not.allowed"));
       }
     });
     Set<String> mandatory = selector.mandatoryFields();
     if (mandatory != null && mandatory.isEmpty()) {
       mandatory.forEach(s -> {
         if (input.getValue(s) == null) {
-          result.put(s, "Missing field");
+          result.put(s, RESOURCE_BUNDLE.getString("missing.field"));
         }
       });
     }
