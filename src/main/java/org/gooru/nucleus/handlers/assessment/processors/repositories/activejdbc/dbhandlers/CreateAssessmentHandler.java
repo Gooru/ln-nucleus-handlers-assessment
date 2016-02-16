@@ -74,7 +74,7 @@ class CreateAssessmentHandler implements DBHandler {
 
     boolean result = assessment.save();
     if (!result) {
-      LOGGER.error("Assessment with id '{}' failed to save", context.assessmentId());
+      LOGGER.error("Assessment creation failed for user '{}'", context.userId());
       if (assessment.hasErrors()) {
         Map<String, String> map = assessment.errors();
         JsonObject errors = new JsonObject();
