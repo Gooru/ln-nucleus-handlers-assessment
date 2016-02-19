@@ -101,9 +101,8 @@ class UpdateCollaboratorHandler implements DBHandler {
         return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
       }
     }
-    return new ExecutionResult<>(MessageResponseFactory
-      .createNoContentResponse(RESOURCE_BUNDLE.getString("updated"), EventBuilderFactory.getUpdateAssessmentEventBuilder(context.assessmentId())),
-      ExecutionResult.ExecutionStatus.SUCCESSFUL);
+    return new ExecutionResult<>(MessageResponseFactory.createNoContentResponse(RESOURCE_BUNDLE.getString("updated"),
+      EventBuilderFactory.getUpdateCollaboratorForAssessmentEventBuilder(context.assessmentId())), ExecutionResult.ExecutionStatus.SUCCESSFUL);
   }
 
   @Override
