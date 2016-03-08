@@ -97,11 +97,18 @@ class AddQuestionToAssessmentHandler implements DBHandler {
 
       if (count == 1) {
         return updateGrading();
+      } else if (count == 0) {
+        LOGGER.error("Question '{}' add to assessment '{}' failed as question is not available or non existent", this.context.questionId(),
+          this.context.assessmentId());
+        return new ExecutionResult<>(
+          MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("question.not.exists.or.not.available")),
+          ExecutionResult.ExecutionStatus.FAILED);
+      } else {
+        LOGGER.error("Something is wrong. Adding question '{}' to assessment '{}' updated '{}' rows", this.context.questionId(),
+          this.context.assessmentId(), count);
+        return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("question.add.fail")),
+          ExecutionResult.ExecutionStatus.FAILED);
       }
-      LOGGER.error("Something is wrong. Adding question '{}' to assessment '{}' updated '{}' rows", this.context.questionId(),
-        this.context.assessmentId(), count);
-      return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("unexpected.count.updated.in.store")),
-        ExecutionResult.ExecutionStatus.FAILED);
 
     } catch (DBException e) {
       LOGGER.error("Not able to add question '{}' to assessment '{}'", this.context.questionId(), this.context.assessmentId(), e);
