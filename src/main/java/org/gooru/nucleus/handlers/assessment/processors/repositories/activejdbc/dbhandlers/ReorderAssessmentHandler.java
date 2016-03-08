@@ -19,7 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -31,6 +33,7 @@ class ReorderAssessmentHandler implements DBHandler {
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private final ProcessorContext context;
   private JsonArray input;
+  private AJEntityAssessment assessment;
 
   public ReorderAssessmentHandler(ProcessorContext context) {
     this.context = context;
@@ -77,7 +80,7 @@ class ReorderAssessmentHandler implements DBHandler {
       return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse(RESOURCE_BUNDLE.getString("assessment.id") + context.assessmentId()),
         ExecutionResult.ExecutionStatus.FAILED);
     }
-    AJEntityAssessment assessment = assessments.get(0);
+    this.assessment = assessments.get(0);
     try {
       List idList = Base.firstColumn(AJEntityQuestion.QUESTIONS_FOR_ASSESSMENT_QUERY, this.context.assessmentId());
       this.input = this.context.request().getJsonArray(AJEntityAssessment.REORDER_PAYLOAD_KEY);
@@ -110,6 +113,18 @@ class ReorderAssessmentHandler implements DBHandler {
         Base.addBatch(ps, sequenceId, this.context.userId(), payloadId, context.assessmentId());
       }
       Base.executeBatch(ps);
+      this.assessment.setTimestamp(AJEntityAssessment.UPDATED_AT, new Timestamp(System.currentTimeMillis()));
+      boolean result = this.assessment.save();
+      if (!result) {
+        LOGGER.error("Assessment with id '{}' failed to save modified time stamp", context.assessmentId());
+        if (this.assessment.hasErrors()) {
+          Map<String, String> map = this.assessment.errors();
+          JsonObject errors = new JsonObject();
+          map.forEach(errors::put);
+          return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
+        }
+      }
+
     } catch (DBException | ClassCastException e) {
       // No special handling for CCE as this could have been thrown in the validation itself
       LOGGER.error("Not able to update the sequences for assessment '{}'", context.assessmentId(), e);

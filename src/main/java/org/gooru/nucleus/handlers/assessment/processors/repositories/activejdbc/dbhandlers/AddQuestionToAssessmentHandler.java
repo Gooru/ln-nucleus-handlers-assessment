@@ -17,6 +17,7 @@ import org.javalite.activejdbc.LazyList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -116,11 +117,13 @@ class AddQuestionToAssessmentHandler implements DBHandler {
 
   private ExecutionResult<MessageResponse> updateGrading() {
     String currentGrading = this.assessment.getString(AJEntityAssessment.GRADING);
+    boolean assessmentUpdated = false;
     if (!currentGrading.equalsIgnoreCase(AJEntityAssessment.GRADING_TYPE_TEACHER)) {
       try {
         long count = Base.count(AJEntityQuestion.TABLE_QUESTION, AJEntityQuestion.OPEN_ENDED_QUESTION_FILTER, this.context.assessmentId());
         if (count > 0) {
           this.assessment.setGrading(AJEntityAssessment.GRADING_TYPE_TEACHER);
+          assessmentUpdated = true;
           if (!this.assessment.save()) {
             LOGGER.error("Assessment '{}' grading type change failed", this.context.assessmentId());
             if (this.assessment.hasErrors()) {
@@ -135,6 +138,21 @@ class AddQuestionToAssessmentHandler implements DBHandler {
         LOGGER.error("Assessment '{}' grading type change lookup failed", this.context.assessmentId(), e);
         return new ExecutionResult<>(MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
           ExecutionResult.ExecutionStatus.FAILED);
+      }
+    }
+
+    if (!assessmentUpdated) {
+      // Need to update the time stamp
+      this.assessment.setTimestamp(AJEntityAssessment.UPDATED_AT, new Timestamp(System.currentTimeMillis()));
+      boolean result = this.assessment.save();
+      if (!result) {
+        LOGGER.error("Assessment with id '{}' failed to save modified time stamp", context.assessmentId());
+        if (this.assessment.hasErrors()) {
+          Map<String, String> map = this.assessment.errors();
+          JsonObject errors = new JsonObject();
+          map.forEach(errors::put);
+          return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors), ExecutionResult.ExecutionStatus.FAILED);
+        }
       }
     }
 

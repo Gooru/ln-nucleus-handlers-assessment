@@ -39,6 +39,7 @@ public class AJEntityAssessment extends Model {
   public static final String COURSE_ID = "course_id";
   public static final String GRADING = "grading";
   public static final String TABLE_COURSE = "course";
+  public static final String UPDATED_AT = "updated_at";
   public static final String UUID_TYPE = "uuid";
   public static final String JSONB_TYPE = "jsonb";
   public static final String ASSESSMENT_TYPE_NAME = "content_container_type";
