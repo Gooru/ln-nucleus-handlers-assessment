@@ -27,7 +27,7 @@ public final class MessageConstants {
   public static final String MSG_OP_ASSESSMENT_DELETE = "assessment.delete";
   public static final String MSG_OP_ASSESSMENT_COLLABORATOR_UPDATE = "assessment.collaborator.update";
   public static final String MSG_OP_ASSESSMENT_QUESTION_ADD = "assessment.question.add";
-  public static final String MSG_OP_ASSESSMENT_QUESTION_REORDER = "assessment.question.reorder";
+  public static final String MSG_OP_ASSESSMENT_QUESTION_REORDER = "assessment.content.reorder";
 
   // Containers for different responses
   public static final String RESP_CONTAINER_MBUS = "mb.container";

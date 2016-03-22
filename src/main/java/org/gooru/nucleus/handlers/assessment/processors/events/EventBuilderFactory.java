@@ -11,7 +11,7 @@ public final class EventBuilderFactory {
   private static final String EVT_ASSESSMENT_UPDATE = "event.assessment.update";
   private static final String EVT_ASSESSMENT_DELETE = "event.assessment.delete";
   private static final String EVT_ASSESSMENT_QUESTION_ADD = "event.assessment.question.add";
-  private static final String EVT_ASSESSMENT_REORDER = "event.assessment.reorder";
+  private static final String EVT_ASSESSMENT_REORDER = "event.assessment.content.reorder";
   private static final String EVT_ASSESSMENT_COLLABORATOR_UPDATE = "event.assessment.collaborator.update";
   private static final String EVENT_NAME = "event.name";
   private static final String EVENT_BODY = "event.body";
