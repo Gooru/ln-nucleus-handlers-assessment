@@ -63,11 +63,9 @@ class DeleteAssessmentHandler implements DBHandler {
         ExecutionResult.ExecutionStatus.FAILED);
     }
     AJEntityAssessment assessment = assessments.get(0);
-    // This should not be published
+    // Log a warning is assessment to be deleted is published
     if (assessment.getDate(AJEntityAssessment.PUBLISH_DATE) != null) {
-      LOGGER.warn("Assessment with id '{}' is published assessment so should not be deleted", context.assessmentId());
-      return new ExecutionResult<>(MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("assessment.published")),
-        ExecutionResult.ExecutionStatus.FAILED);
+      LOGGER.warn("Assessment with id '{}' is published assessment and is being deleted", context.assessmentId());
     }
     return AuthorizerBuilder.buildDeleteAuthorizer(this.context).authorize(assessment);
   }
