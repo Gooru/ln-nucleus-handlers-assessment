@@ -107,7 +107,7 @@ public class AJEntityAssessment extends Model {
     validatorMap.put(TITLE, (value) -> FieldValidator.validateString(value, 5000));
     validatorMap.put(THUMBNAIL, (value) -> FieldValidator.validateStringIfPresent(value, 2000));
     validatorMap.put(LEARNING_OBJECTIVE, (value) -> FieldValidator.validateStringIfPresent(value, 20000));
-    validatorMap.put(AUDIENCE, FieldValidator::validateJsonIfPresent);
+    validatorMap.put(AUDIENCE, FieldValidator::validateJsonArrayIfPresent);
     validatorMap.put(METADATA, FieldValidator::validateJsonIfPresent);
     validatorMap.put(TAXONOMY, FieldValidator::validateJsonIfPresent);
     validatorMap.put(ORIENTATION, (value) -> (value != null && value instanceof String &&
