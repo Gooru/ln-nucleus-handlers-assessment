@@ -16,11 +16,11 @@ import java.util.UUID;
 class MessageProcessor implements Processor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Processor.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private final Message<Object> message;
   private String userId;
   private JsonObject prefs;
   private JsonObject request;
-  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
   public MessageProcessor(Message<Object> message) {
     this.message = message;
@@ -58,6 +58,18 @@ class MessageProcessor implements Processor {
           break;
         case MessageConstants.MSG_OP_ASSESSMENT_COLLABORATOR_UPDATE:
           result = processAssessmentCollaboratorUpdate();
+          break;
+        case MessageConstants.MSG_OP_EXT_ASSESSMENT_GET:
+          result = processExternalAssessmentGet();
+          break;
+        case MessageConstants.MSG_OP_EXT_ASSESSMENT_CREATE:
+          result = processExternalAssessmentCreate();
+          break;
+        case MessageConstants.MSG_OP_EXT_ASSESSMENT_UPDATE:
+          result = processExternalAssessmentUpdate();
+          break;
+        case MessageConstants.MSG_OP_EXT_ASSESSMENT_DELETE:
+          result = processExternalAssessmentDelete();
           break;
         default:
           LOGGER.error("Invalid operation type passed in, not able to handle");
@@ -122,6 +134,36 @@ class MessageProcessor implements Processor {
     ProcessorContext context = createContext();
 
     return RepoBuilder.buildAssessmentRepo(context).createAssessment();
+  }
+
+  private MessageResponse processExternalAssessmentDelete() {
+    ProcessorContext context = createContext();
+    if (!validateContext(context)) {
+      return MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
+    }
+    return RepoBuilder.buildAssessmentRepo(context).deleteExternalAssessment();
+  }
+
+  private MessageResponse processExternalAssessmentUpdate() {
+    ProcessorContext context = createContext();
+    if (!validateContext(context)) {
+      return MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
+    }
+    return RepoBuilder.buildAssessmentRepo(context).updateExternalAssessment();
+  }
+
+  private MessageResponse processExternalAssessmentGet() {
+    ProcessorContext context = createContext();
+    if (!validateContext(context)) {
+      return MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
+    }
+    return RepoBuilder.buildAssessmentRepo(context).fetchExternalAssessment();
+  }
+
+  private MessageResponse processExternalAssessmentCreate() {
+    ProcessorContext context = createContext();
+
+    return RepoBuilder.buildAssessmentRepo(context).createExternalAssessment();
   }
 
   private ProcessorContext createContext() {

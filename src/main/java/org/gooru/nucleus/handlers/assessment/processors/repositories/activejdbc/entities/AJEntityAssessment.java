@@ -18,6 +18,7 @@ import java.util.*;
 public class AJEntityAssessment extends Model {
   // Variables used
   public static final String ID = "id";
+  public static final String ASSESSMENT_EXTERNAL = "assessment-external";
   public static final String ASSESSMENT = "assessment";
   public static final String CREATOR_ID = "creator_id";
   public static final String PUBLISH_DATE = "publish_date";
@@ -44,6 +45,7 @@ public class AJEntityAssessment extends Model {
   public static final String JSONB_TYPE = "jsonb";
   public static final String ASSESSMENT_TYPE_NAME = "content_container_type";
   public static final String ASSESSMENT_TYPE_VALUE = "assessment";
+  public static final String ASSESSMENT_EX_TYPE_VALUE = "assessment-external";
   public static final String ORIENTATION_TYPE_NAME = "orientation_type";
   public static final String GRADING_TYPE_NAME = "grading_type";
   public static final String GRADING_TYPE_TEACHER = "teacher";
@@ -56,18 +58,27 @@ public class AJEntityAssessment extends Model {
       "id = ?::uuid and is_deleted = ?";
 
   public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
-  public static final String FETCH_QUERY =
+  public static final String FETCH_ASSESSMENT_QUERY =
     "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, thumbnail, learning_objective, audience, " +
       "metadata, taxonomy, orientation, setting, grading, visible_on_profile, collaborator, course_id from collection where id = ?::uuid and format" +
       " = 'assessment'::content_container_type and is_deleted = false";
+  public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
+    "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, learning_objective, audience, " +
+      "metadata, taxonomy, orientation, visible_on_profile, url, login_required, course_id from collection where id = ?::uuid and format" +
+      " = 'assessment-external'::content_container_type and is_deleted = false";
   public static final String COURSE_COLLABORATOR_QUERY = "select collaborator from course where id = ?::uuid and is_deleted = false";
   public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays
     .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id", "publish_date", "thumbnail",
       "learning_objective", "audience", "metadata", "taxonomy", "orientation", "setting", "grading", "visible_on_profile");
+  public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays
+    .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id", "thumbnail", "learning_objective", "audience",
+      "metadata", "taxonomy", "orientation", "visible_on_profile", "url", "login_required");
 
   public static final Set<String> EDITABLE_FIELDS = new HashSet<>(
     Arrays.asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, AUDIENCE, METADATA, TAXONOMY, ORIENTATION, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE));
   public static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
+  public static final Set<String> CREATABLE_EX_FIELDS = EDITABLE_FIELDS;
+  public static final Set<String> MANDATORY_EX_FIELDS = new HashSet<>(Arrays.asList(TITLE, URL, LOGIN_REQUIRED));
   public static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(TITLE));
   public static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Arrays.asList(ID));
   public static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
@@ -124,6 +135,10 @@ public class AJEntityAssessment extends Model {
     return () -> Collections.unmodifiableSet(EDITABLE_FIELDS);
   }
 
+  public static FieldSelector editExFieldSelector() {
+    return () -> Collections.unmodifiableSet(EDITABLE_FIELDS);
+  }
+
   public static FieldSelector reorderFieldSelector() {
     return new FieldSelector() {
       @Override
@@ -148,6 +163,20 @@ public class AJEntityAssessment extends Model {
       @Override
       public Set<String> mandatoryFields() {
         return Collections.unmodifiableSet(MANDATORY_FIELDS);
+      }
+    };
+  }
+
+  public static FieldSelector createExFieldSelector() {
+    return new FieldSelector() {
+      @Override
+      public Set<String> allowedFields() {
+        return Collections.unmodifiableSet(CREATABLE_EX_FIELDS);
+      }
+
+      @Override
+      public Set<String> mandatoryFields() {
+        return Collections.unmodifiableSet(MANDATORY_EX_FIELDS);
       }
     };
   }
@@ -229,6 +258,15 @@ public class AJEntityAssessment extends Model {
       this.set(FORMAT, fc.convertField(ASSESSMENT_TYPE_VALUE));
     } else {
       this.set(FORMAT, ASSESSMENT_TYPE_VALUE);
+    }
+  }
+
+  public void setTypeExAssessment() {
+    FieldConverter fc = converterRegistry.get(FORMAT);
+    if (fc != null) {
+      this.set(FORMAT, fc.convertField(ASSESSMENT_EX_TYPE_VALUE));
+    } else {
+      this.set(FORMAT, ASSESSMENT_EX_TYPE_VALUE);
     }
   }
 

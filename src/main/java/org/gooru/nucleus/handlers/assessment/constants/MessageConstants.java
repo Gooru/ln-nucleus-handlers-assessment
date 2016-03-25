@@ -20,7 +20,7 @@ public final class MessageConstants {
   public static final String MSG_HTTP_HEADERS = "http.headers";
   public static final String MSG_MESSAGE = "message";
 
-  // Operation names: Also need to be updated in corresponding handlers
+  // Operation names: Also need to be updated in corresponding gateway
   public static final String MSG_OP_ASSESSMENT_GET = "assessment.get";
   public static final String MSG_OP_ASSESSMENT_CREATE = "assessment.create";
   public static final String MSG_OP_ASSESSMENT_UPDATE = "assessment.update";
@@ -28,6 +28,12 @@ public final class MessageConstants {
   public static final String MSG_OP_ASSESSMENT_COLLABORATOR_UPDATE = "assessment.collaborator.update";
   public static final String MSG_OP_ASSESSMENT_QUESTION_ADD = "assessment.question.add";
   public static final String MSG_OP_ASSESSMENT_QUESTION_REORDER = "assessment.content.reorder";
+
+  // Operation names for external Assessment: Need to be updated in gateway
+  public static final String MSG_OP_EXT_ASSESSMENT_GET = "ext.assessment.get";
+  public static final String MSG_OP_EXT_ASSESSMENT_CREATE = "ext.assessment.create";
+  public static final String MSG_OP_EXT_ASSESSMENT_UPDATE = "ext.assessment.update";
+  public static final String MSG_OP_EXT_ASSESSMENT_DELETE = "ext.assessment.delete";
 
   // Containers for different responses
   public static final String RESP_CONTAINER_MBUS = "mb.container";

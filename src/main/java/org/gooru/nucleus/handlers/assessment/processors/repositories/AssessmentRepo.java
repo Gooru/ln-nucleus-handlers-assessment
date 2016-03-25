@@ -21,4 +21,11 @@ public interface AssessmentRepo {
 
   MessageResponse updateCollaborator();
 
+  MessageResponse deleteExternalAssessment();
+
+  MessageResponse updateExternalAssessment();
+
+  MessageResponse fetchExternalAssessment();
+
+  MessageResponse createExternalAssessment();
 }

@@ -44,4 +44,19 @@ public final class DBHandlerBuilder {
 
   }
 
+  public static DBHandler buildDeleteExternalAssessmentHandler(ProcessorContext context) {
+    return new DeleteExternalAssessmentHandler(context);
+  }
+
+  public static DBHandler buildUpdateExternalAssessmentHandler(ProcessorContext context) {
+    return new UpdateExternalAssessmentHandler(context);
+  }
+
+  public static DBHandler buildFetchExternalAssessmentHandler(ProcessorContext context) {
+    return new FetchExternalAssessmentHandler(context);
+  }
+
+  public static DBHandler buildCreateExternalAssessmentHandler(ProcessorContext context) {
+    return new CreateExternalAssessmentHandler(context);
+  }
 }

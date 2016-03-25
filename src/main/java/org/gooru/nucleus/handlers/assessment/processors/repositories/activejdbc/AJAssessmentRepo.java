@@ -53,4 +53,24 @@ class AJAssessmentRepo implements AssessmentRepo {
     return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildUpdateCollaboratorHandler(context));
   }
 
+  @Override
+  public MessageResponse deleteExternalAssessment() {
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildDeleteExternalAssessmentHandler(context));
+  }
+
+  @Override
+  public MessageResponse updateExternalAssessment() {
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildUpdateExternalAssessmentHandler(context));
+  }
+
+  @Override
+  public MessageResponse fetchExternalAssessment() {
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildFetchExternalAssessmentHandler(context));
+  }
+
+  @Override
+  public MessageResponse createExternalAssessment() {
+    return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildCreateExternalAssessmentHandler(context));
+  }
+
 }
