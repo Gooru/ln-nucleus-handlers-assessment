@@ -92,8 +92,9 @@ class AddQuestionToAssessmentHandler implements DBHandler {
         sequenceId = currentSequence + 1;
       }
       long count = Base
-        .exec(AJEntityQuestion.ADD_QUESTION_QUERY, this.context.assessmentId(), this.context.userId(), sequenceId, this.context.questionId(),
-          this.context.userId());
+        .exec(AJEntityQuestion.ADD_QUESTION_QUERY, this.context.assessmentId(), this.assessment.getString(AJEntityAssessment.COURSE_ID),
+          this.assessment.getString(AJEntityAssessment.UNIT_ID), this.assessment.getString(AJEntityAssessment.LESSON_ID), this.context.userId(),
+          sequenceId, this.context.questionId(), this.context.userId());
 
       if (count == 1) {
         return updateGrading();
