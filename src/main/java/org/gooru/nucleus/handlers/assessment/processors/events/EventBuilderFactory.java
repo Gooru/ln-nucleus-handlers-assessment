@@ -44,9 +44,8 @@ public final class EventBuilderFactory {
     return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_REORDER).put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 
-  public static EventBuilder getUpdateCollaboratorForAssessmentEventBuilder(String assessmentId) {
-    return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_COLLABORATOR_UPDATE)
-                                 .put(EVENT_BODY, new JsonObject().put(ASSESSMENT_ID, assessmentId));
+  public static EventBuilder getUpdateCollaboratorForAssessmentEventBuilder(String assessmentId, JsonObject collaborators) {
+    return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_COLLABORATOR_UPDATE).put(EVENT_BODY, collaborators.put(ASSESSMENT_ID, assessmentId));
   }
 
 

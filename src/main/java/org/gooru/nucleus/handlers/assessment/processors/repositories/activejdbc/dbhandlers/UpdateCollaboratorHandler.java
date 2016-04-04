@@ -1,5 +1,6 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
@@ -23,8 +24,11 @@ import java.util.ResourceBundle;
  */
 class UpdateCollaboratorHandler implements DBHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(UpdateCollaboratorHandler.class);
+  private static final String COLLABORATORS_REMOVED = "collaborators.removed";
+  private static final String COLLABORATORS_ADDED = "collaborators.added";
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private final ProcessorContext context;
+  private AJEntityAssessment assessment;
 
   public UpdateCollaboratorHandler(ProcessorContext context) {
     this.context = context;
@@ -72,19 +76,20 @@ class UpdateCollaboratorHandler implements DBHandler {
       return new ExecutionResult<>(MessageResponseFactory.createNotFoundResponse(RESOURCE_BUNDLE.getString("assessment.id") + context.assessmentId()),
         ExecutionResult.ExecutionStatus.FAILED);
     }
-    AJEntityAssessment assessment = assessments.get(0);
-    final String course = assessment.getString(AJEntityAssessment.COURSE_ID);
+    this.assessment = assessments.get(0);
+    final String course = this.assessment.getString(AJEntityAssessment.COURSE_ID);
     if (course != null) {
       LOGGER.error("Cannot update collaborator for assessment '{}' as it is part of course '{}'", context.assessmentId(), course);
       return new ExecutionResult<>(
         MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("assessment.associated.with.course")),
         ExecutionResult.ExecutionStatus.FAILED);
     }
-    return AuthorizerBuilder.buildUpdateCollaboratorAuthorizer(this.context).authorize(assessment);
+    return AuthorizerBuilder.buildUpdateCollaboratorAuthorizer(this.context).authorize(this.assessment);
   }
 
   @Override
   public ExecutionResult<MessageResponse> executeRequest() {
+    JsonObject diffCollaborators = calculateDiffOfCollaborators();
     AJEntityAssessment assessment = new AJEntityAssessment();
     assessment.setIdWithConverter(context.assessmentId());
     assessment.setModifierId(context.userId());
@@ -102,12 +107,51 @@ class UpdateCollaboratorHandler implements DBHandler {
       }
     }
     return new ExecutionResult<>(MessageResponseFactory.createNoContentResponse(RESOURCE_BUNDLE.getString("updated"),
-      EventBuilderFactory.getUpdateCollaboratorForAssessmentEventBuilder(context.assessmentId())), ExecutionResult.ExecutionStatus.SUCCESSFUL);
+      EventBuilderFactory.getUpdateCollaboratorForAssessmentEventBuilder(context.assessmentId(), diffCollaborators)),
+      ExecutionResult.ExecutionStatus.SUCCESSFUL);
   }
 
   @Override
   public boolean handlerReadOnly() {
     return false;
+  }
+
+  private JsonObject calculateDiffOfCollaborators() {
+    JsonObject result = new JsonObject();
+    // Find current collaborators
+    String currentCollaboratorsAsString = this.assessment.getString(AJEntityAssessment.COLLABORATOR);
+    JsonArray currentCollaborators;
+    currentCollaborators =
+      currentCollaboratorsAsString != null && !currentCollaboratorsAsString.isEmpty() ? new JsonArray(currentCollaboratorsAsString) : new JsonArray();
+    JsonArray newCollaborators = this.context.request().getJsonArray(AJEntityAssessment.COLLABORATOR);
+    if (currentCollaborators.isEmpty() && !newCollaborators.isEmpty()) {
+      // Adding all
+      result.put(COLLABORATORS_ADDED, newCollaborators.copy());
+      result.put(COLLABORATORS_REMOVED, new JsonArray());
+    } else if (!currentCollaborators.isEmpty() && newCollaborators.isEmpty()) {
+      // Removing all
+      result.put(COLLABORATORS_ADDED, new JsonArray());
+      result.put(COLLABORATORS_REMOVED, currentCollaborators.copy());
+    } else if (!currentCollaborators.isEmpty() && !newCollaborators.isEmpty()) {
+      // Do the diffing
+      JsonArray toBeAdded = new JsonArray();
+      JsonArray toBeDeleted = currentCollaborators.copy();
+      for (Object o : newCollaborators) {
+        if (toBeDeleted.contains(o)) {
+          toBeDeleted.remove(o);
+        } else {
+          toBeAdded.add(o);
+        }
+      }
+      result.put(COLLABORATORS_ADDED, toBeAdded);
+      result.put(COLLABORATORS_REMOVED, toBeDeleted);
+    } else {
+      // WHAT ????
+      LOGGER.warn("Updating collaborator with empty payload when current collaborator is empty for assessment '{}'", this.context.assessmentId());
+      result.put(COLLABORATORS_ADDED, new JsonArray());
+      result.put(COLLABORATORS_REMOVED, new JsonArray());
+    }
+    return result;
   }
 
   private static class DefaultPayloadValidator implements PayloadValidator {
