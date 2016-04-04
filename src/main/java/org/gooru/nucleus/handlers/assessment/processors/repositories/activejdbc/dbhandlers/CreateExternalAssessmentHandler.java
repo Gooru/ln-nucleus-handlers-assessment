@@ -81,7 +81,7 @@ public class CreateExternalAssessmentHandler implements DBHandler {
       }
     }
     return new ExecutionResult<>(MessageResponseFactory.createCreatedResponse(assessment.getId().toString(),
-      EventBuilderFactory.getCreateAssessmentEventBuilder(assessment.getString(AJEntityAssessment.ID))), ExecutionResult.ExecutionStatus.SUCCESSFUL);
+      EventBuilderFactory.getCreateExAssessmentEventBuilder(assessment.getString(AJEntityAssessment.ID))), ExecutionResult.ExecutionStatus.SUCCESSFUL);
   }
 
   @Override
