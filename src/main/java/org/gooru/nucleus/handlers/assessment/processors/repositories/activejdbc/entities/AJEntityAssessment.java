@@ -59,6 +59,7 @@ public class AJEntityAssessment extends Model {
     public static final String GRADING_TYPE_TEACHER = "teacher";
     public static final String GRADING_TYPE_SYSTEM = "system";
     public static final String REORDER_PAYLOAD_KEY = "order";
+    public static final String LICENSE = "license";
 
     // Queries used
     public static final String AUTHORIZER_QUERY =
@@ -67,9 +68,10 @@ public class AJEntityAssessment extends Model {
 
     public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
     public static final String FETCH_ASSESSMENT_QUERY =
-        "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, thumbnail, learning_objective, audience, "
-            + "metadata, taxonomy, orientation, setting, grading, visible_on_profile, collaborator, course_id from collection where id = ?::uuid and format"
-            + " = 'assessment'::content_container_type and is_deleted = false";
+        "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, thumbnail, learning_objective, "
+            + "audience, license,"
+            + "metadata, taxonomy, orientation, setting, grading, visible_on_profile, collaborator, course_id from collection where id = ?::uuid "
+            + "and format" + " = 'assessment'::content_container_type and is_deleted = false";
     public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, learning_objective, audience, "
             + "metadata, taxonomy, orientation, visible_on_profile, url, login_required, course_id from collection where id = ?::uuid and format"
@@ -78,7 +80,7 @@ public class AJEntityAssessment extends Model {
         "select collaborator from course where id = ?::uuid and is_deleted = false";
     public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays.asList("id", "title", "owner_id", "creator_id",
         "original_creator_id", "original_collection_id", "publish_date", "thumbnail", "learning_objective", "audience",
-        "metadata", "taxonomy", "orientation", "setting", "grading", "visible_on_profile");
+        "license", "metadata", "taxonomy", "orientation", "setting", "grading", "visible_on_profile");
     public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays.asList("id", "title", "owner_id", "creator_id",
         "original_creator_id", "original_collection_id", "thumbnail", "learning_objective", "audience", "metadata",
         "taxonomy", "orientation", "visible_on_profile", "url", "login_required");
@@ -134,7 +136,7 @@ public class AJEntityAssessment extends Model {
         validatorMap.put(METADATA, FieldValidator::validateJsonIfPresent);
         validatorMap.put(TAXONOMY, FieldValidator::validateJsonIfPresent);
         validatorMap.put(ORIENTATION,
-            (value) -> (value != null && value instanceof String
+            (value) -> ((value != null) && (value instanceof String)
                 && (ORIENTATION_STUDENT.equalsIgnoreCase((String) value)
                     || ORIENTATION_TEACHER.equalsIgnoreCase((String) value))));
         validatorMap.put(URL, (value) -> FieldValidator.validateStringIfPresent(value, 2000));
@@ -265,6 +267,10 @@ public class AJEntityAssessment extends Model {
         } else {
             this.set(ID, grading);
         }
+    }
+
+    public void setLicense(Integer code) {
+        this.set(LICENSE, code);
     }
 
     public void setTypeAssessment() {

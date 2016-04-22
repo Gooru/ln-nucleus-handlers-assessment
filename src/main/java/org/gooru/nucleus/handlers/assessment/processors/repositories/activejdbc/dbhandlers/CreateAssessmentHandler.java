@@ -7,6 +7,7 @@ import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbutils.LicenseUtil;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entitybuilders.EntityBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
@@ -33,7 +34,7 @@ class CreateAssessmentHandler implements DBHandler {
     @Override
     public ExecutionResult<MessageResponse> checkSanity() {
         // The user should not be anonymous
-        if (context.userId() == null || context.userId().isEmpty()
+        if ((context.userId() == null) || context.userId().isEmpty()
             || context.userId().equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
             LOGGER.warn("Anonymous or invalid user attempting to create assessment");
             return new ExecutionResult<>(
@@ -41,7 +42,7 @@ class CreateAssessmentHandler implements DBHandler {
                 ExecutionResult.ExecutionStatus.FAILED);
         }
         // Payload should not be empty
-        if (context.request() == null || context.request().isEmpty()) {
+        if ((context.request() == null) || context.request().isEmpty()) {
             LOGGER.warn("Empty payload supplied to create assessment");
             return new ExecutionResult<>(
                 MessageResponseFactory.createInvalidRequestResponse(RESOURCE_BUNDLE.getString("empty.payload")),
@@ -50,7 +51,7 @@ class CreateAssessmentHandler implements DBHandler {
         // Our validators should certify this
         JsonObject errors = new DefaultPayloadValidator().validatePayload(context.request(),
             AJEntityAssessment.createFieldSelector(), AJEntityAssessment.getValidatorRegistry());
-        if (errors != null && !errors.isEmpty()) {
+        if ((errors != null) && !errors.isEmpty()) {
             LOGGER.warn("Validation errors for request");
             return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors),
                 ExecutionResult.ExecutionStatus.FAILED);
@@ -74,6 +75,7 @@ class CreateAssessmentHandler implements DBHandler {
         assessment.setCreatorId(context.userId());
         assessment.setTypeAssessment();
         assessment.setGrading(AJEntityAssessment.GRADING_TYPE_SYSTEM);
+        assessment.setLicense(LicenseUtil.getDefaultLicenseCode());
         // Now auto populate is done, we need to setup the converter machinery
         new DefaultAJEntityAssessmentEntityBuilder().build(assessment, context.request(),
             AJEntityAssessment.getConverterRegistry());
