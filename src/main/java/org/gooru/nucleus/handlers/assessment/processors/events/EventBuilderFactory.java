@@ -16,6 +16,7 @@ public final class EventBuilderFactory {
     private static final String EVENT_NAME = "event.name";
     private static final String EVENT_BODY = "event.body";
     private static final String ASSESSMENT_ID = "id";
+    private static final String CONTENT_ID = "content.id";
     private static final String EVT_EX_ASSESSMENT_DELETE = "event.external.assessment.delete";
     private static final String EVT_EX_ASSESSMENT_UPDATE = "event.external.assessment.update";
     private static final String EVT_EX_ASSESSMENT_CREATE = "event.external.assessment.create";
@@ -39,9 +40,9 @@ public final class EventBuilderFactory {
             new JsonObject().put(ASSESSMENT_ID, assessmentId));
     }
 
-    public static EventBuilder getAddQuestionToAssessmentEventBuilder(String assessmentId) {
+    public static EventBuilder getAddQuestionToAssessmentEventBuilder(String assessmentId, String contentId) {
         return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_QUESTION_ADD).put(EVENT_BODY,
-            new JsonObject().put(ASSESSMENT_ID, assessmentId));
+            new JsonObject().put(ASSESSMENT_ID, assessmentId)).put(CONTENT_ID, contentId);
     }
 
     public static EventBuilder getReorderAssessmentEventBuilder(String assessmentId) {

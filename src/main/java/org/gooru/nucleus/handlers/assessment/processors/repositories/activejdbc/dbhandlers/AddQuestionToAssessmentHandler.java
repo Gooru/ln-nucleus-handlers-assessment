@@ -186,7 +186,8 @@ class AddQuestionToAssessmentHandler implements DBHandler {
 
         return new ExecutionResult<>(
             MessageResponseFactory.createNoContentResponse("Question added",
-                EventBuilderFactory.getAddQuestionToAssessmentEventBuilder(context.assessmentId())),
+                EventBuilderFactory.getAddQuestionToAssessmentEventBuilder(context.assessmentId(),
+                    context.questionId())),
             ExecutionResult.ExecutionStatus.SUCCESSFUL);
 
     }
