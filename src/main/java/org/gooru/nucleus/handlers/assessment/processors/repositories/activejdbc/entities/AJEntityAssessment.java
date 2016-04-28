@@ -35,7 +35,6 @@ public class AJEntityAssessment extends Model {
     public static final String THUMBNAIL = "thumbnail";
     public static final String LEARNING_OBJECTIVE = "learning_objective";
     public static final String FORMAT = "format";
-    public static final String AUDIENCE = "audience";
     public static final String METADATA = "metadata";
     public static final String TAXONOMY = "taxonomy";
     public static final String ORIENTATION = "orientation";
@@ -68,25 +67,24 @@ public class AJEntityAssessment extends Model {
 
     public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
     public static final String FETCH_ASSESSMENT_QUERY =
-        "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, thumbnail, learning_objective, "
-            + "audience, license,"
+        "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, thumbnail, learning_objective, license,"
             + "metadata, taxonomy, orientation, setting, grading, visible_on_profile, collaborator, course_id from collection where id = ?::uuid "
             + "and format" + " = 'assessment'::content_container_type and is_deleted = false";
     public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
-        "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, learning_objective, audience, "
+        "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, learning_objective, "
             + "metadata, taxonomy, orientation, visible_on_profile, url, login_required, course_id from collection where id = ?::uuid and format"
             + " = 'assessment-external'::content_container_type and is_deleted = false";
     public static final String COURSE_COLLABORATOR_QUERY =
         "select collaborator from course where id = ?::uuid and is_deleted = false";
     public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays.asList("id", "title", "owner_id", "creator_id",
-        "original_creator_id", "original_collection_id", "publish_date", "thumbnail", "learning_objective", "audience",
+        "original_creator_id", "original_collection_id", "publish_date", "thumbnail", "learning_objective",
         "license", "metadata", "taxonomy", "orientation", "setting", "grading", "visible_on_profile");
     public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays.asList("id", "title", "owner_id", "creator_id",
-        "original_creator_id", "original_collection_id", "thumbnail", "learning_objective", "audience", "metadata",
+        "original_creator_id", "original_collection_id", "thumbnail", "learning_objective", "metadata",
         "taxonomy", "orientation", "visible_on_profile", "url", "login_required");
 
     public static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays.asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE,
-        AUDIENCE, METADATA, TAXONOMY, ORIENTATION, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE));
+        METADATA, TAXONOMY, ORIENTATION, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE));
     public static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
     public static final Set<String> CREATABLE_EX_FIELDS = EDITABLE_FIELDS;
     public static final Set<String> MANDATORY_EX_FIELDS = new HashSet<>(Arrays.asList(TITLE, URL, LOGIN_REQUIRED));
@@ -109,7 +107,6 @@ public class AJEntityAssessment extends Model {
     private static Map<String, FieldConverter> initializeConverters() {
         Map<String, FieldConverter> converterMap = new HashMap<>();
         converterMap.put(ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
-        converterMap.put(AUDIENCE, (FieldConverter::convertFieldToJson));
         converterMap.put(METADATA, (FieldConverter::convertFieldToJson));
         converterMap.put(TAXONOMY, (FieldConverter::convertFieldToJson));
         converterMap.put(CREATOR_ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
@@ -132,7 +129,6 @@ public class AJEntityAssessment extends Model {
         validatorMap.put(TITLE, (value) -> FieldValidator.validateString(value, 5000));
         validatorMap.put(THUMBNAIL, (value) -> FieldValidator.validateStringIfPresent(value, 2000));
         validatorMap.put(LEARNING_OBJECTIVE, (value) -> FieldValidator.validateStringIfPresent(value, 20000));
-        validatorMap.put(AUDIENCE, FieldValidator::validateJsonArrayIfPresent);
         validatorMap.put(METADATA, FieldValidator::validateJsonIfPresent);
         validatorMap.put(TAXONOMY, FieldValidator::validateJsonIfPresent);
         validatorMap.put(ORIENTATION,
