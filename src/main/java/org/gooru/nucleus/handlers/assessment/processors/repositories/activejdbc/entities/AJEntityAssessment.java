@@ -37,7 +37,6 @@ public class AJEntityAssessment extends Model {
     public static final String FORMAT = "format";
     public static final String METADATA = "metadata";
     public static final String TAXONOMY = "taxonomy";
-    public static final String ORIENTATION = "orientation";
     public static final String URL = "url";
     public static final String LOGIN_REQUIRED = "login_required";
     public static final String VISIBLE_ON_PROFILE = "visible_on_profile";
@@ -53,7 +52,6 @@ public class AJEntityAssessment extends Model {
     public static final String ASSESSMENT_TYPE_NAME = "content_container_type";
     public static final String ASSESSMENT_TYPE_VALUE = "assessment";
     public static final String ASSESSMENT_EX_TYPE_VALUE = "assessment-external";
-    public static final String ORIENTATION_TYPE_NAME = "orientation_type";
     public static final String GRADING_TYPE_NAME = "grading_type";
     public static final String GRADING_TYPE_TEACHER = "teacher";
     public static final String GRADING_TYPE_SYSTEM = "system";
@@ -68,23 +66,23 @@ public class AJEntityAssessment extends Model {
     public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
     public static final String FETCH_ASSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, thumbnail, learning_objective, license,"
-            + "metadata, taxonomy, orientation, setting, grading, visible_on_profile, collaborator, course_id from collection where id = ?::uuid "
+            + "metadata, taxonomy, setting, grading, visible_on_profile, collaborator, course_id from collection where id = ?::uuid "
             + "and format" + " = 'assessment'::content_container_type and is_deleted = false";
     public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, learning_objective, "
-            + "metadata, taxonomy, orientation, visible_on_profile, url, login_required, course_id from collection where id = ?::uuid and format"
+            + "metadata, taxonomy, visible_on_profile, url, login_required, course_id from collection where id = ?::uuid and format"
             + " = 'assessment-external'::content_container_type and is_deleted = false";
     public static final String COURSE_COLLABORATOR_QUERY =
         "select collaborator from course where id = ?::uuid and is_deleted = false";
     public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays.asList("id", "title", "owner_id", "creator_id",
         "original_creator_id", "original_collection_id", "publish_date", "thumbnail", "learning_objective",
-        "license", "metadata", "taxonomy", "orientation", "setting", "grading", "visible_on_profile");
+        "license", "metadata", "taxonomy", "setting", "grading", "visible_on_profile");
     public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays.asList("id", "title", "owner_id", "creator_id",
         "original_creator_id", "original_collection_id", "thumbnail", "learning_objective", "metadata",
-        "taxonomy", "orientation", "visible_on_profile", "url", "login_required");
+        "taxonomy", "visible_on_profile", "url", "login_required");
 
     public static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays.asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE,
-        METADATA, TAXONOMY, ORIENTATION, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE));
+        METADATA, TAXONOMY, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE));
     public static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
     public static final Set<String> CREATABLE_EX_FIELDS = EDITABLE_FIELDS;
     public static final Set<String> MANDATORY_EX_FIELDS = new HashSet<>(Arrays.asList(TITLE, URL, LOGIN_REQUIRED));
@@ -95,9 +93,6 @@ public class AJEntityAssessment extends Model {
 
     private static final Map<String, FieldValidator> validatorRegistry;
     private static final Map<String, FieldConverter> converterRegistry;
-
-    private static final String ORIENTATION_STUDENT = "student";
-    private static final String ORIENTATION_TEACHER = "teacher";
 
     static {
         validatorRegistry = initializeValidators();
@@ -114,8 +109,6 @@ public class AJEntityAssessment extends Model {
         converterMap.put(OWNER_ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
         converterMap.put(FORMAT,
             (fieldValue -> FieldConverter.convertFieldToNamedType(fieldValue, ASSESSMENT_TYPE_NAME)));
-        converterMap.put(ORIENTATION,
-            (fieldValue -> FieldConverter.convertFieldToNamedType(fieldValue, ORIENTATION_TYPE_NAME)));
         converterMap.put(COLLABORATOR, (FieldConverter::convertFieldToJson));
         converterMap.put(GRADING,
             (fieldValue -> FieldConverter.convertFieldToNamedType(fieldValue, GRADING_TYPE_NAME)));
@@ -131,10 +124,6 @@ public class AJEntityAssessment extends Model {
         validatorMap.put(LEARNING_OBJECTIVE, (value) -> FieldValidator.validateStringIfPresent(value, 20000));
         validatorMap.put(METADATA, FieldValidator::validateJsonIfPresent);
         validatorMap.put(TAXONOMY, FieldValidator::validateJsonIfPresent);
-        validatorMap.put(ORIENTATION,
-            (value) -> ((value != null) && (value instanceof String)
-                && (ORIENTATION_STUDENT.equalsIgnoreCase((String) value)
-                    || ORIENTATION_TEACHER.equalsIgnoreCase((String) value))));
         validatorMap.put(URL, (value) -> FieldValidator.validateStringIfPresent(value, 2000));
         validatorMap.put(LOGIN_REQUIRED, FieldValidator::validateBooleanIfPresent);
         validatorMap.put(VISIBLE_ON_PROFILE, FieldValidator::validateBooleanIfPresent);
