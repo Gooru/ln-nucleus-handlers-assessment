@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 public final class LicenseUtil {
 
     private static Integer defaultLicenseCode;
-    // TODO: Need to provide a proper value here
     private static final String defaultLicenseLabel = "Public Domain";
 
     private LicenseUtil() {
