@@ -42,7 +42,7 @@ public final class EventBuilderFactory {
 
     public static EventBuilder getAddQuestionToAssessmentEventBuilder(String assessmentId, String contentId) {
         return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_QUESTION_ADD).put(EVENT_BODY,
-            new JsonObject().put(ASSESSMENT_ID, assessmentId)).put(CONTENT_ID, contentId);
+            new JsonObject().put(ASSESSMENT_ID, assessmentId).put(CONTENT_ID, contentId));
     }
 
     public static EventBuilder getReorderAssessmentEventBuilder(String assessmentId) {
