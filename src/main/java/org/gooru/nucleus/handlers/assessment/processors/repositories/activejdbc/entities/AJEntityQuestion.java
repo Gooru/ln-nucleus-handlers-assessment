@@ -28,7 +28,7 @@ public class AJEntityQuestion extends Model {
     public static final String OPEN_ENDED_QUESTION_FILTER =
         "collection_id = ?::uuid and content_subformat = 'open_ended_question'::content_subformat_type and is_deleted = false";
     public static final String FETCH_QUESTION_SUMMARY_QUERY =
-        "select id, title, creator_id, original_creator_id, publish_date, content_subformat, answer, metadata, taxonomy, "
+        "select id, title, creator_id, original_creator_id, publish_date, content_subformat, answer, metadata, taxonomy, narration, "
             + "hint_explanation_detail, thumbnail, sequence_id, visible_on_profile, description from content where collection_id = ?::uuid and "
             + " is_deleted = false order by sequence_id asc";
 
@@ -39,7 +39,7 @@ public class AJEntityQuestion extends Model {
             + "false";
 
     public static final List<String> FETCH_QUESTION_SUMMARY_FIELDS = Arrays.asList("id", "title", "creator_id",
-        "original_creator_id", "publish_date", "content_subformat", "answer", "metadata", "taxonomy",
+        "original_creator_id", "publish_date", "content_subformat", "answer", "metadata", "taxonomy", "narration",
         "hint_explanation_detail", "thumbnail", "sequence_id", "visible_on_profile", "description");
     public static final String SEQUENCE_ID = "sequence_id";
 }
