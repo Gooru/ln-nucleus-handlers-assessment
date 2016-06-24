@@ -61,25 +61,28 @@ public class AJEntityAssessment extends Model {
     public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
     public static final String FETCH_ASSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, "
-            + "thumbnail, learning_objective, license,metadata, taxonomy, setting, grading, visible_on_profile, "
-            + "collaborator, course_id from collection where id = ?::uuid and format"
+            + "thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, visible_on_profile, "
+            + "collaborator, course_id, unit_id, lesson_id from collection where id = ?::uuid and format"
             + " = 'assessment'::content_container_type and is_deleted = false";
     public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, "
-            + "learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, course_id from "
-            + "collection where id = ?::uuid and format = 'assessment-external'::content_container_type and "
-            + "is_deleted = false";
+            + "learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, course_id, unit_id, "
+            + "lesson_id from collection where id = ?::uuid and format = 'assessment-external'::content_container_type "
+            + "and is_deleted = false";
     public static final String COURSE_COLLABORATOR_QUERY =
         "select collaborator from course where id = ?::uuid and is_deleted = false";
-    public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays.asList("id", "title", "owner_id", "creator_id",
-        "original_creator_id", "original_collection_id", "publish_date", "thumbnail", "learning_objective",
-        "license", "metadata", "taxonomy", "setting", "grading", "visible_on_profile");
-    public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays.asList("id", "title", "owner_id", "creator_id",
-        "original_creator_id", "original_collection_id", "thumbnail", "learning_objective", "metadata",
-        "taxonomy", "visible_on_profile", "url", "login_required");
+    public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays
+        .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id",
+            "publish_date", "thumbnail", "learning_objective", "license", "metadata", "taxonomy", "setting", "grading",
+            "visible_on_profile", "course_id", "unit_id", "lesson_id");
+    public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays
+        .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id", "thumbnail",
+            "learning_objective", "metadata", "taxonomy", "visible_on_profile", "url", "login_required", "course_id",
+            "unit_id", "lesson_id");
 
-    public static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays.asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE,
-        METADATA, TAXONOMY, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE, SETTING));
+    public static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays
+        .asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, METADATA, TAXONOMY, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE,
+            SETTING));
     public static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
     public static final Set<String> CREATABLE_EX_FIELDS = EDITABLE_FIELDS;
     public static final Set<String> MANDATORY_EX_FIELDS = new HashSet<>(Arrays.asList(TITLE, URL, LOGIN_REQUIRED));
@@ -104,12 +107,12 @@ public class AJEntityAssessment extends Model {
         converterMap.put(CREATOR_ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
         converterMap.put(MODIFIER_ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
         converterMap.put(OWNER_ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
-        converterMap.put(FORMAT,
-            (fieldValue -> FieldConverter.convertFieldToNamedType(fieldValue, ASSESSMENT_TYPE_NAME)));
+        converterMap
+            .put(FORMAT, (fieldValue -> FieldConverter.convertFieldToNamedType(fieldValue, ASSESSMENT_TYPE_NAME)));
         converterMap.put(COLLABORATOR, (FieldConverter::convertFieldToJson));
         converterMap.put(SETTING, FieldConverter::convertFieldToJson);
-        converterMap.put(GRADING,
-            (fieldValue -> FieldConverter.convertFieldToNamedType(fieldValue, GRADING_TYPE_NAME)));
+        converterMap
+            .put(GRADING, (fieldValue -> FieldConverter.convertFieldToNamedType(fieldValue, GRADING_TYPE_NAME)));
 
         return Collections.unmodifiableMap(converterMap);
     }
