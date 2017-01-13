@@ -36,4 +36,8 @@ public final class AuthorizerBuilder {
     public static Authorizer<AJEntityAssessment> buildAddQuestionToAssessmentAuthorizer(ProcessorContext context) {
         return new AddQuestionToAssessmentAuthorizer(context);
     }
+
+    public static Authorizer<AJEntityAssessment> buildTenantAuthorizer(ProcessorContext context) {
+        return new TenantAuthorizer(context);
+    }
 }

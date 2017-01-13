@@ -3,6 +3,7 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 import java.util.ResourceBundle;
 
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.JsonFormatterBuilder;
@@ -62,20 +63,22 @@ class FetchAssessmentHandler implements DBHandler {
                 ExecutionResult.ExecutionStatus.FAILED);
         }
         this.assessment = assessments.get(0);
-        return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
+        return AuthorizerBuilder.buildTenantAuthorizer(this.context).authorize(assessment);
     }
 
     @Override
     public ExecutionResult<MessageResponse> executeRequest() {
         // First create response from Assessment
-        JsonObject response = new JsonObject(JsonFormatterBuilder
-            .buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST).toJson(this.assessment));
+        JsonObject response = new JsonObject(
+            JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST)
+                .toJson(this.assessment));
         // Now query questions and populate them
         LazyList<AJEntityQuestion> questions =
             AJEntityQuestion.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, context.assessmentId());
         if (!questions.isEmpty()) {
-            response.put(AJEntityQuestion.QUESTION, new JsonArray(JsonFormatterBuilder
-                .buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS).toJson(questions)));
+            response.put(AJEntityQuestion.QUESTION, new JsonArray(
+                JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS)
+                    .toJson(questions)));
         } else {
             response.put(AJEntityQuestion.QUESTION, new JsonArray());
         }
@@ -100,8 +103,9 @@ class FetchAssessmentHandler implements DBHandler {
                     response.put(AJEntityAssessment.COLLABORATOR, new JsonArray());
                 }
             } catch (DBException e) {
-                LOGGER.error("Error trying to get course collaborator for course '{}' to fetch assessment '{}'",
-                    courseId, this.context.assessmentId(), e);
+                LOGGER
+                    .error("Error trying to get course collaborator for course '{}' to fetch assessment '{}'", courseId,
+                        this.context.assessmentId(), e);
                 return new ExecutionResult<>(
                     MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
                     ExecutionResult.ExecutionStatus.FAILED);

@@ -54,6 +54,8 @@ public class AJEntityAssessment extends Model {
     public static final String LICENSE = "license";
     public static final String TENANT = "tenant";
     public static final String TENANT_ROOT = "tenant_root";
+    private static final String PUBLISH_STATUS = "publish_status";
+    private static final String PUBLISH_STATUS_PUBLISHED = "published";
 
     // Queries used
     public static final String AUTHORIZER_QUERY =
@@ -61,16 +63,17 @@ public class AJEntityAssessment extends Model {
             + "collection where format = ?::content_container_type and id = ?::uuid and is_deleted = ?";
 
     public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
+    public static final String PUBLISHED_FILTER = "id = ?::uuid and publish_status = 'published'::publish_status_type;";
     public static final String FETCH_ASSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, "
-            + "thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, visible_on_profile, "
-            + "collaborator, course_id, unit_id, lesson_id from collection where id = ?::uuid and format"
-            + " = 'assessment'::content_container_type and is_deleted = false";
+            + "publish_status, thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, "
+            + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root from collection "
+            + "where id = ?::uuid and format = 'assessment'::content_container_type and is_deleted = false";
     public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, "
-            + "learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, course_id, unit_id, "
-            + "lesson_id from collection where id = ?::uuid and format = 'assessment-external'::content_container_type "
-            + "and is_deleted = false";
+            + "publish_status, learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, "
+            + "course_id, unit_id, lesson_id tenant, tenant_root, from collection where id = ?::uuid and format = "
+            + "'assessment-external'::content_container_type and is_deleted = false";
     public static final String COURSE_COLLABORATOR_QUERY =
         "select collaborator from course where id = ?::uuid and is_deleted = false";
     public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays
@@ -264,6 +267,14 @@ public class AJEntityAssessment extends Model {
         } else {
             this.set(fieldName, fieldValue);
         }
+    }
+
+    public boolean isAssessmentPublished() {
+        return Objects.equals(this.getString(PUBLISH_STATUS), PUBLISH_STATUS_PUBLISHED);
+    }
+
+    public String getCourseId() {
+        return this.getString(COURSE_ID);
     }
 
     private static class AssessmentValidationRegistry implements ValidatorRegistry {
