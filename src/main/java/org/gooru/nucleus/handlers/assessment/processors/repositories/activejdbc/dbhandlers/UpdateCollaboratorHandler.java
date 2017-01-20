@@ -30,6 +30,7 @@ class UpdateCollaboratorHandler implements DBHandler {
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
     private final ProcessorContext context;
     private AJEntityAssessment assessment;
+    private JsonObject diffCollaborators;
 
     public UpdateCollaboratorHandler(ProcessorContext context) {
         this.context = context;
@@ -45,8 +46,8 @@ class UpdateCollaboratorHandler implements DBHandler {
                 ExecutionResult.ExecutionStatus.FAILED);
         }
         // The user should not be anonymous
-        if (context.userId() == null || context.userId().isEmpty()
-            || context.userId().equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
+        if (context.userId() == null || context.userId().isEmpty() || context.userId()
+            .equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
             LOGGER.warn("Anonymous user attempting to edit assessment");
             return new ExecutionResult<>(
                 MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")),
@@ -60,8 +61,9 @@ class UpdateCollaboratorHandler implements DBHandler {
                 ExecutionResult.ExecutionStatus.FAILED);
         }
         // Our validators should certify this
-        JsonObject errors = new DefaultPayloadValidator().validatePayload(context.request(),
-            AJEntityAssessment.editCollaboratorFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+        JsonObject errors = new DefaultPayloadValidator()
+            .validatePayload(context.request(), AJEntityAssessment.editCollaboratorFieldSelector(),
+                AJEntityAssessment.getValidatorRegistry());
         if (errors != null && !errors.isEmpty()) {
             LOGGER.warn("Validation errors for request");
             return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors),
@@ -75,38 +77,37 @@ class UpdateCollaboratorHandler implements DBHandler {
     public ExecutionResult<MessageResponse> validateRequest() {
         // Fetch the assessment where type is assessment and it is not deleted
         // already and id is specified id
-        LazyList<AJEntityAssessment> assessments = AJEntityAssessment.findBySQL(AJEntityAssessment.AUTHORIZER_QUERY,
-            AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
+        LazyList<AJEntityAssessment> assessments = AJEntityAssessment
+            .findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT, context.assessmentId(),
+                false);
         // Assessment should be present in DB
         if (assessments.size() < 1) {
             LOGGER.warn("Assessment id: {} not present in DB", context.assessmentId());
-            return new ExecutionResult<>(
-                MessageResponseFactory
-                    .createNotFoundResponse(RESOURCE_BUNDLE.getString("assessment.id") + context.assessmentId()),
+            return new ExecutionResult<>(MessageResponseFactory
+                .createNotFoundResponse(RESOURCE_BUNDLE.getString("assessment.id") + context.assessmentId()),
                 ExecutionResult.ExecutionStatus.FAILED);
         }
         this.assessment = assessments.get(0);
-        final String course = this.assessment.getString(AJEntityAssessment.COURSE_ID);
+        final String course = this.assessment.getCourseId();
         if (course != null) {
             LOGGER.error("Cannot update collaborator for assessment '{}' as it is part of course '{}'",
                 context.assessmentId(), course);
-            return new ExecutionResult<>(
-                MessageResponseFactory
-                    .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("assessment.associated.with.course")),
+            return new ExecutionResult<>(MessageResponseFactory
+                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("assessment.associated.with.course")),
                 ExecutionResult.ExecutionStatus.FAILED);
         }
-        return AuthorizerBuilder.buildUpdateCollaboratorAuthorizer(this.context).authorize(this.assessment);
+        diffCollaborators = calculateDiffOfCollaborators();
+        return doAuthorization();
     }
 
     @Override
     public ExecutionResult<MessageResponse> executeRequest() {
-        JsonObject diffCollaborators = calculateDiffOfCollaborators();
         AJEntityAssessment assessment = new AJEntityAssessment();
         assessment.setIdWithConverter(context.assessmentId());
         assessment.setModifierId(context.userId());
         // Now auto populate is done, we need to setup the converter machinery
-        new DefaultAJEntityAssessmentEntityBuilder().build(assessment, context.request(),
-            AJEntityAssessment.getConverterRegistry());
+        new DefaultAJEntityAssessmentEntityBuilder()
+            .build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
 
         boolean result = assessment.save();
         if (!result) {
@@ -119,8 +120,8 @@ class UpdateCollaboratorHandler implements DBHandler {
                     ExecutionResult.ExecutionStatus.FAILED);
             }
         }
-        return new ExecutionResult<>(
-            MessageResponseFactory.createNoContentResponse(RESOURCE_BUNDLE.getString("updated"), EventBuilderFactory
+        return new ExecutionResult<>(MessageResponseFactory
+            .createNoContentResponse(RESOURCE_BUNDLE.getString("updated"), EventBuilderFactory
                 .getUpdateCollaboratorForAssessmentEventBuilder(context.assessmentId(), diffCollaborators)),
             ExecutionResult.ExecutionStatus.SUCCESSFUL);
     }
@@ -130,13 +131,24 @@ class UpdateCollaboratorHandler implements DBHandler {
         return false;
     }
 
+    private ExecutionResult<MessageResponse> doAuthorization() {
+        ExecutionResult<MessageResponse> result =
+            AuthorizerBuilder.buildUpdateCollaboratorAuthorizer(this.context).authorize(this.assessment);
+        if (result.hasFailed()) {
+            return result;
+        }
+        return AuthorizerBuilder
+            .buildTenantCollaboratorAuthorizer(this.context, diffCollaborators.getJsonArray(COLLABORATORS_ADDED))
+            .authorize(assessment);
+    }
+
     private JsonObject calculateDiffOfCollaborators() {
         JsonObject result = new JsonObject();
         // Find current collaborators
         String currentCollaboratorsAsString = this.assessment.getString(AJEntityAssessment.COLLABORATOR);
         JsonArray currentCollaborators;
-        currentCollaborators = currentCollaboratorsAsString != null && !currentCollaboratorsAsString.isEmpty()
-            ? new JsonArray(currentCollaboratorsAsString) : new JsonArray();
+        currentCollaborators = currentCollaboratorsAsString != null && !currentCollaboratorsAsString.isEmpty() ?
+            new JsonArray(currentCollaboratorsAsString) : new JsonArray();
         JsonArray newCollaborators = this.context.request().getJsonArray(AJEntityAssessment.COLLABORATOR);
         if (currentCollaborators.isEmpty() && !newCollaborators.isEmpty()) {
             // Adding all
@@ -161,9 +173,9 @@ class UpdateCollaboratorHandler implements DBHandler {
             result.put(COLLABORATORS_REMOVED, toBeDeleted);
         } else {
             // WHAT ????
-            LOGGER.warn(
-                "Updating collaborator with empty payload when current collaborator is empty for assessment '{}'",
-                this.context.assessmentId());
+            LOGGER
+                .warn("Updating collaborator with empty payload when current collaborator is empty for assessment '{}'",
+                    this.context.assessmentId());
             result.put(COLLABORATORS_ADDED, new JsonArray());
             result.put(COLLABORATORS_REMOVED, new JsonArray());
         }

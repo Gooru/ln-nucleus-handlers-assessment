@@ -7,8 +7,6 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
-import org.javalite.activejdbc.Base;
-import org.javalite.activejdbc.DBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,34 +26,10 @@ class UpdateCollaboratorAuthorizer implements Authorizer<AJEntityAssessment> {
     @Override
     public ExecutionResult<MessageResponse> authorize(AJEntityAssessment assessment) {
         String ownerId = assessment.getString(AJEntityAssessment.OWNER_ID);
-        String courseId = assessment.getString(AJEntityAssessment.COURSE_ID);
-        long authRecordCount;
-        // If this assessment is not part of course, then user should be either
-        // owner or collaborator on course
-        if (courseId != null) {
-            try {
-                authRecordCount = Base.count(AJEntityAssessment.TABLE_COURSE, AJEntityAssessment.AUTH_FILTER, courseId,
-                    context.userId(), context.userId());
-                if (authRecordCount >= 1) {
-                    return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
-                }
-            } catch (DBException e) {
-                LOGGER.error("Error checking authorization for update for Assessment '{}' for course '{}'",
-                    context.assessmentId(), courseId, e);
-                return new ExecutionResult<>(
-                    MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
-                    ExecutionResult.ExecutionStatus.FAILED);
-            }
-        } else {
-            // Assessment is not part of course, hence we need user to be owner,
-            // collaborator on assessment will not help
-            if (context.userId().equalsIgnoreCase(ownerId)) {
-                // Owner is fine
-                return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
-            }
+        if (context.userId().equalsIgnoreCase(ownerId)) {
+            return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
         }
-        LOGGER.warn("User: '{}' is not owner of assessment: '{}' or owner/collaborator on course", context.userId(),
-            context.assessmentId());
+        LOGGER.warn("User: '{}' is not owner of assessment: '{}'", context.userId(), context.assessmentId());
         return new ExecutionResult<>(
             MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")),
             ExecutionResult.ExecutionStatus.FAILED);
