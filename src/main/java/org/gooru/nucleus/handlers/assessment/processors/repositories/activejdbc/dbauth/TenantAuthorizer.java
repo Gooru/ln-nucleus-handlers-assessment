@@ -32,8 +32,7 @@ class TenantAuthorizer implements Authorizer<AJEntityAssessment> {
     @Override
     public ExecutionResult<MessageResponse> authorize(AJEntityAssessment model) {
         TenantTree userTenantTree = TenantTreeBuilder.build(context.tenant(), context.tenantRoot());
-        TenantTree contentTenantTree = TenantTreeBuilder
-            .build(model.getString(AJEntityAssessment.TENANT), model.getString(AJEntityAssessment.TENANT_ROOT));
+        TenantTree contentTenantTree = TenantTreeBuilder.build(model.getTenant(), model.getTenantRoot());
 
         // First validation based on published status of this entity only
         ContentTenantAuthorization authorization = ContentTenantAuthorizationBuilder
