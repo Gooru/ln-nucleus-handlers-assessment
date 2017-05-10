@@ -9,6 +9,7 @@ import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFacto
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityRubric;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
@@ -118,8 +119,11 @@ class DeleteAssessmentHandler implements DBHandler {
         try {
             long deletedContentCount =
                 Base.exec(AJEntityQuestion.DELETE_CONTENTS_QUERY, this.context.userId(), this.context.assessmentId());
-            LOGGER.info("Assessment '{}' deleted along with '{}' questions", context.assessmentId(),
-                deletedContentCount);
+            long deletedRubricCount =
+                Base.exec(AJEntityRubric.DELETE_RUBRICS_QUERY, this.context.userId(), this.context.assessmentId());
+
+            LOGGER.info("Assessment '{}' deleted along with '{}' questions and '{}' rubrics", context.assessmentId(),
+                deletedContentCount, deletedRubricCount);
             return true;
         } catch (DBException e) {
             LOGGER.error("Error deleting questions for Assessment '{}'", context.assessmentId(), e);
