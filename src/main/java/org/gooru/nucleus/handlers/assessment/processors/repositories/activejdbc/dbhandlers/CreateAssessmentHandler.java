@@ -24,7 +24,7 @@ import io.vertx.core.json.JsonObject;
  */
 class CreateAssessmentHandler implements DBHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateAssessmentHandler.class);
-    public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
     private final ProcessorContext context;
 
     public CreateAssessmentHandler(ProcessorContext context) {
