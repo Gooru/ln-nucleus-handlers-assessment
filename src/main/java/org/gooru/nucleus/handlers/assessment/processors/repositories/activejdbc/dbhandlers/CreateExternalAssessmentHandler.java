@@ -22,7 +22,7 @@ import io.vertx.core.json.JsonObject;
  * Created by ashish on 25/3/16.
  */
 public class CreateExternalAssessmentHandler implements DBHandler {
-    public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateExternalAssessmentHandler.class);
     private final ProcessorContext context;
 

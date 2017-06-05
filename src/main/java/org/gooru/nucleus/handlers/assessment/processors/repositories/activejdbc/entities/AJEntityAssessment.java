@@ -71,7 +71,7 @@ public class AJEntityAssessment extends Model {
     public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, subformat, "
             + "publish_status, learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, "
-            + "course_id, unit_id, lesson_id, tenant, tenant_root, from collection where id = ?::uuid and format = "
+            + "course_id, unit_id, lesson_id, tenant, tenant_root from collection where id = ?::uuid and format = "
             + "'assessment-external'::content_container_type and is_deleted = false";
     public static final String COURSE_COLLABORATOR_QUERY =
         "select collaborator from course where id = ?::uuid and is_deleted = false";
@@ -84,16 +84,16 @@ public class AJEntityAssessment extends Model {
             "learning_objective", "metadata", "taxonomy", "visible_on_profile", "url", "login_required", "course_id",
             "unit_id", "lesson_id", "subformat");
 
-    public static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays
+    private static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays
         .asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, METADATA, TAXONOMY, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE,
             SETTING));
-    public static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
-    public static final Set<String> CREATABLE_EX_FIELDS = EDITABLE_FIELDS;
-    public static final Set<String> MANDATORY_EX_FIELDS = new HashSet<>(Arrays.asList(TITLE, URL, LOGIN_REQUIRED));
-    public static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(TITLE));
-    public static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Arrays.asList(ID));
-    public static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
-    public static final Set<String> REORDER_FIELDS = new HashSet<>(Arrays.asList(REORDER_PAYLOAD_KEY));
+    private static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
+    private static final Set<String> CREATABLE_EX_FIELDS = EDITABLE_FIELDS;
+    private static final Set<String> MANDATORY_EX_FIELDS = new HashSet<>(Arrays.asList(TITLE, URL, LOGIN_REQUIRED));
+    private static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(TITLE));
+    private static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Arrays.asList(ID));
+    private static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
+    private static final Set<String> REORDER_FIELDS = new HashSet<>(Arrays.asList(REORDER_PAYLOAD_KEY));
 
     private static final Map<String, FieldValidator> validatorRegistry;
     private static final Map<String, FieldConverter> converterRegistry;

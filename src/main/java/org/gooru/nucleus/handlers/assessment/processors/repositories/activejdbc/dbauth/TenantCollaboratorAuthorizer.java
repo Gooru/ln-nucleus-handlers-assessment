@@ -56,9 +56,7 @@ class TenantCollaboratorAuthorizer implements Authorizer<AJEntityAssessment> {
         for (TenantTree collaboratorTree : collaboratorTenantTrees) {
             ContentTenantAuthorization authorization =
                 ContentTenantAuthorizationBuilder.build(contentTenantTree, collaboratorTree, attributes);
-            if (authorization.canCollaborate()) {
-                continue;
-            } else {
+            if (!authorization.canCollaborate()) {
                 return sendError();
             }
         }
