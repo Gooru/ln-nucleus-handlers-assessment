@@ -1,16 +1,19 @@
 package org.gooru.nucleus.handlers.assessment.processors;
 
+import static org.gooru.nucleus.handlers.assessment.processors.utils.ValidationUtils.validateUser;
+
 import java.util.ResourceBundle;
-import java.util.UUID;
 
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
-import org.gooru.nucleus.handlers.assessment.processors.repositories.RepoBuilder;
+import org.gooru.nucleus.handlers.assessment.processors.commands.CommandProcessorBuilder;
+import org.gooru.nucleus.handlers.assessment.processors.exceptions.VersionDeprecatedException;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 
@@ -20,7 +23,7 @@ class MessageProcessor implements Processor {
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
     private final Message<Object> message;
     private String userId;
-    private JsonObject prefs;
+    private JsonObject session;
     private JsonObject request;
 
     public MessageProcessor(Message<Object> message) {
@@ -31,157 +34,28 @@ class MessageProcessor implements Processor {
     public MessageResponse process() {
         MessageResponse result;
         try {
-            // Validate the message itself
             ExecutionResult<MessageResponse> validateResult = validateAndInitialize();
             if (validateResult.isCompleted()) {
                 return validateResult.result();
             }
 
             final String msgOp = message.headers().get(MessageConstants.MSG_HEADER_OP);
-            switch (msgOp) {
-            case MessageConstants.MSG_OP_ASSESSMENT_GET:
-                result = processAssessmentGet();
-                break;
-            case MessageConstants.MSG_OP_ASSESSMENT_CREATE:
-                result = processAssessmentCreate();
-                break;
-            case MessageConstants.MSG_OP_ASSESSMENT_UPDATE:
-                result = processAssessmentUpdate();
-                break;
-            case MessageConstants.MSG_OP_ASSESSMENT_DELETE:
-                result = processAssessmentDelete();
-                break;
-            case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_ADD:
-                result = processAssessmentAddQuestion();
-                break;
-            case MessageConstants.MSG_OP_ASSESSMENT_QUESTION_REORDER:
-                result = processAssessmentQuestionReorder();
-                break;
-            case MessageConstants.MSG_OP_ASSESSMENT_COLLABORATOR_UPDATE:
-                result = processAssessmentCollaboratorUpdate();
-                break;
-            case MessageConstants.MSG_OP_EXT_ASSESSMENT_GET:
-                result = processExternalAssessmentGet();
-                break;
-            case MessageConstants.MSG_OP_EXT_ASSESSMENT_CREATE:
-                result = processExternalAssessmentCreate();
-                break;
-            case MessageConstants.MSG_OP_EXT_ASSESSMENT_UPDATE:
-                result = processExternalAssessmentUpdate();
-                break;
-            case MessageConstants.MSG_OP_EXT_ASSESSMENT_DELETE:
-                result = processExternalAssessmentDelete();
-                break;
-            default:
-                LOGGER.error("Invalid operation type passed in, not able to handle");
-                return MessageResponseFactory
-                    .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.operation"));
-            }
-            return result;
+            return CommandProcessorBuilder.lookupBuilder(msgOp).build(createContext()).process();
+        } catch (VersionDeprecatedException e) {
+            LOGGER.error("Version is deprecated");
+            return MessageResponseFactory.createVersionDeprecatedResponse();
         } catch (Throwable e) {
             LOGGER.error("Unhandled exception in processing", e);
             return MessageResponseFactory.createInternalErrorResponse();
         }
     }
 
-    private MessageResponse processAssessmentQuestionReorder() {
-        ProcessorContext context = createContext();
-        if (!validateContext(context)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).reorderQuestionInAssessment();
-    }
-
-    private MessageResponse processAssessmentCollaboratorUpdate() {
-        ProcessorContext context = createContext();
-        if (!validateContext(context)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).updateCollaborator();
-    }
-
-    private MessageResponse processAssessmentAddQuestion() {
-        ProcessorContext context = createContext();
-        if (!validateContext(context, true)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.question.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).addQuestionToAssessment();
-    }
-
-    private MessageResponse processAssessmentDelete() {
-        ProcessorContext context = createContext();
-        if (!validateContext(context)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).deleteAssessment();
-    }
-
-    private MessageResponse processAssessmentUpdate() {
-        ProcessorContext context = createContext();
-        if (!validateContext(context)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).updateAssessment();
-    }
-
-    private MessageResponse processAssessmentGet() {
-        ProcessorContext context = createContext();
-        if (!validateContext(context)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).fetchAssessment();
-    }
-
-    private MessageResponse processAssessmentCreate() {
-        ProcessorContext context = createContext();
-
-        return RepoBuilder.buildAssessmentRepo(context).createAssessment();
-    }
-
-    private MessageResponse processExternalAssessmentDelete() {
-        ProcessorContext context = createContext();
-        if (!validateContext(context)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).deleteExternalAssessment();
-    }
-
-    private MessageResponse processExternalAssessmentUpdate() {
-        ProcessorContext context = createContext();
-        if (!validateContext(context)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).updateExternalAssessment();
-    }
-
-    private MessageResponse processExternalAssessmentGet() {
-        ProcessorContext context = createContext();
-        if (!validateContext(context)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).fetchExternalAssessment();
-    }
-
-    private MessageResponse processExternalAssessmentCreate() {
-        ProcessorContext context = createContext();
-
-        return RepoBuilder.buildAssessmentRepo(context).createExternalAssessment();
-    }
-
     private ProcessorContext createContext() {
-        String assessmentId = message.headers().get(MessageConstants.ASSESSMENT_ID);
+        MultiMap headers = message.headers();
+        String assessmentId = headers.get(MessageConstants.ASSESSMENT_ID);
         String questionId = request.getString(MessageConstants.ID);
 
-        return new ProcessorContext(userId, prefs, request, assessmentId, questionId);
+        return new ProcessorContext(userId, session, request, assessmentId, questionId, headers);
     }
 
     private ExecutionResult<MessageResponse> validateAndInitialize() {
@@ -200,13 +74,13 @@ class MessageProcessor implements Processor {
                 ExecutionResult.ExecutionStatus.FAILED);
         }
 
-        prefs = ((JsonObject) message.body()).getJsonObject(MessageConstants.MSG_KEY_PREFS);
+        session = ((JsonObject) message.body()).getJsonObject(MessageConstants.MSG_KEY_SESSION);
         request = ((JsonObject) message.body()).getJsonObject(MessageConstants.MSG_HTTP_BODY);
 
-        if (prefs == null || prefs.isEmpty()) {
-            LOGGER.error("Invalid preferences obtained, probably not authorized properly");
+        if (session == null || session.isEmpty()) {
+            LOGGER.error("Invalid session obtained, probably not authorized properly");
             return new ExecutionResult<>(
-                MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("missing.preferences")),
+                MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("missing.session")),
                 ExecutionResult.ExecutionStatus.FAILED);
         }
 
@@ -219,44 +93,6 @@ class MessageProcessor implements Processor {
 
         // All is well, continue processing
         return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
-    }
-
-    private boolean validateContext(ProcessorContext context) {
-        return validateContext(context, false);
-    }
-
-    private boolean validateContext(ProcessorContext context, boolean shouldHaveQuestion) {
-        if (!validateId(context.assessmentId())) {
-            LOGGER.error("Invalid request, assessment id not available/incorrect format. Aborting");
-            return false;
-        }
-        if (shouldHaveQuestion) {
-            if (!validateId(context.questionId())) {
-                LOGGER.error("Invalid request, question id not available/incorrect format. Aborting");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean validateUser(String userId) {
-        return !(userId == null || userId.isEmpty())
-            && (userId.equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS) || validateUuid(userId));
-    }
-
-    private boolean validateId(String id) {
-        return !(id == null || id.isEmpty()) && validateUuid(id);
-    }
-
-    private boolean validateUuid(String uuidString) {
-        try {
-            UUID uuid = UUID.fromString(uuidString);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
 }

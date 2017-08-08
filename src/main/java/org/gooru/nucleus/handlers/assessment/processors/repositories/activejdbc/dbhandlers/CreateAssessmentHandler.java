@@ -24,7 +24,7 @@ import io.vertx.core.json.JsonObject;
  */
 class CreateAssessmentHandler implements DBHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateAssessmentHandler.class);
-    public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
     private final ProcessorContext context;
 
     public CreateAssessmentHandler(ProcessorContext context) {
@@ -34,8 +34,8 @@ class CreateAssessmentHandler implements DBHandler {
     @Override
     public ExecutionResult<MessageResponse> checkSanity() {
         // The user should not be anonymous
-        if ((context.userId() == null) || context.userId().isEmpty()
-            || context.userId().equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
+        if ((context.userId() == null) || context.userId().isEmpty() || context.userId()
+            .equalsIgnoreCase(MessageConstants.MSG_USER_ANONYMOUS)) {
             LOGGER.warn("Anonymous or invalid user attempting to create assessment");
             return new ExecutionResult<>(
                 MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")),
@@ -49,8 +49,9 @@ class CreateAssessmentHandler implements DBHandler {
                 ExecutionResult.ExecutionStatus.FAILED);
         }
         // Our validators should certify this
-        JsonObject errors = new DefaultPayloadValidator().validatePayload(context.request(),
-            AJEntityAssessment.createFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+        JsonObject errors = new DefaultPayloadValidator()
+            .validatePayload(context.request(), AJEntityAssessment.createFieldSelector(),
+                AJEntityAssessment.getValidatorRegistry());
         if ((errors != null) && !errors.isEmpty()) {
             LOGGER.warn("Validation errors for request");
             return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors),
@@ -68,17 +69,10 @@ class CreateAssessmentHandler implements DBHandler {
     @Override
     public ExecutionResult<MessageResponse> executeRequest() {
         AJEntityAssessment assessment = new AJEntityAssessment();
-        // First time creation is standalone, no course exists. It will be
-        // associated later, if the need arises. So all user ids are same
-        assessment.setModifierId(context.userId());
-        assessment.setOwnerId(context.userId());
-        assessment.setCreatorId(context.userId());
-        assessment.setTypeAssessment();
-        assessment.setGrading(AJEntityAssessment.GRADING_TYPE_SYSTEM);
-        assessment.setLicense(LicenseUtil.getDefaultLicenseCode());
-        // Now auto populate is done, we need to setup the converter machinery
-        new DefaultAJEntityAssessmentEntityBuilder().build(assessment, context.request(),
-            AJEntityAssessment.getConverterRegistry());
+        autoPopulateFields(assessment);
+
+        new DefaultAJEntityAssessmentEntityBuilder()
+            .build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
 
         boolean result = assessment.save();
         if (!result) {
@@ -91,10 +85,23 @@ class CreateAssessmentHandler implements DBHandler {
                     ExecutionResult.ExecutionStatus.FAILED);
             }
         }
-        return new ExecutionResult<>(
-            MessageResponseFactory.createCreatedResponse(assessment.getId().toString(),
-                EventBuilderFactory.getCreateAssessmentEventBuilder(assessment.getString(AJEntityAssessment.ID))),
+        return new ExecutionResult<>(MessageResponseFactory.createCreatedResponse(assessment.getId().toString(),
+            EventBuilderFactory.getCreateAssessmentEventBuilder(assessment.getString(AJEntityAssessment.ID))),
             ExecutionResult.ExecutionStatus.SUCCESSFUL);
+    }
+
+    private void autoPopulateFields(AJEntityAssessment assessment) {
+        assessment.setModifierId(context.userId());
+        assessment.setOwnerId(context.userId());
+        assessment.setCreatorId(context.userId());
+        assessment.setTypeAssessment();
+        assessment.setGrading(AJEntityAssessment.GRADING_TYPE_SYSTEM);
+        assessment.setLicense(LicenseUtil.getDefaultLicenseCode());
+        assessment.setTenant(context.tenant());
+        String tenantRoot = context.tenantRoot();
+        if (tenantRoot != null && !tenantRoot.isEmpty()) {
+            assessment.setTenantRoot(tenantRoot);
+        }
     }
 
     @Override
