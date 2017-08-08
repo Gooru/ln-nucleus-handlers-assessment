@@ -4,6 +4,8 @@ import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 
+import io.vertx.core.json.JsonArray;
+
 /**
  * Created by ashish on 29/1/16.
  */
@@ -35,5 +37,14 @@ public final class AuthorizerBuilder {
 
     public static Authorizer<AJEntityAssessment> buildAddQuestionToAssessmentAuthorizer(ProcessorContext context) {
         return new AddQuestionToAssessmentAuthorizer(context);
+    }
+
+    public static Authorizer<AJEntityAssessment> buildTenantAuthorizer(ProcessorContext context) {
+        return new TenantAuthorizer(context);
+    }
+
+    public static Authorizer<AJEntityAssessment> buildTenantCollaboratorAuthorizer(ProcessorContext context,
+        JsonArray collaborators) {
+        return new TenantCollaboratorAuthorizer(context, collaborators);
     }
 }

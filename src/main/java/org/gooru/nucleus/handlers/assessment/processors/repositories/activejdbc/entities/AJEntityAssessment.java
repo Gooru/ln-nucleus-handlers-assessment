@@ -20,76 +20,80 @@ public class AJEntityAssessment extends Model {
     public static final String ID = "id";
     public static final String ASSESSMENT_EXTERNAL = "assessment-external";
     public static final String ASSESSMENT = "assessment";
-    public static final String CREATOR_ID = "creator_id";
+    private static final String CREATOR_ID = "creator_id";
     public static final String PUBLISH_DATE = "publish_date";
     public static final String IS_DELETED = "is_deleted";
-    public static final String MODIFIER_ID = "modifier_id";
+    private static final String MODIFIER_ID = "modifier_id";
     public static final String OWNER_ID = "owner_id";
-    public static final String TITLE = "title";
-    public static final String THUMBNAIL = "thumbnail";
-    public static final String LEARNING_OBJECTIVE = "learning_objective";
-    public static final String FORMAT = "format";
-    public static final String METADATA = "metadata";
-    public static final String TAXONOMY = "taxonomy";
-    public static final String URL = "url";
-    public static final String LOGIN_REQUIRED = "login_required";
-    public static final String VISIBLE_ON_PROFILE = "visible_on_profile";
+    private static final String TITLE = "title";
+    private static final String THUMBNAIL = "thumbnail";
+    private static final String LEARNING_OBJECTIVE = "learning_objective";
+    private static final String FORMAT = "format";
+    private static final String METADATA = "metadata";
+    private static final String TAXONOMY = "taxonomy";
+    private static final String URL = "url";
+    private static final String LOGIN_REQUIRED = "login_required";
+    private static final String VISIBLE_ON_PROFILE = "visible_on_profile";
     public static final String COLLABORATOR = "collaborator";
-    public static final String SETTING = "setting";
+    private static final String SETTING = "setting";
     public static final String COURSE_ID = "course_id";
     public static final String UNIT_ID = "unit_id";
     public static final String LESSON_ID = "lesson_id";
     public static final String GRADING = "grading";
     public static final String TABLE_COURSE = "course";
     public static final String UPDATED_AT = "updated_at";
-    public static final String UUID_TYPE = "uuid";
-    public static final String JSONB_TYPE = "jsonb";
-    public static final String ASSESSMENT_TYPE_NAME = "content_container_type";
-    public static final String ASSESSMENT_TYPE_VALUE = "assessment";
-    public static final String ASSESSMENT_EX_TYPE_VALUE = "assessment-external";
-    public static final String GRADING_TYPE_NAME = "grading_type";
+    private static final String ASSESSMENT_TYPE_NAME = "content_container_type";
+    private static final String ASSESSMENT_TYPE_VALUE = "assessment";
+    private static final String ASSESSMENT_EX_TYPE_VALUE = "assessment-external";
+    private static final String GRADING_TYPE_NAME = "grading_type";
     public static final String GRADING_TYPE_TEACHER = "teacher";
     public static final String GRADING_TYPE_SYSTEM = "system";
     public static final String REORDER_PAYLOAD_KEY = "order";
-    public static final String LICENSE = "license";
+    private static final String LICENSE = "license";
+    private static final String TENANT = "tenant";
+    private static final String TENANT_ROOT = "tenant_root";
+    private static final String PUBLISH_STATUS = "publish_status";
+    private static final String PUBLISH_STATUS_PUBLISHED = "published";
 
     // Queries used
     public static final String AUTHORIZER_QUERY =
-        "select id, course_id, unit_id, lesson_id, owner_id, creator_id, publish_date, collaborator, grading from "
-            + "collection where format = ?::content_container_type and id = ?::uuid and is_deleted = ?";
+        "select id, course_id, unit_id, lesson_id, owner_id, creator_id, publish_date, collaborator, grading, tenant,"
+            + " tenant_root from collection where format = ?::content_container_type and id = ?::uuid and "
+            + "is_deleted = ?";
 
     public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
+    public static final String PUBLISHED_FILTER = "id = ?::uuid and publish_status = 'published'::publish_status_type;";
     public static final String FETCH_ASSESSMENT_QUERY =
-        "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, "
-            + "thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, visible_on_profile, "
-            + "collaborator, course_id, unit_id, lesson_id from collection where id = ?::uuid and format"
-            + " = 'assessment'::content_container_type and is_deleted = false";
+        "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, subformat, "
+            + "publish_status, thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, "
+            + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root from collection "
+            + "where id = ?::uuid and format = 'assessment'::content_container_type and is_deleted = false";
     public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
-        "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, "
-            + "learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, course_id, unit_id, "
-            + "lesson_id from collection where id = ?::uuid and format = 'assessment-external'::content_container_type "
-            + "and is_deleted = false";
+        "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, subformat, "
+            + "publish_status, learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, "
+            + "course_id, unit_id, lesson_id, tenant, tenant_root from collection where id = ?::uuid and format = "
+            + "'assessment-external'::content_container_type and is_deleted = false";
     public static final String COURSE_COLLABORATOR_QUERY =
         "select collaborator from course where id = ?::uuid and is_deleted = false";
     public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays
         .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id",
             "publish_date", "thumbnail", "learning_objective", "license", "metadata", "taxonomy", "setting", "grading",
-            "visible_on_profile", "course_id", "unit_id", "lesson_id");
+            "visible_on_profile", "course_id", "unit_id", "lesson_id", "subformat");
     public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays
         .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id", "thumbnail",
             "learning_objective", "metadata", "taxonomy", "visible_on_profile", "url", "login_required", "course_id",
-            "unit_id", "lesson_id");
+            "unit_id", "lesson_id", "subformat");
 
-    public static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays
+    private static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays
         .asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, METADATA, TAXONOMY, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE,
             SETTING));
-    public static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
-    public static final Set<String> CREATABLE_EX_FIELDS = EDITABLE_FIELDS;
-    public static final Set<String> MANDATORY_EX_FIELDS = new HashSet<>(Arrays.asList(TITLE, URL, LOGIN_REQUIRED));
-    public static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(TITLE));
-    public static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Arrays.asList(ID));
-    public static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
-    public static final Set<String> REORDER_FIELDS = new HashSet<>(Arrays.asList(REORDER_PAYLOAD_KEY));
+    private static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
+    private static final Set<String> CREATABLE_EX_FIELDS = EDITABLE_FIELDS;
+    private static final Set<String> MANDATORY_EX_FIELDS = new HashSet<>(Arrays.asList(TITLE, URL, LOGIN_REQUIRED));
+    private static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(TITLE));
+    private static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Arrays.asList(ID));
+    private static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
+    private static final Set<String> REORDER_FIELDS = new HashSet<>(Arrays.asList(REORDER_PAYLOAD_KEY));
 
     private static final Map<String, FieldValidator> validatorRegistry;
     private static final Map<String, FieldConverter> converterRegistry;
@@ -113,6 +117,8 @@ public class AJEntityAssessment extends Model {
         converterMap.put(SETTING, FieldConverter::convertFieldToJson);
         converterMap
             .put(GRADING, (fieldValue -> FieldConverter.convertFieldToNamedType(fieldValue, GRADING_TYPE_NAME)));
+        converterMap.put(TENANT, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
+        converterMap.put(TENANT_ROOT, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
 
         return Collections.unmodifiableMap(converterMap);
     }
@@ -132,6 +138,8 @@ public class AJEntityAssessment extends Model {
         validatorMap.put(COLLABORATOR,
             (value) -> FieldValidator.validateDeepJsonArrayIfPresent(value, FieldValidator::validateUuid));
         validatorMap.put(REORDER_PAYLOAD_KEY, new ReorderFieldValidator());
+        validatorMap.put(TENANT, (FieldValidator::validateUuid));
+        validatorMap.put(TENANT_ROOT, (FieldValidator::validateUuid));
         return Collections.unmodifiableMap(validatorMap);
     }
 
@@ -212,48 +220,31 @@ public class AJEntityAssessment extends Model {
     }
 
     public void setModifierId(String modifier) {
-        FieldConverter fc = converterRegistry.get(MODIFIER_ID);
-        if (fc != null) {
-            this.set(MODIFIER_ID, fc.convertField(modifier));
-        } else {
-            this.set(MODIFIER_ID, modifier);
-        }
+        setFieldUsingConverter(MODIFIER_ID, modifier);
     }
 
-    public void setCreatorId(String modifier) {
-        FieldConverter fc = converterRegistry.get(CREATOR_ID);
-        if (fc != null) {
-            this.set(CREATOR_ID, fc.convertField(modifier));
-        } else {
-            this.set(CREATOR_ID, modifier);
-        }
+    public void setCreatorId(String creator) {
+        setFieldUsingConverter(CREATOR_ID, creator);
     }
 
     public void setOwnerId(String owner) {
-        FieldConverter fc = converterRegistry.get(OWNER_ID);
-        if (fc != null) {
-            this.set(OWNER_ID, fc.convertField(owner));
-        } else {
-            this.set(OWNER_ID, owner);
-        }
+        setFieldUsingConverter(OWNER_ID, owner);
     }
 
     public void setIdWithConverter(String id) {
-        FieldConverter fc = converterRegistry.get(ID);
-        if (fc != null) {
-            this.set(ID, fc.convertField(id));
-        } else {
-            this.set(ID, id);
-        }
+        setFieldUsingConverter(ID, id);
+    }
+
+    public void setTenant(String tenant) {
+        setFieldUsingConverter(TENANT, tenant);
+    }
+
+    public void setTenantRoot(String tenantRoot) {
+        setFieldUsingConverter(TENANT_ROOT, tenantRoot);
     }
 
     public void setGrading(String grading) {
-        FieldConverter fc = converterRegistry.get(GRADING);
-        if (fc != null) {
-            this.set(GRADING, fc.convertField(grading));
-        } else {
-            this.set(ID, grading);
-        }
+        setFieldUsingConverter(GRADING, grading);
     }
 
     public void setLicense(Integer code) {
@@ -261,21 +252,36 @@ public class AJEntityAssessment extends Model {
     }
 
     public void setTypeAssessment() {
-        FieldConverter fc = converterRegistry.get(FORMAT);
-        if (fc != null) {
-            this.set(FORMAT, fc.convertField(ASSESSMENT_TYPE_VALUE));
-        } else {
-            this.set(FORMAT, ASSESSMENT_TYPE_VALUE);
-        }
+        setFieldUsingConverter(FORMAT, ASSESSMENT_TYPE_VALUE);
     }
 
     public void setTypeExAssessment() {
-        FieldConverter fc = converterRegistry.get(FORMAT);
+        setFieldUsingConverter(FORMAT, ASSESSMENT_EX_TYPE_VALUE);
+    }
+
+    private void setFieldUsingConverter(String fieldName, Object fieldValue) {
+        FieldConverter fc = converterRegistry.get(fieldName);
         if (fc != null) {
-            this.set(FORMAT, fc.convertField(ASSESSMENT_EX_TYPE_VALUE));
+            this.set(fieldName, fc.convertField(fieldValue));
         } else {
-            this.set(FORMAT, ASSESSMENT_EX_TYPE_VALUE);
+            this.set(fieldName, fieldValue);
         }
+    }
+
+    public boolean isAssessmentPublished() {
+        return Objects.equals(this.getString(PUBLISH_STATUS), PUBLISH_STATUS_PUBLISHED);
+    }
+
+    public String getCourseId() {
+        return this.getString(COURSE_ID);
+    }
+
+    public String getTenant() {
+        return this.getString(TENANT);
+    }
+
+    public String getTenantRoot() {
+        return this.getString(TENANT_ROOT);
     }
 
     private static class AssessmentValidationRegistry implements ValidatorRegistry {

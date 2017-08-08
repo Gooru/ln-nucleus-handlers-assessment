@@ -109,6 +109,13 @@ class AddQuestionToAssessmentHandler implements DBHandler {
                 this.context.questionId(), this.context.userId());
 
             if (count == 1) {
+                // Add rubric in CULA
+                Base.exec(AJEntityQuestion.ADD_RUBRIC_QUERY, this.context.assessmentId(),
+                    this.assessment.getString(AJEntityAssessment.COURSE_ID),
+                    this.assessment.getString(AJEntityAssessment.UNIT_ID),
+                    this.assessment.getString(AJEntityAssessment.LESSON_ID), this.context.userId(),
+                    this.context.questionId(), this.context.userId());
+
                 return updateGrading();
             } else if (count == 0) {
                 LOGGER.error("Question '{}' add to assessment '{}' failed as question is not available or non existent",

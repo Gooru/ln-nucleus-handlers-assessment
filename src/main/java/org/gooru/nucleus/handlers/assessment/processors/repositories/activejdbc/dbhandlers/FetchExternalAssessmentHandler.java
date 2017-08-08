@@ -3,6 +3,7 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 import java.util.ResourceBundle;
 
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.JsonFormatterBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
@@ -60,14 +61,15 @@ class FetchExternalAssessmentHandler implements DBHandler {
                 ExecutionResult.ExecutionStatus.FAILED);
         }
         this.assessment = assessments.get(0);
-        return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
+        return AuthorizerBuilder.buildTenantAuthorizer(this.context).authorize(assessment);
     }
 
     @Override
     public ExecutionResult<MessageResponse> executeRequest() {
         // First create response from Assessment
-        JsonObject response = new JsonObject(JsonFormatterBuilder
-            .buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_EA_QUERY_FIELD_LIST).toJson(this.assessment));
+        JsonObject response = new JsonObject(
+            JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_EA_QUERY_FIELD_LIST)
+                .toJson(this.assessment));
         // Now collaborator, we need to know if we want to get it from course
         // else no collaboration on external assessment
         String courseId = this.assessment.getString(AJEntityAssessment.COURSE_ID);
@@ -84,8 +86,9 @@ class FetchExternalAssessmentHandler implements DBHandler {
                     response.put(AJEntityAssessment.COLLABORATOR, new JsonArray());
                 }
             } catch (DBException e) {
-                LOGGER.error("Error trying to get course collaborator for course '{}' to fetch assessment '{}'",
-                    courseId, this.context.assessmentId(), e);
+                LOGGER
+                    .error("Error trying to get course collaborator for course '{}' to fetch assessment '{}'", courseId,
+                        this.context.assessmentId(), e);
                 return new ExecutionResult<>(
                     MessageResponseFactory.createInternalErrorResponse(RESOURCE_BUNDLE.getString("error.from.store")),
                     ExecutionResult.ExecutionStatus.FAILED);
