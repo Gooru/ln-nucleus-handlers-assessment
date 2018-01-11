@@ -94,6 +94,12 @@ public enum CommandProcessorBuilder {
         public Processor build(ProcessorContext context) {
             return new AssessmentGetProcessor(context);
         }
+    },
+    ASSESSMENT_QUESTION_TAG_AGGREGATE(MessageConstants.MSG_OP_ASSESSMENT_QUESTION_TAG_AGGREGATE) {
+        @Override
+        public Processor build(ProcessorContext context) {
+            return new AssessmentQuestionTagAggregateProcessor(context);
+        }
     };
 
     private String name;
