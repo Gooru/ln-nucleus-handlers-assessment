@@ -68,8 +68,8 @@ public class AJEntityAssessment extends Model {
     public static final String FETCH_ASSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, subformat, "
             + "publish_status, thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, "
-            + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root from collection "
-            + "where id = ?::uuid and format = 'assessment'::content_container_type and is_deleted = false";
+            + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root, aggregated_taxonomy, "
+            + "aggregated_gut_codes from collection where id = ?::uuid and format = 'assessment'::content_container_type and is_deleted = false";
     public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, subformat, "
             + "publish_status, learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, "
@@ -80,7 +80,7 @@ public class AJEntityAssessment extends Model {
     public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays
         .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id",
             "publish_date", "thumbnail", "learning_objective", "license", "metadata", "taxonomy", "setting", "grading",
-            "visible_on_profile", "course_id", "unit_id", "lesson_id", "subformat");
+            "visible_on_profile", "course_id", "unit_id", "lesson_id", "subformat", "aggregated_taxonomy", "aggregated_gut_codes");
     public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays
         .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id", "thumbnail",
             "learning_objective", "metadata", "taxonomy", "visible_on_profile", "url", "login_required", "course_id",
