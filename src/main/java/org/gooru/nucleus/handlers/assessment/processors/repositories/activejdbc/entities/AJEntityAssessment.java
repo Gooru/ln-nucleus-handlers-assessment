@@ -54,20 +54,22 @@ public class AJEntityAssessment extends Model {
     private static final String TENANT_ROOT = "tenant_root";
     private static final String PUBLISH_STATUS = "publish_status";
     private static final String PUBLISH_STATUS_PUBLISHED = "published";
+    public static final String AGGREGATED_TAXONOMY = "aggregated_taxonomy";
+    public static final String AGGREGATED_GUT_CODES = "aggregated_gut_codes";
 
     // Queries used
     public static final String AUTHORIZER_QUERY =
         "select id, course_id, unit_id, lesson_id, owner_id, creator_id, publish_date, collaborator, grading, tenant,"
-            + " tenant_root from collection where format = ?::content_container_type and id = ?::uuid and "
-            + "is_deleted = ?";
+            + " tenant_root, taxonomy, aggregated_taxonomy, aggregated_gut_codes from collection where format = ?::content_container_type"
+            + " and id = ?::uuid and is_deleted = ?";
 
     public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
     public static final String PUBLISHED_FILTER = "id = ?::uuid and publish_status = 'published'::publish_status_type;";
     public static final String FETCH_ASSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, subformat, "
             + "publish_status, thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, "
-            + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root from collection "
-            + "where id = ?::uuid and format = 'assessment'::content_container_type and is_deleted = false";
+            + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root, aggregated_taxonomy, "
+            + "aggregated_gut_codes from collection where id = ?::uuid and format = 'assessment'::content_container_type and is_deleted = false";
     public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, subformat, "
             + "publish_status, learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, "
@@ -78,7 +80,7 @@ public class AJEntityAssessment extends Model {
     public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays
         .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id",
             "publish_date", "thumbnail", "learning_objective", "license", "metadata", "taxonomy", "setting", "grading",
-            "visible_on_profile", "course_id", "unit_id", "lesson_id", "subformat");
+            "visible_on_profile", "course_id", "unit_id", "lesson_id", "subformat", "aggregated_taxonomy", "aggregated_gut_codes");
     public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays
         .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id", "thumbnail",
             "learning_objective", "metadata", "taxonomy", "visible_on_profile", "url", "login_required", "course_id",
@@ -94,6 +96,7 @@ public class AJEntityAssessment extends Model {
     private static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Arrays.asList(ID));
     private static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
     private static final Set<String> REORDER_FIELDS = new HashSet<>(Arrays.asList(REORDER_PAYLOAD_KEY));
+    public static final Set<String> AGGREGATE_TAGS_FIELDS = new HashSet<>(Arrays.asList(AGGREGATED_TAXONOMY));
 
     private static final Map<String, FieldValidator> validatorRegistry;
     private static final Map<String, FieldConverter> converterRegistry;
@@ -119,7 +122,8 @@ public class AJEntityAssessment extends Model {
             .put(GRADING, (fieldValue -> FieldConverter.convertFieldToNamedType(fieldValue, GRADING_TYPE_NAME)));
         converterMap.put(TENANT, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
         converterMap.put(TENANT_ROOT, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
-
+        converterMap.put(AGGREGATED_TAXONOMY, (FieldConverter::convertFieldToJson));
+        converterMap.put(AGGREGATED_GUT_CODES, (FieldConverter::convertFieldToJson));
         return Collections.unmodifiableMap(converterMap);
     }
 
@@ -140,11 +144,16 @@ public class AJEntityAssessment extends Model {
         validatorMap.put(REORDER_PAYLOAD_KEY, new ReorderFieldValidator());
         validatorMap.put(TENANT, (FieldValidator::validateUuid));
         validatorMap.put(TENANT_ROOT, (FieldValidator::validateUuid));
+        validatorMap.put(AGGREGATED_TAXONOMY, FieldValidator::validateJsonIfPresent);
         return Collections.unmodifiableMap(validatorMap);
     }
 
     public static FieldSelector editFieldSelector() {
         return () -> Collections.unmodifiableSet(EDITABLE_FIELDS);
+    }
+    
+    public static FieldSelector aggregateTagsFieldSelector() {
+        return() -> Collections.unmodifiableSet(AGGREGATE_TAGS_FIELDS);
     }
 
     public static FieldSelector editExFieldSelector() {
@@ -257,6 +266,14 @@ public class AJEntityAssessment extends Model {
 
     public void setTypeExAssessment() {
         setFieldUsingConverter(FORMAT, ASSESSMENT_EX_TYPE_VALUE);
+    }
+
+    public void setAggregatedTaxonomy(String aggregatedTaxonomy) {
+        setFieldUsingConverter(AGGREGATED_TAXONOMY, aggregatedTaxonomy);
+    }
+
+    public void setAggregatedGutCodes(String aggregatedGutCodes) {
+        setFieldUsingConverter(AGGREGATED_GUT_CODES, aggregatedGutCodes);
     }
 
     private void setFieldUsingConverter(String fieldName, Object fieldValue) {
