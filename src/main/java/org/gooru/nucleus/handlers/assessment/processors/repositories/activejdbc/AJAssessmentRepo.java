@@ -73,9 +73,4 @@ class AJAssessmentRepo implements AssessmentRepo {
         return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildCreateExternalAssessmentHandler(context));
     }
 
-    @Override
-    public MessageResponse aggregateQuestionTagsAtAssessment() {
-        return TransactionExecutor.executeTransaction(DBHandlerBuilder.buildAggregateQuestionTagsAtAssessmentHandler(context));
-    }
-
 }

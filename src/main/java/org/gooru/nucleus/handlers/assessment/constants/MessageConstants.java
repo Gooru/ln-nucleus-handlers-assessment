@@ -27,7 +27,6 @@ public final class MessageConstants {
     public static final String MSG_OP_ASSESSMENT_COLLABORATOR_UPDATE = "assessment.collaborator.update";
     public static final String MSG_OP_ASSESSMENT_QUESTION_ADD = "assessment.question.add";
     public static final String MSG_OP_ASSESSMENT_QUESTION_REORDER = "assessment.content.reorder";
-    public static final String MSG_OP_ASSESSMENT_QUESTION_TAG_AGGREGATE = "assessment.question.tag.aggregate";
 
     // Operation names for external Assessment: Need to be updated in gateway
     public static final String MSG_OP_EXT_ASSESSMENT_GET = "ext.assessment.get";
