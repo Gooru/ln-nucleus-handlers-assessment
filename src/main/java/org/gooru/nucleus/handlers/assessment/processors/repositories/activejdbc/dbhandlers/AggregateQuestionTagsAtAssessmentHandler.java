@@ -99,8 +99,8 @@ public class AggregateQuestionTagsAtAssessmentHandler implements DBHandler {
 
     @Override
     public ExecutionResult<MessageResponse> executeRequest() {
-        String existingAggregatedGutCodes = this.assessment.getString(AJEntityAssessment.AGGREGATED_GUT_CODES);
-        String existingAggregatedTaxonomy = this.assessment.getString(AJEntityAssessment.AGGREGATED_TAXONOMY);
+        String existingAggregatedGutCodes = this.assessment.getString(AJEntityAssessment.GUT_CODES);
+        String existingAggregatedTaxonomy = this.assessment.getString(AJEntityAssessment.TAXONOMY);
 
         this.aggregatedGutCodes = (existingAggregatedGutCodes != null && !existingAggregatedGutCodes.isEmpty())
             ? new JsonObject(existingAggregatedGutCodes) : new JsonObject();
@@ -128,8 +128,7 @@ public class AggregateQuestionTagsAtAssessmentHandler implements DBHandler {
             processTagAddition();
         }
 
-        this.assessment.setAggregatedGutCodes(this.aggregatedGutCodes.toString());
-        this.assessment.setAggregatedTaxonomy(this.aggregatedTaxonomy.toString());
+        this.assessment.setGutCodes(this.aggregatedGutCodes.toString());
         boolean result = this.assessment.save();
         if (!result) {
             LOGGER.error("Assessment with id '{}' failed to save after tag aggregation", context.assessmentId());
@@ -204,10 +203,10 @@ public class AggregateQuestionTagsAtAssessmentHandler implements DBHandler {
 
     private JsonObject calculateTagDifference() {
         JsonObject result = new JsonObject();
-        String existingTagsAsString = this.assessment.getString(AJEntityAssessment.AGGREGATED_TAXONOMY);
+        String existingTagsAsString = this.assessment.getString(AJEntityAssessment.TAXONOMY);
         JsonObject existingTags = existingTagsAsString != null && !existingTagsAsString.isEmpty()
             ? new JsonObject(existingTagsAsString) : new JsonObject();
-        JsonObject newTags = this.context.request().getJsonObject(AJEntityAssessment.AGGREGATED_TAXONOMY);
+        JsonObject newTags = this.context.request().getJsonObject(AJEntityAssessment.TAXONOMY);
 
         if (existingTags.isEmpty() && newTags != null && !newTags.isEmpty()) {
             result.put(TAGS_ADDED, newTags.copy());

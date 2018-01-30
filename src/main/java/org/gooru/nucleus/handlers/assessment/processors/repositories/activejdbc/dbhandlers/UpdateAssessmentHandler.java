@@ -1,5 +1,7 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -7,6 +9,7 @@ import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbutils.GUTCodeLookupHelper;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entitybuilders.EntityBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
@@ -94,6 +97,15 @@ class UpdateAssessmentHandler implements DBHandler {
         // Now auto populate is done, we need to setup the converter machinery
         new DefaultAJEntityAssessmentEntityBuilder().build(assessment, context.request(),
             AJEntityAssessment.getConverterRegistry());
+        
+        String existingTagsAsString = assessment.getString(AJEntityAssessment.TAXONOMY);
+        JsonObject existingTags = existingTagsAsString != null && !existingTagsAsString.isEmpty()
+            ? new JsonObject(existingTagsAsString) : new JsonObject();
+        if (!existingTags.isEmpty()) {
+            Map<String, String> frameworkToGutCodeMapping =
+                GUTCodeLookupHelper.populateGutCodesToTaxonomyMapping(existingTags.fieldNames());
+            assessment.setGutCodes(toPostgresArrayString(frameworkToGutCodeMapping.keySet()));
+        }
 
         boolean result = assessment.save();
         if (!result) {
@@ -121,5 +133,23 @@ class UpdateAssessmentHandler implements DBHandler {
     }
 
     private static class DefaultAJEntityAssessmentEntityBuilder implements EntityBuilder<AJEntityAssessment> {
+    }
+    
+    private static String toPostgresArrayString(Collection<String> input) {
+        Iterator<String> it = input.iterator();
+        if (!it.hasNext()) {
+            return "{}";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append('{');
+        for (;;) {
+            String s = it.next();
+            sb.append('"').append(s).append('"');
+            if (!it.hasNext()) {
+                return sb.append('}').toString();
+            }
+            sb.append(',');
+        }
     }
 }
