@@ -28,6 +28,5 @@ public interface AssessmentRepo {
     MessageResponse fetchExternalAssessment();
 
     MessageResponse createExternalAssessment();
-    
-    MessageResponse aggregateQuestionTagsAtAssessment();
+
 }

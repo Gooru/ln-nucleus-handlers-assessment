@@ -13,7 +13,6 @@ public final class EventBuilderFactory {
     private static final String EVT_ASSESSMENT_QUESTION_ADD = "event.assessment.question.add";
     private static final String EVT_ASSESSMENT_REORDER = "event.assessment.content.reorder";
     private static final String EVT_ASSESSMENT_COLLABORATOR_UPDATE = "event.assessment.collaborator.update";
-    private static final String EVT_ASSESSMENT_QUESTION_TAG_AGGREGATE = "event.assessment.question.tag.aggregate";
     private static final String EVENT_NAME = "event.name";
     private static final String EVENT_BODY = "event.body";
     private static final String ASSESSMENT_ID = "id";
@@ -71,9 +70,5 @@ public final class EventBuilderFactory {
         return () -> new JsonObject().put(EVENT_NAME, EVT_EX_ASSESSMENT_UPDATE).put(EVENT_BODY,
             new JsonObject().put(ASSESSMENT_ID, assessmentId));
     }
-    
-    public static EventBuilder getAggregateQuestionTagAtAssessmentEventBuilder(String assessmentId, JsonObject tags) {
-        return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_QUESTION_TAG_AGGREGATE).put(EVENT_BODY,
-            tags.put(ASSESSMENT_ID, assessmentId));
-    }
+
 }

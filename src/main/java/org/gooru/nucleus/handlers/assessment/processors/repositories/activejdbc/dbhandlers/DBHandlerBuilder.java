@@ -60,7 +60,4 @@ public final class DBHandlerBuilder {
         return new CreateExternalAssessmentHandler(context);
     }
 
-    public static DBHandler buildAggregateQuestionTagsAtAssessmentHandler(ProcessorContext context) {
-        return new AggregateQuestionTagsAtAssessmentHandler(context);
-    }
 }
