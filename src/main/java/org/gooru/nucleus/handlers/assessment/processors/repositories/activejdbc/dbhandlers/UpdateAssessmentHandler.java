@@ -99,7 +99,7 @@ class UpdateAssessmentHandler implements DBHandler {
             AJEntityAssessment.getConverterRegistry());
         
         JsonObject newTags = this.context.request().getJsonObject(AJEntityAssessment.TAXONOMY);
-        if (!newTags.isEmpty()) {
+        if (newTags != null && !newTags.isEmpty()) {
             Map<String, String> frameworkToGutCodeMapping =
                 GUTCodeLookupHelper.populateGutCodesToTaxonomyMapping(newTags.fieldNames());
             assessment.setGutCodes(toPostgresArrayString(frameworkToGutCodeMapping.keySet()));
