@@ -59,4 +59,5 @@ public final class DBHandlerBuilder {
     public static DBHandler buildCreateExternalAssessmentHandler(ProcessorContext context) {
         return new CreateExternalAssessmentHandler(context);
     }
+
 }

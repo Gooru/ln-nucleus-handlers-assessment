@@ -70,4 +70,5 @@ public final class EventBuilderFactory {
         return () -> new JsonObject().put(EVENT_NAME, EVT_EX_ASSESSMENT_UPDATE).put(EVENT_BODY,
             new JsonObject().put(ASSESSMENT_ID, assessmentId));
     }
+
 }
