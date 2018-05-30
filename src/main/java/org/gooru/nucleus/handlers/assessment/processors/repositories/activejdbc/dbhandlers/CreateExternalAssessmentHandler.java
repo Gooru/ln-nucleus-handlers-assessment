@@ -7,12 +7,14 @@ import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbutils.GUTCodeLookupHelper;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entitybuilders.EntityBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
+import org.gooru.nucleus.handlers.assessment.processors.utils.CommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +74,13 @@ public class CreateExternalAssessmentHandler implements DBHandler {
 
         new DefaultAJEntityAssessmentEntityBuilder()
             .build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
+        
+        JsonObject newTags = this.context.request().getJsonObject(AJEntityAssessment.TAXONOMY);
+        if (newTags != null && !newTags.isEmpty()) {
+            Map<String, String> frameworkToGutCodeMapping =
+                GUTCodeLookupHelper.populateGutCodesToTaxonomyMapping(newTags.fieldNames());
+            assessment.setGutCodes(CommonUtils.toPostgresArrayString(frameworkToGutCodeMapping.keySet()));
+        }
 
         boolean result = assessment.save();
         if (!result) {
