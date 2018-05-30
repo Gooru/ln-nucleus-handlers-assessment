@@ -1,7 +1,5 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -16,6 +14,7 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
+import org.gooru.nucleus.handlers.assessment.processors.utils.CommonUtils;
 import org.javalite.activejdbc.LazyList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +101,7 @@ class UpdateAssessmentHandler implements DBHandler {
         if (newTags != null && !newTags.isEmpty()) {
             Map<String, String> frameworkToGutCodeMapping =
                 GUTCodeLookupHelper.populateGutCodesToTaxonomyMapping(newTags.fieldNames());
-            assessment.setGutCodes(toPostgresArrayString(frameworkToGutCodeMapping.keySet()));
+            assessment.setGutCodes(CommonUtils.toPostgresArrayString(frameworkToGutCodeMapping.keySet()));
         }
 
         boolean result = assessment.save();
@@ -131,23 +130,5 @@ class UpdateAssessmentHandler implements DBHandler {
     }
 
     private static class DefaultAJEntityAssessmentEntityBuilder implements EntityBuilder<AJEntityAssessment> {
-    }
-    
-    private static String toPostgresArrayString(Collection<String> input) {
-        Iterator<String> it = input.iterator();
-        if (!it.hasNext()) {
-            return "{}";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append('{');
-        for (;;) {
-            String s = it.next();
-            sb.append('"').append(s).append('"');
-            if (!it.hasNext()) {
-                return sb.append('}').toString();
-            }
-            sb.append(',');
-        }
     }
 }
