@@ -67,6 +67,7 @@ public class AJEntityAssessment extends Model {
     private static final String PUBLISH_STATUS = "publish_status";
     private static final String PUBLISH_STATUS_PUBLISHED = "published";
     public static final String GUT_CODES = "gut_codes";
+    public static final String PRIMARY_LANGUAGE = "primary_language";
 
     private static final String TEXT_ARRAY_TYPE = "text[]";
     
@@ -81,27 +82,27 @@ public class AJEntityAssessment extends Model {
     public static final String FETCH_ASSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, subformat, "
             + "publish_status, thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, "
-            + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root "
+            + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root, primary_language "
             + "from collection where id = ?::uuid and format = 'assessment'::content_container_type and is_deleted = false";
     public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
         "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, subformat, "
             + "publish_status, learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, "
-            + "course_id, unit_id, lesson_id, tenant, tenant_root from collection where id = ?::uuid and format = "
+            + "course_id, unit_id, lesson_id, tenant, tenant_root, primary_language from collection where id = ?::uuid and format = "
             + "'assessment-external'::content_container_type and is_deleted = false";
     public static final String COURSE_COLLABORATOR_QUERY =
         "select collaborator from course where id = ?::uuid and is_deleted = false";
     public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays
         .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id",
             "publish_date", "thumbnail", "learning_objective", "license", "metadata", "taxonomy", "setting", "grading",
-            "visible_on_profile", "course_id", "unit_id", "lesson_id", "subformat");
+            "visible_on_profile", "course_id", "unit_id", "lesson_id", "subformat", "primary_language");
     public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays
         .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "original_collection_id", "thumbnail",
             "learning_objective", "metadata", "taxonomy", "visible_on_profile", "url", "login_required", "course_id",
-            "unit_id", "lesson_id", "subformat");
+            "unit_id", "lesson_id", "subformat", "primary_language");
 
     private static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays
         .asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, METADATA, TAXONOMY, URL, LOGIN_REQUIRED, VISIBLE_ON_PROFILE,
-            SETTING));
+            SETTING, PRIMARY_LANGUAGE));
     private static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
     private static final Set<String> CREATABLE_EX_FIELDS = EDITABLE_FIELDS;
     private static final Set<String> MANDATORY_EX_FIELDS = new HashSet<>(Arrays.asList(TITLE, URL, LOGIN_REQUIRED));
@@ -155,6 +156,7 @@ public class AJEntityAssessment extends Model {
         validatorMap.put(REORDER_PAYLOAD_KEY, new ReorderFieldValidator());
         validatorMap.put(TENANT, (FieldValidator::validateUuid));
         validatorMap.put(TENANT_ROOT, (FieldValidator::validateUuid));
+        validatorMap.put(PRIMARY_LANGUAGE, FieldValidator::validateLanguageIfPresent);
         return Collections.unmodifiableMap(validatorMap);
     }
 
