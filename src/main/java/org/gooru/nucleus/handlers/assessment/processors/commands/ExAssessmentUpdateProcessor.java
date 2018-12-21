@@ -11,21 +11,22 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
  * @author ashish on 30/12/16.
  */
 class ExAssessmentUpdateProcessor extends AbstractCommandProcessor {
-    public ExAssessmentUpdateProcessor(ProcessorContext context) {
-        super(context);
-    }
 
-    @Override
-    protected void setDeprecatedVersions() {
+  public ExAssessmentUpdateProcessor(ProcessorContext context) {
+    super(context);
+  }
 
-    }
+  @Override
+  protected void setDeprecatedVersions() {
 
-    @Override
-    protected MessageResponse processCommand() {
-        if (!validateContext(context)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).updateExternalAssessment();
+  }
+
+  @Override
+  protected MessageResponse processCommand() {
+    if (!validateContext(context)) {
+      return MessageResponseFactory
+          .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
     }
+    return RepoBuilder.buildAssessmentRepo(context).updateExternalAssessment();
+  }
 }

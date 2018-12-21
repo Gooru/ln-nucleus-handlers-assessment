@@ -80,13 +80,15 @@ class FetchDiagnosticAssessmentHandler implements DBHandler {
     }
     AJEntityAssessment assessment = assessments.get(0);
     JsonObject response = new JsonObject(
-        JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST)
+        JsonFormatterBuilder
+            .buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST)
             .toJson(assessment));
     LazyList<AJEntityQuestion> questions =
         AJEntityQuestion.findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, assessmentId);
     if (!questions.isEmpty()) {
       response.put(AJEntityQuestion.QUESTION, new JsonArray(
-          JsonFormatterBuilder.buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS)
+          JsonFormatterBuilder
+              .buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS)
               .toJson(questions)));
     } else {
       response.put(AJEntityQuestion.QUESTION, new JsonArray());
