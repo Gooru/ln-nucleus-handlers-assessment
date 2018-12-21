@@ -7,26 +7,28 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
  */
 public interface AssessmentRepo {
 
-    MessageResponse createAssessment();
+  MessageResponse createAssessment();
 
-    MessageResponse updateAssessment();
+  MessageResponse updateAssessment();
 
-    MessageResponse deleteAssessment();
+  MessageResponse deleteAssessment();
 
-    MessageResponse fetchAssessment();
+  MessageResponse fetchAssessment();
 
-    MessageResponse reorderQuestionInAssessment();
+  MessageResponse reorderQuestionInAssessment();
 
-    MessageResponse addQuestionToAssessment();
+  MessageResponse addQuestionToAssessment();
 
-    MessageResponse updateCollaborator();
+  MessageResponse updateCollaborator();
 
-    MessageResponse deleteExternalAssessment();
+  MessageResponse deleteExternalAssessment();
 
-    MessageResponse updateExternalAssessment();
+  MessageResponse updateExternalAssessment();
 
-    MessageResponse fetchExternalAssessment();
+  MessageResponse fetchExternalAssessment();
 
-    MessageResponse createExternalAssessment();
+  MessageResponse createExternalAssessment();
+
+  MessageResponse fetchDiagnosticAssessment();
 
 }

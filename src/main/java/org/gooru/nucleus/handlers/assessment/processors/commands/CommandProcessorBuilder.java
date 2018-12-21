@@ -94,6 +94,12 @@ public enum CommandProcessorBuilder {
         public Processor build(ProcessorContext context) {
             return new AssessmentGetProcessor(context);
         }
+    },
+    MSG_OP_ASSESSMENT_DIAG_GET(MessageConstants.MSG_OP_ASSESSMENT_DIAG_GET) {
+        @Override
+        public Processor build(ProcessorContext context) {
+            return new AssessmentDiagnosticGetProcessor(context);
+        }
     };
 
     private String name;
