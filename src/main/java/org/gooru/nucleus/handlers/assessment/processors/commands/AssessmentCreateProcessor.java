@@ -8,18 +8,19 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
  * @author ashish on 30/12/16.
  */
 class AssessmentCreateProcessor extends AbstractCommandProcessor {
-    public AssessmentCreateProcessor(ProcessorContext context) {
-        super(context);
-    }
 
-    @Override
-    protected void setDeprecatedVersions() {
+  public AssessmentCreateProcessor(ProcessorContext context) {
+    super(context);
+  }
 
-    }
+  @Override
+  protected void setDeprecatedVersions() {
 
-    @Override
-    protected MessageResponse processCommand() {
+  }
 
-        return RepoBuilder.buildAssessmentRepo(context).createAssessment();
-    }
+  @Override
+  protected MessageResponse processCommand() {
+
+    return RepoBuilder.buildAssessmentRepo(context).createAssessment();
+  }
 }
