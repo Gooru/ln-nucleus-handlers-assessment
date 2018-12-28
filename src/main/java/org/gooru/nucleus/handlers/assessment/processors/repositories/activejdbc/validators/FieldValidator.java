@@ -1,14 +1,21 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators;
 
+import java.util.UUID;
+
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhelpers.LanguageValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import java.util.UUID;
 
 /**
  * Created by ashish on 28/1/16.
  */
 public interface FieldValidator {
-
+    
+  Logger LOGGER = LoggerFactory.getLogger(FieldValidator.class);
+    
   static boolean validateStringIfPresent(Object o, int len) {
     return o == null || o instanceof String && !((String) o).isEmpty()
         && ((String) o).length() < len;
@@ -67,11 +74,12 @@ public interface FieldValidator {
   static boolean validateBoolean(Object o) {
     return o != null && o instanceof Boolean;
   }
-
+  
   static boolean validateBooleanIfPresent(Object o) {
     return o == null || o instanceof Boolean;
   }
 
+  @SuppressWarnings("unused")
   static boolean validateUuid(Object o) {
     try {
       UUID uuid = UUID.fromString((String) o);
@@ -83,6 +91,15 @@ public interface FieldValidator {
 
   static boolean validateUuidIfPresent(String o) {
     return o == null || validateUuid(o);
+  }
+  
+  static boolean validateLanguageIfPresent(Object o) {
+    try {
+      return o == null || LanguageValidator.isValidLanguage((Integer) o);
+    } catch (ClassCastException e) {
+      LOGGER.warn("Passed language id is not of Long type");
+      return false;
+    }
   }
 
   boolean validateField(Object value);
