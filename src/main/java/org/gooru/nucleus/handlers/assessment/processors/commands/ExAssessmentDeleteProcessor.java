@@ -12,21 +12,21 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
  */
 class ExAssessmentDeleteProcessor extends AbstractCommandProcessor {
 
-    public ExAssessmentDeleteProcessor(ProcessorContext context) {
-        super(context);
-    }
+  public ExAssessmentDeleteProcessor(ProcessorContext context) {
+    super(context);
+  }
 
-    @Override
-    protected void setDeprecatedVersions() {
+  @Override
+  protected void setDeprecatedVersions() {
 
-    }
+  }
 
-    @Override
-    protected MessageResponse processCommand() {
-        if (!validateContext(context)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).deleteExternalAssessment();
+  @Override
+  protected MessageResponse processCommand() {
+    if (!validateContext(context)) {
+      return MessageResponseFactory
+          .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.id"));
     }
+    return RepoBuilder.buildAssessmentRepo(context).deleteExternalAssessment();
+  }
 }

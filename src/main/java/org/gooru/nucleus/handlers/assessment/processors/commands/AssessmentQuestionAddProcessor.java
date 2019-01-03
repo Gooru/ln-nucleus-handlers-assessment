@@ -11,21 +11,23 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
  * @author ashish on 30/12/16.
  */
 class AssessmentQuestionAddProcessor extends AbstractCommandProcessor {
-    public AssessmentQuestionAddProcessor(ProcessorContext context) {
-        super(context);
-    }
 
-    @Override
-    protected void setDeprecatedVersions() {
+  public AssessmentQuestionAddProcessor(ProcessorContext context) {
+    super(context);
+  }
 
-    }
+  @Override
+  protected void setDeprecatedVersions() {
 
-    @Override
-    protected MessageResponse processCommand() {
-        if (!validateContext(context, true)) {
-            return MessageResponseFactory
-                .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("invalid.assessment.question.id"));
-        }
-        return RepoBuilder.buildAssessmentRepo(context).addQuestionToAssessment();
+  }
+
+  @Override
+  protected MessageResponse processCommand() {
+    if (!validateContext(context, true)) {
+      return MessageResponseFactory
+          .createInvalidRequestResponse(
+              RESOURCE_BUNDLE.getString("invalid.assessment.question.id"));
     }
+    return RepoBuilder.buildAssessmentRepo(context).addQuestionToAssessment();
+  }
 }

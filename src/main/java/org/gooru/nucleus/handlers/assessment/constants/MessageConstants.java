@@ -27,6 +27,7 @@ public final class MessageConstants {
     public static final String MSG_OP_ASSESSMENT_COLLABORATOR_UPDATE = "assessment.collaborator.update";
     public static final String MSG_OP_ASSESSMENT_QUESTION_ADD = "assessment.question.add";
     public static final String MSG_OP_ASSESSMENT_QUESTION_REORDER = "assessment.content.reorder";
+    public static final String MSG_OP_ASSESSMENT_DIAG_GET = "assessment.diagnostic.get";
 
     // Operation names for external Assessment: Need to be updated in gateway
     public static final String MSG_OP_EXT_ASSESSMENT_GET = "ext.assessment.get";
@@ -40,6 +41,7 @@ public final class MessageConstants {
 
     public static final String ASSESSMENT_ID = "assessmentId";
     public static final String ID = "id";
+    public static final String ID_GRADE = "gradeId";
 
     private MessageConstants() {
         throw new AssertionError();

@@ -7,9 +7,9 @@ import org.gooru.nucleus.handlers.assessment.processors.responses.MessageRespons
 /**
  * @author ashish on 30/12/16.
  */
-public class ExAssessmentCreateProcessor extends AbstractCommandProcessor {
+class AssessmentDiagnosticGetProcessor extends AbstractCommandProcessor {
 
-  public ExAssessmentCreateProcessor(ProcessorContext context) {
+  public AssessmentDiagnosticGetProcessor(ProcessorContext context) {
     super(context);
   }
 
@@ -20,7 +20,6 @@ public class ExAssessmentCreateProcessor extends AbstractCommandProcessor {
 
   @Override
   protected MessageResponse processCommand() {
-
-    return RepoBuilder.buildAssessmentRepo(context).createExternalAssessment();
+    return RepoBuilder.buildAssessmentRepo(context).fetchDiagnosticAssessment();
   }
 }
