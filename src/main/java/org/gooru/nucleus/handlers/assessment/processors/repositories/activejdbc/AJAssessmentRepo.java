@@ -85,11 +85,4 @@ class AJAssessmentRepo implements AssessmentRepo {
         .executeTransaction(DBHandlerBuilder.buildCreateExternalAssessmentHandler(context));
   }
 
-  @Override
-  public MessageResponse fetchDiagnosticAssessment() {
-    return TransactionExecutor
-        .executeTransaction(DBHandlerBuilder.buildFetchDiagnosticAssessmentHandler(context));
-
-  }
-
 }
