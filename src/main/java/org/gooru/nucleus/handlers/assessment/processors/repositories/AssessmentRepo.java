@@ -29,6 +29,4 @@ public interface AssessmentRepo {
 
   MessageResponse createExternalAssessment();
 
-  MessageResponse fetchDiagnosticAssessment();
-
 }
