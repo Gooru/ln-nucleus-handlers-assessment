@@ -60,4 +60,7 @@ public final class DBHandlerBuilder {
     return new CreateExternalAssessmentHandler(context);
   }
 
+  public static DBHandler buildGetMasteryAccrualForAssessmentHandler(ProcessorContext context) {
+    return new GetMasteryAccrualForAssessmentHandler(context);
+  }
 }

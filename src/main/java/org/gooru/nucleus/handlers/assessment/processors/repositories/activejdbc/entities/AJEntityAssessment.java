@@ -66,8 +66,8 @@ public class AJEntityAssessment extends Model {
   private static final String TENANT_ROOT = "tenant_root";
   private static final String PUBLISH_STATUS = "publish_status";
   private static final String PUBLISH_STATUS_PUBLISHED = "published";
-  public static final String GUT_CODES = "gut_codes";
-  public static final String PRIMARY_LANGUAGE = "primary_language";
+  private static final String GUT_CODES = "gut_codes";
+  private static final String PRIMARY_LANGUAGE = "primary_language";
 
   private static final String TEXT_ARRAY_TYPE = "text[]";
 
@@ -84,6 +84,13 @@ public class AJEntityAssessment extends Model {
           + "publish_status, thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, "
           + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root, primary_language "
           + "from collection where id = ?::uuid and format = 'assessment'::content_container_type and is_deleted = false";
+  public static final String FETCH_ASSESSMENT_EXTERNAL_ASMT_QUERY =
+      "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, subformat, "
+          + "publish_status, thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, "
+          + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root, primary_language, gut_codes "
+          + "from collection where id = ?::uuid and "
+          + " (format = 'assessment'::content_container_type OR format = 'assessment-external'::content_container_type) "
+          + " and is_deleted = false";
   public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
       "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, subformat, "
           + "publish_status, learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, "
@@ -117,7 +124,7 @@ public class AJEntityAssessment extends Model {
   private static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
   private static final Set<String> REORDER_FIELDS = new HashSet<>(
       Arrays.asList(REORDER_PAYLOAD_KEY));
-  public static final Set<String> AGGREGATE_TAGS_FIELDS = new HashSet<>(Arrays.asList(TAXONOMY));
+  private static final Set<String> AGGREGATE_TAGS_FIELDS = new HashSet<>(Arrays.asList(TAXONOMY));
 
   private static final Map<String, FieldValidator> validatorRegistry;
   private static final Map<String, FieldConverter> converterRegistry;
@@ -302,6 +309,19 @@ public class AJEntityAssessment extends Model {
 
   public void setGutCodes(String gutCodes) {
     setPGObject(GUT_CODES, TEXT_ARRAY_TYPE, gutCodes);
+  }
+
+  public List<String> getGutCodes() throws SQLException {
+    java.sql.Array sqlArray = (java.sql.Array) this.get(GUT_CODES);
+    if (sqlArray == null) {
+      return Collections.emptyList();
+    }
+    String[] resultArray = (String[]) (sqlArray).getArray();
+    if (resultArray == null) {
+      return Collections.emptyList();
+    } else {
+      return Arrays.asList(resultArray);
+    }
   }
 
   private void setPGObject(String field, String type, String value) {

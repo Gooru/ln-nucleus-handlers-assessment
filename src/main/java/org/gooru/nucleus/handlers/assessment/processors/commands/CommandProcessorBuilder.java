@@ -88,6 +88,12 @@ public enum CommandProcessorBuilder {
       return new AssessmentCreateProcessor(context);
     }
   },
+  ASSESSMENT_MASTERY_ACCRUAL_GET(MessageConstants.MSG_OP_ASSESSMENT_MASTERY_ACCRUAL_GET) {
+    @Override
+    public Processor build(ProcessorContext context) {
+      return new AssessmentMasteryAccrualProcessor(context);
+    }
+  },
   ASSESSMENT_GET(MessageConstants.MSG_OP_ASSESSMENT_GET) {
     @Override
     public Processor build(ProcessorContext context) {

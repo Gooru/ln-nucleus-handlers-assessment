@@ -85,4 +85,10 @@ class AJAssessmentRepo implements AssessmentRepo {
         .executeTransaction(DBHandlerBuilder.buildCreateExternalAssessmentHandler(context));
   }
 
+  @Override
+  public MessageResponse getAssessmentMasteryAccrual() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildGetMasteryAccrualForAssessmentHandler(context));
+  }
+
 }
