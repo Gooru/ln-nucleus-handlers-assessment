@@ -29,4 +29,5 @@ public interface AssessmentRepo {
 
   MessageResponse createExternalAssessment();
 
+  MessageResponse getAssessmentMasteryAccrual();
 }

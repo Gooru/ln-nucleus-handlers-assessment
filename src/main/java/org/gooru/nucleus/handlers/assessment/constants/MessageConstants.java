@@ -33,6 +33,7 @@ public final class MessageConstants {
     public static final String MSG_OP_EXT_ASSESSMENT_CREATE = "ext.assessment.create";
     public static final String MSG_OP_EXT_ASSESSMENT_UPDATE = "ext.assessment.update";
     public static final String MSG_OP_EXT_ASSESSMENT_DELETE = "ext.assessment.delete";
+    public static final String MSG_OP_ASSESSMENT_MASTERY_ACCRUAL_GET = "assessment.mastery-accrual.get";
 
     // Containers for different responses
     public static final String RESP_CONTAINER_MBUS = "mb.container";
