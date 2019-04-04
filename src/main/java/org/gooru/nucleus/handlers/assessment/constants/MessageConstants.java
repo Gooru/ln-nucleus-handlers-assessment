@@ -40,6 +40,7 @@ public final class MessageConstants {
     public static final String RESP_CONTAINER_EVENT = "mb.event";
 
     public static final String ASSESSMENT_ID = "assessmentId";
+    public static final String ASSESSMENT_IDS = "assessmentIds";
     public static final String ID = "id";
 
     private MessageConstants() {

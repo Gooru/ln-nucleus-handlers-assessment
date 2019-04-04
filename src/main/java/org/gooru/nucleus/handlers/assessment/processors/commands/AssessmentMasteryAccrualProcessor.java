@@ -1,6 +1,6 @@
 package org.gooru.nucleus.handlers.assessment.processors.commands;
 
-import static org.gooru.nucleus.handlers.assessment.processors.utils.ValidationUtils.validateContext;
+import static org.gooru.nucleus.handlers.assessment.processors.utils.ValidationUtils.validateAssessmentMasteryAccrualContext;
 
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.RepoBuilder;
@@ -24,7 +24,7 @@ class AssessmentMasteryAccrualProcessor extends AbstractCommandProcessor {
 
   @Override
   protected MessageResponse processCommand() {
-    if (!validateContext(context)) {
+    if (!validateAssessmentMasteryAccrualContext(context)) {
       return MessageResponseFactory
           .createInvalidRequestResponse(
               RESOURCE_BUNDLE.getString("invalid.assessment.id"));

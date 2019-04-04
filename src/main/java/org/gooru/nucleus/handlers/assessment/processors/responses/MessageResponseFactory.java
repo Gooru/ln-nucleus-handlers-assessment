@@ -11,7 +11,7 @@ import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilder;
 public final class MessageResponseFactory {
 
   private static final String API_VERSION_DEPRECATED = "API version is deprecated";
-  private static final String API_VERSION_NOT_SUPPORTED = "API version is not supported";
+  
 
   private MessageResponseFactory() {
     throw new AssertionError();

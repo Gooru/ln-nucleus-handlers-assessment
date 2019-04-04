@@ -110,6 +110,11 @@ public class AJEntityAssessment extends Model {
           "learning_objective", "metadata", "taxonomy", "visible_on_profile", "url",
           "login_required", "course_id", "primary_language",
           "unit_id", "lesson_id", "subformat");
+  
+  public static final String FETCH_ASSESSMENTS_EXTERNAL_ASMT_QUERY =
+      "select id, gut_codes from collection where id  = ANY(?::uuid[]) and "
+          + " (format = 'assessment'::content_container_type OR format = 'assessment-external'::content_container_type) "
+          + " and gut_codes[1] is not null and is_deleted = false";
 
   private static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays
       .asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, METADATA, TAXONOMY, URL, LOGIN_REQUIRED,
