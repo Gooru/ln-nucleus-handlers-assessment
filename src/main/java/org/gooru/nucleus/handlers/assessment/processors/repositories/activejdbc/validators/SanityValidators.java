@@ -51,6 +51,7 @@ public final class SanityValidators {
 
   public static void validateOATaskSubmissionId(OAProcessorContext context) {
     validateValuePresence(context.oaTaskSubmissionId(), "missing.oatasksubmission.id");
+    validateLong(context.oaTaskSubmissionId());
   }
 
   public static void validateOARefId(OAProcessorContext context) {
