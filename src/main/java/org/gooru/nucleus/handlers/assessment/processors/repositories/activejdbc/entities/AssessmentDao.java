@@ -50,15 +50,15 @@ public final class AssessmentDao {
           AJEntityAssessment.VISIBLE_ON_PROFILE,
           AJEntityAssessment.SETTING, AJEntityAssessment.PRIMARY_LANGUAGE));
   private static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
-  private static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(
+  private static final Set<String> MANDATORY_FIELDS = new HashSet<>(Collections.singletonList(
       AJEntityAssessment.TITLE));
-  private static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Arrays.asList(
+  private static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Collections.singletonList(
       AJEntityAssessment.ID));
-  private static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(
+  private static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Collections.singletonList(
       AJEntityAssessment.COLLABORATOR));
   private static final Set<String> REORDER_FIELDS = new HashSet<>(
-      Arrays.asList(AJEntityAssessment.REORDER_PAYLOAD_KEY));
-  private static final Set<String> AGGREGATE_TAGS_FIELDS = new HashSet<>(Arrays.asList(
+      Collections.singletonList(AJEntityAssessment.REORDER_PAYLOAD_KEY));
+  private static final Set<String> AGGREGATE_TAGS_FIELDS = new HashSet<>(Collections.singletonList(
       AJEntityAssessment.TAXONOMY));
 
   public static FieldSelector editFieldSelector() {
