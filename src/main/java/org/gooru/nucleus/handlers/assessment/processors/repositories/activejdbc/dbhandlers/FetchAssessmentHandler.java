@@ -11,6 +11,7 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityRubric;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.JsonFormatterBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
@@ -59,7 +60,7 @@ class FetchAssessmentHandler implements DBHandler {
   public ExecutionResult<MessageResponse> validateRequest() {
     LazyList<AJEntityAssessment> assessments =
         AJEntityAssessment
-            .findBySQL(AJEntityAssessment.FETCH_ASSESSMENT_QUERY, context.assessmentId());
+            .findBySQL(AssessmentDao.FETCH_ASSESSMENT_QUERY, context.assessmentId());
     if (assessments.isEmpty()) {
       LOGGER.warn("Not able to find assessment '{}'", this.context.assessmentId());
       return new ExecutionResult<>(
@@ -75,7 +76,7 @@ class FetchAssessmentHandler implements DBHandler {
     // First create response from Assessment
     JsonObject response = new JsonObject(
         JsonFormatterBuilder
-            .buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_QUERY_FIELD_LIST)
+            .buildSimpleJsonFormatter(false, AssessmentDao.FETCH_QUERY_FIELD_LIST)
             .toJson(this.assessment));
     // Now query questions and populate them
     LazyList<AJEntityQuestion> questions =
@@ -132,7 +133,7 @@ class FetchAssessmentHandler implements DBHandler {
       try {
         // Need to fetch collaborators
         Object courseCollaboratorObject =
-            Base.firstCell(AJEntityAssessment.COURSE_COLLABORATOR_QUERY, courseId);
+            Base.firstCell(AssessmentDao.COURSE_COLLABORATOR_QUERY, courseId);
         if (courseCollaboratorObject != null) {
           response.put(AJEntityAssessment.COLLABORATOR,
               new JsonArray(courseCollaboratorObject.toString()));

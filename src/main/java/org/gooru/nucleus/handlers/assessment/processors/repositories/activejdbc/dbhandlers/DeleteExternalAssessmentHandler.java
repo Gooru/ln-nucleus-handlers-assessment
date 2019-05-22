@@ -8,6 +8,7 @@ import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
@@ -57,7 +58,7 @@ class DeleteExternalAssessmentHandler implements DBHandler {
     // deleted already and id is specified id
 
     LazyList<AJEntityAssessment> assessments = AJEntityAssessment
-        .findBySQL(AJEntityAssessment.AUTHORIZER_QUERY,
+        .findBySQL(AssessmentDao.AUTHORIZER_QUERY,
             AJEntityAssessment.ASSESSMENT_EXTERNAL, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {

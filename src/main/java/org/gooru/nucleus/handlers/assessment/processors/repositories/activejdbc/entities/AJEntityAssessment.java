@@ -67,44 +67,6 @@ public class AJEntityAssessment extends Model {
 
   private static final String TEXT_ARRAY_TYPE = "text[]";
 
-  // Queries used
-  public static final String AUTHORIZER_QUERY =
-      "select id, course_id, unit_id, lesson_id, owner_id, creator_id, publish_date, collaborator, grading, tenant,"
-          + " tenant_root, taxonomy from collection where format = ?::content_container_type"
-          + " and id = ?::uuid and is_deleted = ?";
-
-  public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
-  public static final String PUBLISHED_FILTER = "id = ?::uuid and publish_status = 'published'::publish_status_type;";
-  public static final String FETCH_ASSESSMENT_QUERY =
-      "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, subformat, "
-          + "publish_status, thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, "
-          + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root, primary_language "
-          + "from collection where id = ?::uuid and format = 'assessment'::content_container_type and is_deleted = false";
-  public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
-      "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, subformat, "
-          + "publish_status, learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, "
-          + "course_id, unit_id, lesson_id, tenant, tenant_root, primary_language from collection where id = ?::uuid and format = "
-          + "'assessment-external'::content_container_type and is_deleted = false";
-  public static final String COURSE_COLLABORATOR_QUERY =
-      "select collaborator from course where id = ?::uuid and is_deleted = false";
-  public static final List<String> FETCH_QUERY_FIELD_LIST = Arrays
-      .asList("id", "title", "owner_id", "creator_id", "original_creator_id",
-          "original_collection_id",
-          "publish_date", "thumbnail", "learning_objective", "license", "metadata", "taxonomy",
-          "setting", "grading", "primary_language",
-          "visible_on_profile", "course_id", "unit_id", "lesson_id", "subformat");
-  public static final List<String> FETCH_EA_QUERY_FIELD_LIST = Arrays
-      .asList("id", "title", "owner_id", "creator_id", "original_creator_id",
-          "original_collection_id", "thumbnail",
-          "learning_objective", "metadata", "taxonomy", "visible_on_profile", "url",
-          "login_required", "course_id", "primary_language",
-          "unit_id", "lesson_id", "subformat");
-
-  public static final String FETCH_ASSESSMENTS_EXTERNAL_ASMT_QUERY =
-      "select id, gut_codes from collection where id  = ANY(?::uuid[]) and "
-          + " (format = 'assessment'::content_container_type OR format = 'assessment-external'::content_container_type) "
-          + " and gut_codes[1] is not null and is_deleted = false";
-
   static final Map<String, FieldValidator> validatorRegistry;
   static final Map<String, FieldConverter> converterRegistry;
 

@@ -3,6 +3,7 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
@@ -34,7 +35,7 @@ class DeleteAuthorizer implements Authorizer<AJEntityAssessment> {
     if (courseId != null) {
       try {
         authRecordCount = Base
-            .count(AJEntityAssessment.TABLE_COURSE, AJEntityAssessment.AUTH_FILTER, courseId,
+            .count(AJEntityAssessment.TABLE_COURSE, AssessmentDao.AUTH_FILTER, courseId,
                 context.userId(), context.userId());
         if (authRecordCount >= 1) {
           return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);

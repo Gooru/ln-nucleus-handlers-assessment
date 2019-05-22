@@ -83,7 +83,7 @@ class AddQuestionToAssessmentHandler implements DBHandler {
     // already and id is specified id
 
     LazyList<AJEntityAssessment> assessments = AJEntityAssessment
-        .findBySQL(AJEntityAssessment.AUTHORIZER_QUERY,
+        .findBySQL(AssessmentDao.AUTHORIZER_QUERY,
             AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {

@@ -80,7 +80,7 @@ class UpdateCollaboratorHandler implements DBHandler {
     // Fetch the assessment where type is assessment and it is not deleted
     // already and id is specified id
     LazyList<AJEntityAssessment> assessments = AJEntityAssessment
-        .findBySQL(AJEntityAssessment.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT,
+        .findBySQL(AssessmentDao.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT,
             context.assessmentId(),
             false);
     // Assessment should be present in DB
