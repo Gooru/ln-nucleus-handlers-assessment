@@ -53,6 +53,7 @@ public class AJEntityAssessment extends Model {
   private static final String ASSESSMENT_TYPE_NAME = "content_container_type";
   private static final String ASSESSMENT_TYPE_VALUE = "assessment";
   private static final String ASSESSMENT_EX_TYPE_VALUE = "assessment-external";
+  private static final String ASSESSMENT_TYPE_OFFLINE = "offline-activity";
   private static final String GRADING_TYPE_NAME = "grading_type";
   public static final String GRADING_TYPE_TEACHER = "teacher";
   public static final String GRADING_TYPE_SYSTEM = "system";
@@ -64,6 +65,11 @@ public class AJEntityAssessment extends Model {
   private static final String PUBLISH_STATUS_PUBLISHED = "published";
   private static final String GUT_CODES = "gut_codes";
   static final String PRIMARY_LANGUAGE = "primary_language";
+  static final String TAXONOMY_TO_BUILD = "taxonomy_to_build";
+  static final String REFERENCE = "reference";
+  static final String DURATION_HOURS = "duration_hours";
+  static final String MAX_SCORE = "max_score";
+  static final String EXEMPLAR = "exemplar";
 
   private static final String TEXT_ARRAY_TYPE = "text[]";
 
@@ -80,6 +86,7 @@ public class AJEntityAssessment extends Model {
     converterMap.put(ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
     converterMap.put(METADATA, (FieldConverter::convertFieldToJson));
     converterMap.put(TAXONOMY, (FieldConverter::convertFieldToJson));
+    converterMap.put(TAXONOMY_TO_BUILD, (FieldConverter::convertFieldToJson));
     converterMap
         .put(CREATOR_ID, (fieldValue -> FieldConverter.convertFieldToUuid((String) fieldValue)));
     converterMap
@@ -110,10 +117,13 @@ public class AJEntityAssessment extends Model {
         .put(LEARNING_OBJECTIVE, (value) -> FieldValidator.validateStringIfPresent(value, 20000));
     validatorMap.put(METADATA, FieldValidator::validateJsonIfPresent);
     validatorMap.put(TAXONOMY, FieldValidator::validateJsonIfPresent);
+    validatorMap.put(TAXONOMY_TO_BUILD, FieldValidator::validateJsonIfPresent);
     validatorMap.put(SETTING, FieldValidator::validateJsonIfPresent);
     validatorMap.put(URL, (value) -> FieldValidator.validateStringIfPresent(value, 2000));
     validatorMap.put(LOGIN_REQUIRED, FieldValidator::validateBooleanIfPresent);
     validatorMap.put(VISIBLE_ON_PROFILE, FieldValidator::validateBooleanIfPresent);
+    validatorMap.put(MAX_SCORE, FieldValidator::validateOptionalInteger);
+    validatorMap.put(DURATION_HOURS, FieldValidator::validateOptionalInteger);
     validatorMap.put(COLLABORATOR,
         (value) -> FieldValidator
             .validateDeepJsonArrayIfPresent(value, FieldValidator::validateUuid));
@@ -240,5 +250,21 @@ public class AJEntityAssessment extends Model {
 
   public String getOwnerId() {
     return this.getString(AJEntityAssessment.OWNER_ID);
+  }
+
+  public String getReference() {
+    return this.getString(REFERENCE);
+  }
+
+  public Integer getDurationHours() {
+    return this.getInteger(DURATION_HOURS);
+  }
+
+  public Integer getMaxScore() {
+    return this.getInteger(MAX_SCORE);
+  }
+
+  public String getExemplar() {
+    return this.getString(EXEMPLAR);
   }
 }
