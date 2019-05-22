@@ -30,4 +30,34 @@ public interface AssessmentRepo {
   MessageResponse createExternalAssessment();
 
   MessageResponse getAssessmentMasteryAccrual();
+
+  MessageResponse oaCreate();
+
+  MessageResponse oaDelete();
+
+  MessageResponse oaFetchDetail();
+
+  MessageResponse oaFetchSummary();
+
+  MessageResponse oaRefCreate();
+
+  MessageResponse oaRefDelete();
+
+  MessageResponse oaRefRubricStudentAssociate();
+
+  MessageResponse oaRefRubricTeacherAssociate();
+
+  MessageResponse oaTaskCreate();
+
+  MessageResponse oaTaskDelete();
+
+  MessageResponse oaTaskSubmissionCreate();
+
+  MessageResponse oaTaskSubmissionDelete();
+
+  MessageResponse oaTaskUpdate();
+
+  MessageResponse oaUpdateCollaborator();
+
+  MessageResponse oaUpdate();
 }

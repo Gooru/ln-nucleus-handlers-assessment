@@ -91,4 +91,94 @@ class AJAssessmentRepo implements AssessmentRepo {
         .executeTransaction(DBHandlerBuilder.buildGetMasteryAccrualForAssessmentHandler(context));
   }
 
+  @Override
+  public MessageResponse oaCreate() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOACreateHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaDelete() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOADeleteHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaFetchDetail() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOAFetchDetailHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaFetchSummary() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOAFetchSummaryHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaRefCreate() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOARefCreateHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaRefDelete() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOARefDeleteHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaRefRubricStudentAssociate() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOARubricStudentAssociateHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaRefRubricTeacherAssociate() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOARubricTeacherAssociateHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaTaskCreate() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOATaskCreateHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaTaskDelete() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOATaskDeleteHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaTaskSubmissionCreate() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOATaskSubmissionCreateHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaTaskSubmissionDelete() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOATaskSubmissionDeleteHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaTaskUpdate() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOATaskUpdateHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaUpdateCollaborator() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOAUpdateCollaboratorHandler(context));
+  }
+
+  @Override
+  public MessageResponse oaUpdate() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOAUpdateHandler(context));
+  }
+
 }
