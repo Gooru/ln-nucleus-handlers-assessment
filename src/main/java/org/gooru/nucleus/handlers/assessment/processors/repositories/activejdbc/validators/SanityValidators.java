@@ -46,6 +46,7 @@ public final class SanityValidators {
 
   public static void validateOATaskId(OAProcessorContext context) {
     validateValuePresence(context.oaTaskId(), "missing.oatask.id");
+    validateLong(context.oaTaskId());
   }
 
   public static void validateOATaskSubmissionId(OAProcessorContext context) {
@@ -54,12 +55,16 @@ public final class SanityValidators {
 
   public static void validateOARefId(OAProcessorContext context) {
     validateValuePresence(context.oaRefId(), "missing.oaref.id");
+    validateLong(context.oaRefId());
+  }
+
+  private static void validateLong(String value) {
     try {
-      Long.parseLong(context.oaRefId());
+      Long.parseLong(value);
     } catch (NumberFormatException e) {
       throw new MessageResponseWrapperException(MessageResponseFactory
           .createInvalidRequestResponse(
-              RESOURCE_BUNDLE.getString("invalid.value") + context.oaRefId()));
+              RESOURCE_BUNDLE.getString("invalid.value") + value));
     }
   }
 
