@@ -9,6 +9,8 @@ import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFacto
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbutils.GUTCodeLookupHelper;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentExDao;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entitybuilders.EntityBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
@@ -52,8 +54,8 @@ public class CreateExternalAssessmentHandler implements DBHandler {
     }
     // Our validators should certify this
     JsonObject errors = new DefaultPayloadValidator()
-        .validatePayload(context.request(), AJEntityAssessment.createExFieldSelector(),
-            AJEntityAssessment.getValidatorRegistry());
+        .validatePayload(context.request(), AssessmentExDao.createExFieldSelector(),
+            AssessmentDao.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors),
@@ -74,7 +76,7 @@ public class CreateExternalAssessmentHandler implements DBHandler {
     autoPopulateFields(assessment);
 
     new DefaultAJEntityAssessmentEntityBuilder()
-        .build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
+        .build(assessment, context.request(), AssessmentDao.getConverterRegistry());
 
     JsonObject newTags = this.context.request().getJsonObject(AJEntityAssessment.TAXONOMY);
     if (newTags != null && !newTags.isEmpty()) {

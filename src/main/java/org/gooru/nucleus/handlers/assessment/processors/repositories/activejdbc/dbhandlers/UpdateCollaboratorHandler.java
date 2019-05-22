@@ -9,6 +9,7 @@ import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entitybuilders.EntityBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
@@ -63,8 +64,8 @@ class UpdateCollaboratorHandler implements DBHandler {
     }
     // Our validators should certify this
     JsonObject errors = new DefaultPayloadValidator()
-        .validatePayload(context.request(), AJEntityAssessment.editCollaboratorFieldSelector(),
-            AJEntityAssessment.getValidatorRegistry());
+        .validatePayload(context.request(), AssessmentDao.editCollaboratorFieldSelector(),
+            AssessmentDao.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors),
@@ -111,7 +112,7 @@ class UpdateCollaboratorHandler implements DBHandler {
     assessment.setModifierId(context.userId());
     // Now auto populate is done, we need to setup the converter machinery
     new DefaultAJEntityAssessmentEntityBuilder()
-        .build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
+        .build(assessment, context.request(), AssessmentDao.getConverterRegistry());
 
     boolean result = assessment.save();
     if (!result) {

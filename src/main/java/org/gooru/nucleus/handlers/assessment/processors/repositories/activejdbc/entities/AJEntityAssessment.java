@@ -4,17 +4,12 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.converters.ConverterRegistry;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.converters.FieldConverter;
-import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.FieldSelector;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.FieldValidator;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.ReorderFieldValidator;
-import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.ValidatorRegistry;
 import org.javalite.activejdbc.Model;
 import org.javalite.activejdbc.annotations.Table;
 import org.postgresql.util.PGobject;
@@ -37,17 +32,17 @@ public class AJEntityAssessment extends Model {
   public static final String IS_DELETED = "is_deleted";
   private static final String MODIFIER_ID = "modifier_id";
   public static final String OWNER_ID = "owner_id";
-  private static final String TITLE = "title";
-  private static final String THUMBNAIL = "thumbnail";
-  private static final String LEARNING_OBJECTIVE = "learning_objective";
+  static final String TITLE = "title";
+  static final String THUMBNAIL = "thumbnail";
+  static final String LEARNING_OBJECTIVE = "learning_objective";
   private static final String FORMAT = "format";
-  private static final String METADATA = "metadata";
+  static final String METADATA = "metadata";
   public static final String TAXONOMY = "taxonomy";
-  private static final String URL = "url";
-  private static final String LOGIN_REQUIRED = "login_required";
-  private static final String VISIBLE_ON_PROFILE = "visible_on_profile";
+  static final String URL = "url";
+  static final String LOGIN_REQUIRED = "login_required";
+  static final String VISIBLE_ON_PROFILE = "visible_on_profile";
   public static final String COLLABORATOR = "collaborator";
-  private static final String SETTING = "setting";
+  static final String SETTING = "setting";
   public static final String COURSE_ID = "course_id";
   public static final String UNIT_ID = "unit_id";
   public static final String LESSON_ID = "lesson_id";
@@ -67,7 +62,7 @@ public class AJEntityAssessment extends Model {
   private static final String PUBLISH_STATUS = "publish_status";
   private static final String PUBLISH_STATUS_PUBLISHED = "published";
   private static final String GUT_CODES = "gut_codes";
-  private static final String PRIMARY_LANGUAGE = "primary_language";
+  static final String PRIMARY_LANGUAGE = "primary_language";
 
   private static final String TEXT_ARRAY_TYPE = "text[]";
 
@@ -110,29 +105,14 @@ public class AJEntityAssessment extends Model {
           "learning_objective", "metadata", "taxonomy", "visible_on_profile", "url",
           "login_required", "course_id", "primary_language",
           "unit_id", "lesson_id", "subformat");
-  
+
   public static final String FETCH_ASSESSMENTS_EXTERNAL_ASMT_QUERY =
       "select id, gut_codes from collection where id  = ANY(?::uuid[]) and "
           + " (format = 'assessment'::content_container_type OR format = 'assessment-external'::content_container_type) "
           + " and gut_codes[1] is not null and is_deleted = false";
 
-  private static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays
-      .asList(TITLE, THUMBNAIL, LEARNING_OBJECTIVE, METADATA, TAXONOMY, URL, LOGIN_REQUIRED,
-          VISIBLE_ON_PROFILE,
-          SETTING, PRIMARY_LANGUAGE));
-  private static final Set<String> CREATABLE_FIELDS = EDITABLE_FIELDS;
-  private static final Set<String> CREATABLE_EX_FIELDS = EDITABLE_FIELDS;
-  private static final Set<String> MANDATORY_EX_FIELDS = new HashSet<>(
-      Arrays.asList(TITLE, URL, LOGIN_REQUIRED));
-  private static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(TITLE));
-  private static final Set<String> ADD_QUESTION_FIELDS = new HashSet<>(Arrays.asList(ID));
-  private static final Set<String> COLLABORATOR_FIELDS = new HashSet<>(Arrays.asList(COLLABORATOR));
-  private static final Set<String> REORDER_FIELDS = new HashSet<>(
-      Arrays.asList(REORDER_PAYLOAD_KEY));
-  private static final Set<String> AGGREGATE_TAGS_FIELDS = new HashSet<>(Arrays.asList(TAXONOMY));
-
-  private static final Map<String, FieldValidator> validatorRegistry;
-  private static final Map<String, FieldConverter> converterRegistry;
+  static final Map<String, FieldValidator> validatorRegistry;
+  static final Map<String, FieldConverter> converterRegistry;
 
   static {
     validatorRegistry = initializeValidators();
@@ -186,86 +166,6 @@ public class AJEntityAssessment extends Model {
     validatorMap.put(TENANT_ROOT, (FieldValidator::validateUuid));
     validatorMap.put(PRIMARY_LANGUAGE, FieldValidator::validateLanguageIfPresent);
     return Collections.unmodifiableMap(validatorMap);
-  }
-
-  public static FieldSelector editFieldSelector() {
-    return () -> Collections.unmodifiableSet(EDITABLE_FIELDS);
-  }
-
-  public static FieldSelector aggregateTagsFieldSelector() {
-    return () -> Collections.unmodifiableSet(AGGREGATE_TAGS_FIELDS);
-  }
-
-  public static FieldSelector editExFieldSelector() {
-    return () -> Collections.unmodifiableSet(EDITABLE_FIELDS);
-  }
-
-  public static FieldSelector reorderFieldSelector() {
-    return new FieldSelector() {
-      @Override
-      public Set<String> allowedFields() {
-        return Collections.unmodifiableSet(REORDER_FIELDS);
-      }
-
-      @Override
-      public Set<String> mandatoryFields() {
-        return Collections.unmodifiableSet(REORDER_FIELDS);
-      }
-    };
-  }
-
-  public static FieldSelector createFieldSelector() {
-    return new FieldSelector() {
-      @Override
-      public Set<String> allowedFields() {
-        return Collections.unmodifiableSet(CREATABLE_FIELDS);
-      }
-
-      @Override
-      public Set<String> mandatoryFields() {
-        return Collections.unmodifiableSet(MANDATORY_FIELDS);
-      }
-    };
-  }
-
-  public static FieldSelector createExFieldSelector() {
-    return new FieldSelector() {
-      @Override
-      public Set<String> allowedFields() {
-        return Collections.unmodifiableSet(CREATABLE_EX_FIELDS);
-      }
-
-      @Override
-      public Set<String> mandatoryFields() {
-        return Collections.unmodifiableSet(MANDATORY_EX_FIELDS);
-      }
-    };
-  }
-
-  public static FieldSelector editCollaboratorFieldSelector() {
-    return new FieldSelector() {
-      @Override
-      public Set<String> mandatoryFields() {
-        return Collections.unmodifiableSet(COLLABORATOR_FIELDS);
-      }
-
-      @Override
-      public Set<String> allowedFields() {
-        return Collections.unmodifiableSet(COLLABORATOR_FIELDS);
-      }
-    };
-  }
-
-  public static FieldSelector addQuestionFieldSelector() {
-    return () -> Collections.unmodifiableSet(ADD_QUESTION_FIELDS);
-  }
-
-  public static ValidatorRegistry getValidatorRegistry() {
-    return new AssessmentValidationRegistry();
-  }
-
-  public static ConverterRegistry getConverterRegistry() {
-    return new AssessmentConverterRegistry();
   }
 
   public void setModifierId(String modifier) {
@@ -364,22 +264,6 @@ public class AJEntityAssessment extends Model {
 
   public String getTenantRoot() {
     return this.getString(TENANT_ROOT);
-  }
-
-  private static class AssessmentValidationRegistry implements ValidatorRegistry {
-
-    @Override
-    public FieldValidator lookupValidator(String fieldName) {
-      return validatorRegistry.get(fieldName);
-    }
-  }
-
-  private static class AssessmentConverterRegistry implements ConverterRegistry {
-
-    @Override
-    public FieldConverter lookupConverter(String fieldName) {
-      return converterRegistry.get(fieldName);
-    }
   }
 
 }

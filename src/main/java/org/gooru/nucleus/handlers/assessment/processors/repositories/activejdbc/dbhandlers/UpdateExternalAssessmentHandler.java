@@ -9,6 +9,8 @@ import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFacto
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbutils.GUTCodeLookupHelper;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentExDao;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entitybuilders.EntityBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
@@ -61,7 +63,7 @@ class UpdateExternalAssessmentHandler implements DBHandler {
     }
     // Our validators should certify this
     JsonObject errors = new DefaultPayloadValidator().validatePayload(context.request(),
-        AJEntityAssessment.editExFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+        AssessmentExDao.editExFieldSelector(), AssessmentDao.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors),
@@ -99,7 +101,7 @@ class UpdateExternalAssessmentHandler implements DBHandler {
     assessment.setModifierId(context.userId());
     // Now auto populate is done, we need to setup the converter machinery
     new DefaultAJEntityAssessmentEntityBuilder().build(assessment, context.request(),
-        AJEntityAssessment.getConverterRegistry());
+        AssessmentDao.getConverterRegistry());
 
     JsonObject newTags = this.context.request().getJsonObject(AJEntityAssessment.TAXONOMY);
     if (newTags != null && !newTags.isEmpty()) {

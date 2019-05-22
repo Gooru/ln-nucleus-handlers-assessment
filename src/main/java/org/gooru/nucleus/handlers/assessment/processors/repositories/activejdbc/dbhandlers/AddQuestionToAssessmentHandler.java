@@ -10,6 +10,7 @@ import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFacto
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
@@ -65,7 +66,7 @@ class AddQuestionToAssessmentHandler implements DBHandler {
     }
     // Our validators should certify this
     JsonObject errors = new DefaultPayloadValidator().validatePayload(context.request(),
-        AJEntityAssessment.addQuestionFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+        AssessmentDao.addQuestionFieldSelector(), AssessmentDao.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors),
