@@ -3,6 +3,7 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.OAProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
+import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFactory;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.DBHandler;
@@ -12,6 +13,7 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.SanityValidators;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
+import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +68,10 @@ public class OADeleteHandler implements DBHandler {
         return ModelErrorFormatter.formattedErrorResponse(offlineActivity);
       }
     }
-    throw new AssertionError("Not Implemented");
+    return new ExecutionResult<>(
+        MessageResponseFactory.createNoContentResponse(RESOURCE_BUNDLE.getString("deleted"),
+            EventBuilderFactory.getDeleteOAEventBuilder(context.oaId())),
+        ExecutionResult.ExecutionStatus.SUCCESSFUL);
   }
 
   @Override
