@@ -54,6 +54,13 @@ public final class SanityValidators {
 
   public static void validateOARefId(OAProcessorContext context) {
     validateValuePresence(context.oaRefId(), "missing.oaref.id");
+    try {
+      Long.parseLong(context.oaRefId());
+    } catch (NumberFormatException e) {
+      throw new MessageResponseWrapperException(MessageResponseFactory
+          .createInvalidRequestResponse(
+              RESOURCE_BUNDLE.getString("invalid.value") + context.oaRefId()));
+    }
   }
 
   public static void validateOARubricId(OAProcessorContext context) {
