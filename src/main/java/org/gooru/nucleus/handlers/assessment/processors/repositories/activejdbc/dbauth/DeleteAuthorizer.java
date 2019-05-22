@@ -26,8 +26,8 @@ class DeleteAuthorizer implements Authorizer<AJEntityAssessment> {
 
   @Override
   public ExecutionResult<MessageResponse> authorize(AJEntityAssessment assessment) {
-    String ownerId = assessment.getString(AJEntityAssessment.OWNER_ID);
-    String courseId = assessment.getString(AJEntityAssessment.COURSE_ID);
+    String ownerId = assessment.getOwnerId();
+    String courseId = assessment.getCourseId();
     long authRecordCount;
     // If this assessment is part of course, then user should be either
     // owner or collaborator on course

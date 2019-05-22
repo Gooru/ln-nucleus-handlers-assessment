@@ -75,7 +75,7 @@ class FetchExternalAssessmentHandler implements DBHandler {
             .toJson(this.assessment));
     // Now collaborator, we need to know if we want to get it from course
     // else no collaboration on external assessment
-    String courseId = this.assessment.getString(AJEntityAssessment.COURSE_ID);
+    String courseId = this.assessment.getCourseId();
     if (courseId == null || courseId.isEmpty()) {
       response.put(AJEntityAssessment.COLLABORATOR, new JsonArray());
     } else {

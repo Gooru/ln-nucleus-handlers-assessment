@@ -24,7 +24,7 @@ class UpdateCollaboratorAuthorizer implements Authorizer<AJEntityAssessment> {
 
   @Override
   public ExecutionResult<MessageResponse> authorize(AJEntityAssessment assessment) {
-    String ownerId = assessment.getString(AJEntityAssessment.OWNER_ID);
+    String ownerId = assessment.getOwnerId();
     if (context.userId().equalsIgnoreCase(ownerId)) {
       return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
     }

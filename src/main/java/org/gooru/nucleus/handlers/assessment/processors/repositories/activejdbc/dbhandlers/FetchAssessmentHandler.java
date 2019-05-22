@@ -1,9 +1,10 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers;
 
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhelpers.DbHelperUtil;
@@ -19,9 +20,6 @@ import org.javalite.activejdbc.DBException;
 import org.javalite.activejdbc.LazyList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 
 /**
  * Created by ashish on 11/1/16.
@@ -84,32 +82,35 @@ class FetchAssessmentHandler implements DBHandler {
         AJEntityQuestion
             .findBySQL(AJEntityQuestion.FETCH_QUESTION_SUMMARY_QUERY, context.assessmentId());
     if (!questions.isEmpty()) {
-      List<String> oeQuestionIds = new ArrayList<>(); 
+      List<String> oeQuestionIds = new ArrayList<>();
       for (AJEntityQuestion question : questions) {
-          if (question.get(AJEntityQuestion.CONTENT_SUBFORMAT) != null && AJEntityQuestion.RUBRIC_ASSOCIATION_ALLOWED_TYPES
-              .contains(question.getString(AJEntityQuestion.CONTENT_SUBFORMAT))) {
-              oeQuestionIds.add(question.get(AJEntityQuestion.ID).toString());
-          }
+        if (question.get(AJEntityQuestion.CONTENT_SUBFORMAT) != null
+            && AJEntityQuestion.RUBRIC_ASSOCIATION_ALLOWED_TYPES
+            .contains(question.getString(AJEntityQuestion.CONTENT_SUBFORMAT))) {
+          oeQuestionIds.add(question.get(AJEntityQuestion.ID).toString());
+        }
       }
-        
+
       JsonArray questionsArray = new JsonArray(
-           JsonFormatterBuilder
-          .buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS)
-          .toJson(questions));
+          JsonFormatterBuilder
+              .buildSimpleJsonFormatter(false, AJEntityQuestion.FETCH_QUESTION_SUMMARY_FIELDS)
+              .toJson(questions));
       if (!oeQuestionIds.isEmpty()) {
         LazyList<AJEntityRubric> rubrics =
-          AJEntityRubric.findBySQL(AJEntityRubric.FETCH_RUBRIC_SUMMARY, DbHelperUtil.toPostgresArrayString(oeQuestionIds));
+            AJEntityRubric.findBySQL(AJEntityRubric.FETCH_RUBRIC_SUMMARY,
+                DbHelperUtil.toPostgresArrayString(oeQuestionIds));
         if (rubrics != null && !rubrics.isEmpty()) {
           rubrics.forEach(rubric -> {
-              for (Object questionObject : questionsArray) {
-                  JsonObject question = (JsonObject) questionObject;
-                  if (question.getString(AJEntityQuestion.ID) != null && rubric.get(AJEntityRubric.CONTENT_ID).toString()
-                      .contains(question.getString(AJEntityQuestion.ID))) {
-                      if (!rubric.getBoolean(AJEntityRubric.IS_RUBRIC)) {
-                          question.put(AJEntityQuestion.MAX_SCORE, rubric.get(AJEntityRubric.MAX_SCORE));
-                      }
-                  }
+            for (Object questionObject : questionsArray) {
+              JsonObject question = (JsonObject) questionObject;
+              if (question.getString(AJEntityQuestion.ID) != null && rubric
+                  .get(AJEntityRubric.CONTENT_ID).toString()
+                  .contains(question.getString(AJEntityQuestion.ID))) {
+                if (!rubric.getBoolean(AJEntityRubric.IS_RUBRIC)) {
+                  question.put(AJEntityQuestion.MAX_SCORE, rubric.get(AJEntityRubric.MAX_SCORE));
+                }
               }
+            }
           });
         }
       }
@@ -119,7 +120,7 @@ class FetchAssessmentHandler implements DBHandler {
     }
     // Now collaborator, we need to know if we want to get it from course or
     // whatever is in the collection would suffice
-    String courseId = this.assessment.getString(AJEntityAssessment.COURSE_ID);
+    String courseId = this.assessment.getCourseId();
     if (courseId == null || courseId.isEmpty()) {
       String collaborators = this.assessment.getString(AJEntityAssessment.COLLABORATOR);
       if (collaborators == null || collaborators.isEmpty()) {

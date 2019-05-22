@@ -70,7 +70,7 @@ class DeleteExternalAssessmentHandler implements DBHandler {
     }
     AJEntityAssessment assessment = assessments.get(0);
     // Log a warning is assessment to be deleted is published
-    if (assessment.getDate(AJEntityAssessment.PUBLISH_DATE) != null) {
+    if (assessment.getPublishDate() != null) {
       LOGGER.warn("Assessment with id '{}' is published assessment and is being deleted",
           context.assessmentId());
     }
@@ -83,7 +83,7 @@ class DeleteExternalAssessmentHandler implements DBHandler {
     // deleting it but We do not reset the sequence id right now
     AJEntityAssessment assessmentToDelete = new AJEntityAssessment();
     assessmentToDelete.setIdWithConverter(context.assessmentId());
-    assessmentToDelete.setBoolean(AJEntityAssessment.IS_DELETED, true);
+    assessmentToDelete.setIsDeleted(true);
     assessmentToDelete.setModifierId(context.userId());
 
     boolean result = assessmentToDelete.save();

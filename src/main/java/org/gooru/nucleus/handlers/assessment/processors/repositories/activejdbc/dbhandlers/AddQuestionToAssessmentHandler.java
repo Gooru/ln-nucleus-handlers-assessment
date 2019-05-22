@@ -110,19 +110,15 @@ class AddQuestionToAssessmentHandler implements DBHandler {
         sequenceId = currentSequence + 1;
       }
       long count = Base.exec(AJEntityQuestion.ADD_QUESTION_QUERY, this.context.assessmentId(),
-          this.assessment.getString(AJEntityAssessment.COURSE_ID),
-          this.assessment.getString(AJEntityAssessment.UNIT_ID),
-          this.assessment.getString(AJEntityAssessment.LESSON_ID), this.context.userId(),
-          sequenceId,
-          this.context.questionId(), this.context.userId());
+          this.assessment.getCourseId(), this.assessment.getUnitId(), this.assessment.getLessonId(),
+          this.context.userId(), sequenceId, this.context.questionId(), this.context.userId());
 
       if (count == 1) {
         // Add rubric in CULA
         Base.exec(AJEntityQuestion.ADD_RUBRIC_QUERY, this.context.assessmentId(),
-            this.assessment.getString(AJEntityAssessment.COURSE_ID),
-            this.assessment.getString(AJEntityAssessment.UNIT_ID),
-            this.assessment.getString(AJEntityAssessment.LESSON_ID), this.context.userId(),
-            this.context.questionId(), this.context.userId());
+            this.assessment.getCourseId(), this.assessment.getUnitId(),
+            this.assessment.getLessonId(), this.context.userId(), this.context.questionId(),
+            this.context.userId());
 
         return updateGrading();
       } else if (count == 0) {

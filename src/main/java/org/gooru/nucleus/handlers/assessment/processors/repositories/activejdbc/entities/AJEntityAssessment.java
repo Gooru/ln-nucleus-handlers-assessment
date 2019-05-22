@@ -1,5 +1,6 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,10 +29,10 @@ public class AJEntityAssessment extends Model {
   public static final String ASSESSMENT_EXTERNAL = "assessment-external";
   public static final String ASSESSMENT = "assessment";
   private static final String CREATOR_ID = "creator_id";
-  public static final String PUBLISH_DATE = "publish_date";
-  public static final String IS_DELETED = "is_deleted";
+  private static final String PUBLISH_DATE = "publish_date";
+  private static final String IS_DELETED = "is_deleted";
   private static final String MODIFIER_ID = "modifier_id";
-  public static final String OWNER_ID = "owner_id";
+  private static final String OWNER_ID = "owner_id";
   static final String TITLE = "title";
   static final String THUMBNAIL = "thumbnail";
   static final String LEARNING_OBJECTIVE = "learning_objective";
@@ -43,9 +44,9 @@ public class AJEntityAssessment extends Model {
   static final String VISIBLE_ON_PROFILE = "visible_on_profile";
   public static final String COLLABORATOR = "collaborator";
   static final String SETTING = "setting";
-  public static final String COURSE_ID = "course_id";
-  public static final String UNIT_ID = "unit_id";
-  public static final String LESSON_ID = "lesson_id";
+  private static final String COURSE_ID = "course_id";
+  private static final String UNIT_ID = "unit_id";
+  private static final String LESSON_ID = "lesson_id";
   public static final String GRADING = "grading";
   public static final String TABLE_COURSE = "course";
   public static final String UPDATED_AT = "updated_at";
@@ -79,13 +80,6 @@ public class AJEntityAssessment extends Model {
           + "publish_status, thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, "
           + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root, primary_language "
           + "from collection where id = ?::uuid and format = 'assessment'::content_container_type and is_deleted = false";
-  public static final String FETCH_ASSESSMENT_EXTERNAL_ASMT_QUERY =
-      "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, publish_date, subformat, "
-          + "publish_status, thumbnail, learning_objective, license, metadata, taxonomy, setting, grading, "
-          + "visible_on_profile, collaborator, course_id, unit_id, lesson_id, tenant, tenant_root, primary_language, gut_codes "
-          + "from collection where id = ?::uuid and "
-          + " (format = 'assessment'::content_container_type OR format = 'assessment-external'::content_container_type) "
-          + " and is_deleted = false";
   public static final String FETCH_EXTERNAL_ASSSESSMENT_QUERY =
       "select id, title, owner_id, creator_id, original_creator_id, original_collection_id, thumbnail, subformat, "
           + "publish_status, learning_objective, metadata, taxonomy, visible_on_profile, url, login_required, "
@@ -254,8 +248,24 @@ public class AJEntityAssessment extends Model {
     return Objects.equals(this.getString(PUBLISH_STATUS), PUBLISH_STATUS_PUBLISHED);
   }
 
+  public void setIsDeleted(boolean deleted) {
+    this.setBoolean(AJEntityAssessment.IS_DELETED, deleted);
+  }
+
+  public Date getPublishDate() {
+    return this.getDate(AJEntityAssessment.PUBLISH_DATE);
+  }
+
   public String getCourseId() {
     return this.getString(COURSE_ID);
+  }
+
+  public String getUnitId() {
+    return this.getString(UNIT_ID);
+  }
+
+  public String getLessonId() {
+    return this.getString(LESSON_ID);
   }
 
   public String getTenant() {
@@ -266,4 +276,7 @@ public class AJEntityAssessment extends Model {
     return this.getString(TENANT_ROOT);
   }
 
+  public String getOwnerId() {
+    return this.getString(AJEntityAssessment.OWNER_ID);
+  }
 }
