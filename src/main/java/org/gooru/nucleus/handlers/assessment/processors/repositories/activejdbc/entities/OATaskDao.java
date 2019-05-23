@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oataskcreate.OATaskCreateCommand;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oataskupdate.OATaskUpdateCommand;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.ModelErrorFormatter;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.javalite.activejdbc.Base;
@@ -59,5 +60,16 @@ public final class OATaskDao {
           MessageResponseFactory.createValidationErrorResponse(errors));
     }
     return (Long) task.getId();
+  }
+
+  public static void updateTask(AJEntityOATask task, OATaskUpdateCommand command) {
+    task.setTitle(command.getTitle());
+    task.setDescription(command.getDescription());
+    boolean result = task.save();
+    if (!result) {
+      JsonObject errors = ModelErrorFormatter.formattedError(task);
+      throw new MessageResponseWrapperException(
+          MessageResponseFactory.createValidationErrorResponse(errors));
+    }
   }
 }
