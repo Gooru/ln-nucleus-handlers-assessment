@@ -60,7 +60,7 @@ class GetMasteryAccrualForAssessmentHandler implements DBHandler {
   @Override
   public ExecutionResult<MessageResponse> validateRequest() {
     LazyList<AJEntityAssessment> assessmentList =
-        AJEntityAssessment.findBySQL(AssessmentExDao.FETCH_ASSESSMENTS_EXTERNAL_ASMT_QUERY,
+        AJEntityAssessment.findBySQL(AssessmentExDao.FETCH_ASMT_ASMTEX_OA_QUERY,
             DbHelperUtil.toPostgresArrayString(assessmentIds.getList()));
     if (assessments != null && assessments.isEmpty()) {
       LOGGER.warn("Not able to find assessments '{}'", assessmentIds);
