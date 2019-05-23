@@ -4,18 +4,27 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
+import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.converters.ConverterRegistry;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.converters.FieldConverter;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.FieldSelector;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.FieldValidator;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.ValidatorRegistry;
+import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
+import org.javalite.activejdbc.LazyList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ashish.
  */
 
 public final class AssessmentDao {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(AssessmentDao.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
   public static final String AUTH_FILTER = "id = ?::uuid and (owner_id = ?::uuid or collaborator ?? ?);";
   public static final String PUBLISHED_FILTER = "id = ?::uuid and publish_status = 'published'::publish_status_type;";
@@ -137,5 +146,18 @@ public final class AssessmentDao {
     public FieldConverter lookupConverter(String fieldName) {
       return AJEntityAssessment.converterRegistry.get(fieldName);
     }
+  }
+
+  public static AJEntityAssessment fetchAssessmentWithAuthorizerQuery(String assessmentId) {
+    LazyList<AJEntityAssessment> assessments = AJEntityAssessment
+        .findBySQL(AssessmentDao.AUTHORIZER_QUERY, AJEntityAssessment.ASSESSMENT,
+            assessmentId, false);
+    if (assessments.size() < 1) {
+      LOGGER.warn("Assessment id: {} not present in DB", assessmentId);
+      throw new MessageResponseWrapperException(MessageResponseFactory
+          .createNotFoundResponse(
+              RESOURCE_BUNDLE.getString("assessment.id") + assessmentId));
+    }
+    return assessments.get(0);
   }
 }

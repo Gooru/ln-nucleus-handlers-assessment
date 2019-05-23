@@ -1,5 +1,6 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators;
 
+import io.vertx.core.json.JsonObject;
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 import org.gooru.nucleus.handlers.assessment.processors.OAProcessorContext;
@@ -39,6 +40,14 @@ public final class SanityValidators {
     validateUser(context.userId());
   }
 
+  public static void validateAssessmentId(String assessmentId) {
+    if (assessmentId == null || assessmentId.isEmpty()) {
+      LOGGER.warn("Missing assessment id");
+      throw new MessageResponseWrapperException(
+          MessageResponseFactory
+              .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("missing.assessment.id")));
+    }
+  }
 
   public static void validateOAId(OAProcessorContext context) {
     validateValuePresence(context.oaId(), "missing.oa.id");
@@ -59,6 +68,14 @@ public final class SanityValidators {
     validateLong(context.oaRefId());
   }
 
+  public static void validatePayloadNotEmpty(JsonObject request) {
+    if (request == null || request.isEmpty()) {
+      throw new MessageResponseWrapperException(
+          MessageResponseFactory
+              .createInvalidRequestResponse(RESOURCE_BUNDLE.getString("empty.payload")));
+    }
+  }
+
   private static void validateLong(String value) {
     try {
       Long.parseLong(value);
@@ -73,6 +90,17 @@ public final class SanityValidators {
     validateValuePresence(context.oaRubricId(), "missing.oarubric.id");
   }
 
+  public static void validateWithDefaultPayloadValidator(JsonObject request,
+      FieldSelector fieldSelector, ValidatorRegistry validatorRegistry) {
+    JsonObject errors = new DefaultPayloadValidator()
+        .validatePayload(request, fieldSelector, validatorRegistry);
+    if (errors != null && !errors.isEmpty()) {
+      LOGGER.warn("Validation errors for request");
+      throw new MessageResponseWrapperException(
+          MessageResponseFactory.createValidationErrorResponse(errors));
+    }
+  }
+
   private static void validateValuePresence(String value, String messageKey) {
     if (value == null || value.isEmpty()) {
       throw new MessageResponseWrapperException(
@@ -80,5 +108,10 @@ public final class SanityValidators {
               .createNotFoundResponse(RESOURCE_BUNDLE.getString(messageKey)));
     }
   }
+
+  private static class DefaultPayloadValidator implements PayloadValidator {
+
+  }
+
 
 }

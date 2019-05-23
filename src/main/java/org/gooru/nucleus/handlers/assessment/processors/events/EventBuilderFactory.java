@@ -22,6 +22,7 @@ public final class EventBuilderFactory {
   private static final String EVT_EX_ASSESSMENT_CREATE = "event.external.assessment.create";
   private static final String EVT_OA_DELETE = "event.oa.delete";
   private static final String EVT_OA_UPDATE = "event.oa.update";
+  private static final String EVT_OA_COLLABORATOR_UPDATE = "event.oa.collaborator.update";
 
   private EventBuilderFactory() {
     throw new AssertionError();
@@ -68,6 +69,12 @@ public final class EventBuilderFactory {
     return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_COLLABORATOR_UPDATE)
         .put(EVENT_BODY,
             collaborators.put(ASSESSMENT_ID, assessmentId));
+  }
+
+  public static EventBuilder getUpdateCollaboratorForOAEventBuilder(String oaId,
+      JsonObject collaborators) {
+    return () -> new JsonObject().put(EVENT_NAME, EVT_OA_COLLABORATOR_UPDATE)
+        .put(EVENT_BODY, collaborators.put(ASSESSMENT_ID, oaId));
   }
 
   public static EventBuilder getDeleteExAssessmentEventBuilder(String assessmentId) {

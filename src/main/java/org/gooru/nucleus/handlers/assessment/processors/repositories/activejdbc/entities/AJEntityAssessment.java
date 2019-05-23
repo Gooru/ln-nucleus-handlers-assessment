@@ -1,5 +1,6 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities;
 
+import io.vertx.core.json.JsonArray;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -266,5 +267,12 @@ public class AJEntityAssessment extends Model {
 
   public String getExemplar() {
     return this.getString(EXEMPLAR);
+  }
+
+  public JsonArray getCollaborators() {
+    String currentCollaboratorsAsString = this.getString(COLLABORATOR);
+    return (currentCollaboratorsAsString != null && !currentCollaboratorsAsString.isEmpty()
+        ? new JsonArray(currentCollaboratorsAsString) : new JsonArray());
+
   }
 }
