@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.converters.FieldConverter;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbutils.OASubformatValidationUtil;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.FieldValidator;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.ReorderFieldValidator;
 import org.javalite.activejdbc.Model;
@@ -71,6 +72,7 @@ public class AJEntityAssessment extends Model {
   static final String DURATION_HOURS = "duration_hours";
   static final String MAX_SCORE = "max_score";
   static final String EXEMPLAR = "exemplar";
+  static final String SUBFORMAT = "subformat";
 
   private static final String TEXT_ARRAY_TYPE = "text[]";
 
@@ -132,6 +134,7 @@ public class AJEntityAssessment extends Model {
     validatorMap.put(TENANT, (FieldValidator::validateUuid));
     validatorMap.put(TENANT_ROOT, (FieldValidator::validateUuid));
     validatorMap.put(PRIMARY_LANGUAGE, FieldValidator::validateLanguageIfPresent);
+    validatorMap.put(SUBFORMAT, OASubformatValidationUtil::validateOASubformat);
     return Collections.unmodifiableMap(validatorMap);
   }
 
@@ -169,6 +172,10 @@ public class AJEntityAssessment extends Model {
 
   public void setTypeAssessment() {
     setFieldUsingConverter(FORMAT, ASSESSMENT_TYPE_VALUE);
+  }
+
+  public void setTypeOfflineActivity() {
+    setFieldUsingConverter(FORMAT, ASSESSMENT_TYPE_OFFLINE);
   }
 
   public void setTypeExAssessment() {

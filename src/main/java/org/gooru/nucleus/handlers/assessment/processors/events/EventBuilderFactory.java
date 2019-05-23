@@ -23,6 +23,7 @@ public final class EventBuilderFactory {
   private static final String EVT_OA_DELETE = "event.oa.delete";
   private static final String EVT_OA_UPDATE = "event.oa.update";
   private static final String EVT_OA_COLLABORATOR_UPDATE = "event.oa.collaborator.update";
+  private static final String EVT_OA_CREATE = "event.oa.create";
 
   private EventBuilderFactory() {
     throw new AssertionError();
@@ -92,4 +93,8 @@ public final class EventBuilderFactory {
         new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 
+  public static EventBuilder getCreateOfflineActivityEventBuilder(String id) {
+    return () -> new JsonObject().put(EVENT_NAME, EVT_OA_CREATE).put(EVENT_BODY,
+        new JsonObject().put(ASSESSMENT_ID, id));
+  }
 }
