@@ -1,8 +1,11 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities;
 
+import io.vertx.core.json.JsonObject;
 import java.util.List;
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oataskcreate.OATaskCreateCommand;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.ModelErrorFormatter;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.javalite.activejdbc.Base;
 import org.slf4j.Logger;
@@ -41,5 +44,20 @@ public final class OATaskDao {
     if (oaTaskId != null) {
       Base.exec(DELETE_TASK, oaTaskId);
     }
+  }
+
+  public static Long createTask(OATaskCreateCommand command) {
+    AJEntityOATask task = new AJEntityOATask();
+    task.setOaId(command.getOaId());
+    task.setTitle(command.getTitle());
+    task.setDescription(command.getDescription());
+
+    boolean result = task.save();
+    if (!result) {
+      JsonObject errors = ModelErrorFormatter.formattedError(task);
+      throw new MessageResponseWrapperException(
+          MessageResponseFactory.createValidationErrorResponse(errors));
+    }
+    return (Long) task.getId();
   }
 }

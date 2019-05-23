@@ -28,4 +28,14 @@ public final class ModelErrorFormatter {
     return null;
   }
 
+  public static JsonObject formattedError(Model model) {
+    if (model.hasErrors()) {
+      Map<String, String> map = model.errors();
+      JsonObject errors = new JsonObject();
+      map.forEach(errors::put);
+      return errors;
+    }
+    return null;
+  }
+
 }
