@@ -35,4 +35,16 @@ public class AJEntityOATaskSubmission extends Model {
   public Date getUpdatedAt() {
     return this.getDate(UPDATED_AT);
   }
+
+  public void setOaTaskId(Long taskId) {
+    this.setLong(OA_TASK_ID, taskId);
+  }
+
+  public void setOaTaskSubmissionType(String type) {
+    this.setString(OA_TASK_SUBMISSION_TYPE, type);
+  }
+
+  public void setOaTaskSubmissionSubtype(String subtype) {
+    this.setString(OA_TASK_SUBMISSION_SUBTYPE, subtype);
+  }
 }

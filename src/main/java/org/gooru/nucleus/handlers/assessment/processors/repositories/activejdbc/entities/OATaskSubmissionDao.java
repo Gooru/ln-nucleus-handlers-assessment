@@ -1,8 +1,11 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities;
 
+import io.vertx.core.json.JsonObject;
 import java.util.List;
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oatasksubmissioncreate.OATaskSubmissionCreateCommand;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.ModelErrorFormatter;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.javalite.activejdbc.Base;
 import org.slf4j.Logger;
@@ -44,5 +47,21 @@ public final class OATaskSubmissionDao {
     if (oaTaskSubmissionId != null) {
       Base.exec(DELETE_TASK_SUBMISSION, oaTaskSubmissionId);
     }
+  }
+
+  public static Long createTaskSubmission(OATaskSubmissionCreateCommand command) {
+    AJEntityOATaskSubmission submission = new AJEntityOATaskSubmission();
+    submission.setOaTaskId(command.getOaTaskId());
+    submission.setOaTaskSubmissionType(command.getOaTaskSubmissionType());
+    submission.setOaTaskSubmissionSubtype(command.getOaTaskSubmissionSubtype());
+
+    boolean result = submission.save();
+
+    if (!result) {
+      JsonObject errors = ModelErrorFormatter.formattedError(submission);
+      throw new MessageResponseWrapperException(
+          MessageResponseFactory.createValidationErrorResponse(errors));
+    }
+    return (Long) submission.getId();
   }
 }

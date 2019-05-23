@@ -34,4 +34,9 @@ public final class OfflineActivityDao {
     return offlineActivities.get(0);
 
   }
+
+  public boolean offlineActivityExists(String id) {
+    // TODO: Implement this and replace the fetch with this whereever needed
+    return false;
+  }
 }
