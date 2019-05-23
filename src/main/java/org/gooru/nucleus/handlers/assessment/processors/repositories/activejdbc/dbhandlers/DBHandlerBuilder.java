@@ -10,6 +10,7 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oarefdelete.OARefDeleteHandler;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oarubricstudent.OARubricStudentAssociateHandler;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oarubricteacher.OARubricTeacherAssociateHandler;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oasubtypeslist.OASubtypesListHandler;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oataskcreate.OATaskCreateHandler;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oataskdelete.OATaskDeleteHandler;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oatasksubmissioncreate.OATaskSubmissionCreateHandler;
@@ -137,5 +138,9 @@ public final class DBHandlerBuilder {
 
   public static DBHandler buildOAUpdateHandler(ProcessorContext context) {
     return new OAUpdateHandler(context);
+  }
+
+  public static DBHandler buildOASubtypesListHandler(ProcessorContext context) {
+    return new OASubtypesListHandler(context);
   }
 }

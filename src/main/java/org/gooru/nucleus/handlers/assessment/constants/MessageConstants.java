@@ -51,6 +51,7 @@ public final class MessageConstants {
   public static final String MSG_OP_OA_REF_CREATE = "oa.ref.create";
   public static final String MSG_OP_OA_TEACHER_RUBRIC_ASSOCIATE = "oa.rubric.teacher.add";
   public static final String MSG_OP_OA_STUDENT_RUBRIC_ASSOCIATE = "oa.rubric.student.add";
+  public static final String MSG_OP_OA_SUBTYPES_LIST = "oa.list.subtypes";
 
   // Containers for different responses
   public static final String RESP_CONTAINER_MBUS = "mb.container";

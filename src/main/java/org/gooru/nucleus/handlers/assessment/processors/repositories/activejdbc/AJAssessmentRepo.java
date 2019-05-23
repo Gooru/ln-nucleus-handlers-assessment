@@ -181,4 +181,9 @@ class AJAssessmentRepo implements AssessmentRepo {
         .executeTransaction(DBHandlerBuilder.buildOAUpdateHandler(context));
   }
 
+  @Override
+  public MessageResponse oaSubtypesList() {
+    return TransactionExecutor
+        .executeTransaction(DBHandlerBuilder.buildOASubtypesListHandler(context));
+  }
 }

@@ -189,6 +189,12 @@ public enum CommandProcessorBuilder {
     public Processor build(ProcessorContext context) {
       return new OARubricStudentAssociateProcessor(context);
     }
+  },
+  MSG_OP_OA_SUBTYPES_LIST(MessageConstants.MSG_OP_OA_SUBTYPES_LIST) {
+    @Override
+    public Processor build(ProcessorContext context) {
+      return new OASubtypesListProcessor(context);
+    }
   };
 
   private String name;

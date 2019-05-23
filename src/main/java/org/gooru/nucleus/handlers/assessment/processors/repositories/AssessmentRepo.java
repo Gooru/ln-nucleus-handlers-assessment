@@ -60,4 +60,6 @@ public interface AssessmentRepo {
   MessageResponse oaUpdateCollaborator();
 
   MessageResponse oaUpdate();
+
+  MessageResponse oaSubtypesList();
 }
