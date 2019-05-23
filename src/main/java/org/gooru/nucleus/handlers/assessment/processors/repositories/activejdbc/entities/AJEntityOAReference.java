@@ -1,6 +1,7 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities;
 
 import java.sql.Date;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.converters.FieldConverter;
 import org.javalite.activejdbc.Model;
 import org.javalite.activejdbc.annotations.Table;
 
@@ -40,5 +41,21 @@ public class AJEntityOAReference extends Model {
 
   public Date getUpdatedAt() {
     return this.getDate(UPDATED_AT);
+  }
+
+  public void setOaId(String oaId) {
+    this.set(OA_ID, FieldConverter.convertFieldToUuid(oaId));
+  }
+
+  public void setOaReferenceType(String type) {
+    this.setString(OA_REFERENCE_TYPE, type);
+  }
+
+  public void setOaReferenceSubtype(String subtype) {
+    this.setString(OA_REFERENCE_SUBTYPE, subtype);
+  }
+
+  public void setLocation(String location) {
+    this.setString(LOCATION, location);
   }
 }

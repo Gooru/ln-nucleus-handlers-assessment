@@ -1,8 +1,11 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities;
 
+import io.vertx.core.json.JsonObject;
 import java.util.List;
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oarefcreate.OARefCreateCommand;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.ModelErrorFormatter;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.javalite.activejdbc.Base;
 import org.slf4j.Logger;
@@ -41,5 +44,21 @@ public final class OAReferenceDao {
     if (oaRefId != null) {
       Base.exec(DELETE_REF, oaRefId);
     }
+  }
+
+  public static Long createReference(OARefCreateCommand command) {
+    AJEntityOAReference ref = new AJEntityOAReference();
+    ref.setOaId(command.getOaId());
+    ref.setOaReferenceType(command.getOaRefType());
+    ref.setOaReferenceSubtype(command.getOaRefSubtype());
+    ref.setLocation(command.getLocation());
+
+    boolean result = ref.save();
+    if (!result) {
+      JsonObject errors = ModelErrorFormatter.formattedError(ref);
+      throw new MessageResponseWrapperException(
+          MessageResponseFactory.createValidationErrorResponse(errors));
+    }
+    return (Long) ref.getId();
   }
 }
