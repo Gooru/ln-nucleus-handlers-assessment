@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import org.gooru.nucleus.handlers.assessment.processors.OAProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.converters.ConverterRegistry;
@@ -31,7 +32,7 @@ public final class OfflineActivityDao {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OfflineActivityDao.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
-  static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays
+  private static final Set<String> EDITABLE_FIELDS = new HashSet<>(Arrays
       .asList(
           AJEntityAssessment.TITLE, AJEntityAssessment.THUMBNAIL,
           AJEntityAssessment.LEARNING_OBJECTIVE, AJEntityAssessment.METADATA,
@@ -123,13 +124,7 @@ public final class OfflineActivityDao {
     }
         .build(offlineActivity, context.request(), AssessmentDao.getConverterRegistry());
 
-    JsonObject newTags = context.request().getJsonObject(AJEntityAssessment.TAXONOMY);
-    if (newTags != null && !newTags.isEmpty()) {
-      Map<String, String> frameworkToGutCodeMapping =
-          GUTCodeLookupHelper.populateGutCodesToTaxonomyMapping(newTags.fieldNames());
-      offlineActivity
-          .setGutCodes(CommonUtils.toPostgresArrayString(frameworkToGutCodeMapping.keySet()));
-    }
+    populateGutCodes(offlineActivity, context.request());
 
     boolean result = offlineActivity.save();
     if (!result) {
@@ -143,6 +138,38 @@ public final class OfflineActivityDao {
           MessageResponseFactory.createInternalErrorResponse());
     }
     return offlineActivity.getId().toString();
+  }
+
+  public static void updateOfflineActivity(OAProcessorContext context) {
+    AJEntityAssessment offlineActivity = new AJEntityAssessment();
+    offlineActivity.setIdWithConverter(context.oaId());
+    offlineActivity.setModifierId(context.userId());
+    new EntityBuilder<AJEntityAssessment>() {
+    }.build(offlineActivity, context.request(), AssessmentDao.getConverterRegistry());
+
+    populateGutCodes(offlineActivity, context.request());
+
+    boolean result = offlineActivity.save();
+    if (!result) {
+      LOGGER.error("Offline activity with id '{}' failed to save", context.oaId());
+      if (offlineActivity.hasErrors()) {
+        throw new MessageResponseWrapperException(
+            MessageResponseFactory.createValidationErrorResponse(
+                ModelErrorFormatter.formattedError(offlineActivity)));
+      }
+      throw new MessageResponseWrapperException(
+          MessageResponseFactory.createInternalErrorResponse());
+    }
+  }
+
+  private static void populateGutCodes(AJEntityAssessment offlineActivity, JsonObject request) {
+    JsonObject newTags = request.getJsonObject(AJEntityAssessment.TAXONOMY);
+    if (newTags != null && !newTags.isEmpty()) {
+      Map<String, String> frameworkToGutCodeMapping =
+          GUTCodeLookupHelper.populateGutCodesToTaxonomyMapping(newTags.fieldNames());
+      offlineActivity
+          .setGutCodes(CommonUtils.toPostgresArrayString(frameworkToGutCodeMapping.keySet()));
+    }
   }
 
   private static void autoPopulateFields(ProcessorContext context,
