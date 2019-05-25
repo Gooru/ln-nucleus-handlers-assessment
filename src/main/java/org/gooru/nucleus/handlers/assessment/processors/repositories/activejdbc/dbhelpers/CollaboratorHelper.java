@@ -7,9 +7,12 @@ import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
+import org.javalite.activejdbc.Base;
+import org.javalite.activejdbc.DBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,4 +94,31 @@ public final class CollaboratorHelper {
     }
   }
 
+  public static JsonArray fetchCollaboratorsForAssessment(AJEntityAssessment assessment) {
+    String courseId = assessment.getCourseId();
+    if (courseId == null || courseId.isEmpty()) {
+      String collaborators = assessment.getString(AJEntityAssessment.COLLABORATOR);
+      if (collaborators == null || collaborators.isEmpty()) {
+        return new JsonArray();
+      } else {
+        return new JsonArray(collaborators);
+      }
+    } else {
+      try {
+        Object courseCollaboratorObject =
+            Base.firstCell(AssessmentDao.COURSE_COLLABORATOR_QUERY, courseId);
+        if (courseCollaboratorObject != null) {
+          return new JsonArray(courseCollaboratorObject.toString());
+        } else {
+          return new JsonArray();
+        }
+      } catch (DBException e) {
+        LOGGER.error(
+            "Error trying to get course collaborator for course '{}' to fetch assessment '{}'",
+            courseId, assessment.getId(), e);
+        return new JsonArray();
+      }
+
+    }
+  }
 }

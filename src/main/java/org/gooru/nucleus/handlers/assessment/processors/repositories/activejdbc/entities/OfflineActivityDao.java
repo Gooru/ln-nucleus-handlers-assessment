@@ -62,6 +62,14 @@ public final class OfflineActivityDao {
   private static final String FETCH_QUERY_FILTER =
       " format = 'offline-activity'::content_container_type and id = ?::uuid and is_deleted = false";
 
+  public static final List<String> FETCH_FIELD_LIST = Arrays
+      .asList("id", "title", "owner_id", "creator_id", "original_creator_id", "url",
+          "login_required",
+          "original_collection_id", "publish_date", "thumbnail", "learning_objective", "license",
+          "metadata", "taxonomy", "setting", "grading", "primary_language", "visible_on_profile",
+          "course_id", "unit_id", "lesson_id", "subformat", "exemplar", "reference",
+          "duration_hours", "max_score");
+
   public static FieldSelector editFieldSelector() {
     return () -> Collections.unmodifiableSet(EDITABLE_FIELDS);
   }
