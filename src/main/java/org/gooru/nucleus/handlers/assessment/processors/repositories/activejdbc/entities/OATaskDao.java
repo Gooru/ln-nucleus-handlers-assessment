@@ -2,8 +2,11 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oataskcreate.OATaskCreateCommand;
@@ -60,6 +63,54 @@ public final class OATaskDao {
           .buildSimpleJsonFormatter(false, FETCH_LIST).toJsonFromList(tasks));
     }
     return new JsonArray();
+  }
+
+  public static JsonArray fetchTasksWithDetailsForActivityAsJson(String oaId) {
+    List<AJEntityOATask> tasks = fetchTasksForActivity(oaId);
+    if (tasks != null && !tasks.isEmpty()) {
+      List<AJEntityOATaskSubmission> submissions = OATaskSubmissionDao
+          .fetchOATaskSubmissionsForSpecifiedTasks(tasks);
+
+      JsonArray tasksInfo = new JsonArray(JsonFormatterBuilder
+          .buildSimpleJsonFormatter(false, FETCH_LIST).toJsonFromList(tasks));
+      if (submissions != null && !submissions.isEmpty()) {
+        return mergeTaskDetailsInTasksInfo(tasksInfo, submissions);
+      } else {
+        return tasksInfo;
+      }
+    } else {
+      return new JsonArray();
+    }
+  }
+
+  private static JsonArray mergeTaskDetailsInTasksInfo(JsonArray tasksInfo,
+      List<AJEntityOATaskSubmission> submissions) {
+    Map<Long, List<AJEntityOATaskSubmission>> mapTaskIdToSubmission = new HashMap<>();
+    for (AJEntityOATaskSubmission submission : submissions) {
+      List<AJEntityOATaskSubmission> existingSubmissions = mapTaskIdToSubmission
+          .get(submission.getOaTaskId());
+      if (existingSubmissions == null) {
+        existingSubmissions = new ArrayList<>();
+      }
+      existingSubmissions.add(submission);
+      mapTaskIdToSubmission.put(submission.getOaTaskId(), existingSubmissions);
+    }
+
+    for (Object o : tasksInfo) {
+      JsonObject task = (JsonObject) o;
+      Long id = task.getLong("id");
+      List<AJEntityOATaskSubmission> submissionsForTask = mapTaskIdToSubmission.get(id);
+      if (submissionsForTask != null && !submissionsForTask.isEmpty()) {
+        JsonArray taskSubmissions = new JsonArray(JsonFormatterBuilder
+            .buildSimpleJsonFormatter(false, AJEntityOATaskSubmission.FETCH_LIST)
+            .toJsonFromList(mapTaskIdToSubmission.get(id)));
+        task.put(OATaskSubmissionDao.OA_TASKS_SUBMISSIONS, taskSubmissions);
+      } else {
+        task.put(OATaskSubmissionDao.OA_TASKS_SUBMISSIONS, new JsonArray());
+      }
+    }
+
+    return tasksInfo;
   }
 
 

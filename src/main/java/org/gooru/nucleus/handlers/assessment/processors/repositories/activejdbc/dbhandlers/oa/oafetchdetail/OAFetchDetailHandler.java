@@ -1,16 +1,23 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oafetchdetail;
 
+import io.vertx.core.json.JsonObject;
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.OAProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.DBHandler;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhelpers.CollaboratorHelper;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.OAReferenceDao;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.OATaskDao;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.OfflineActivityDao;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.RubricDao;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.JsonFormatterBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.SanityValidators;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
+import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +63,21 @@ public class OAFetchDetailHandler implements DBHandler {
 
   @Override
   public ExecutionResult<MessageResponse> executeRequest() {
-    throw new AssertionError("Not Implemented");
+    JsonObject response = new JsonObject(
+        JsonFormatterBuilder
+            .buildSimpleJsonFormatter(false, OfflineActivityDao.FETCH_FIELD_LIST)
+            .toJson(this.offlineActivity));
+    response
+        .put(OATaskDao.OA_TASKS, OATaskDao.fetchTasksWithDetailsForActivityAsJson(context.oaId()));
+    response.put(OAReferenceDao.OA_REFERENCES,
+        OAReferenceDao.fetchRefsForActivityAsJson(context.oaId()));
+    response.put(AJEntityAssessment.COLLABORATOR,
+        CollaboratorHelper.fetchCollaboratorsForAssessment(offlineActivity));
+    response.put(RubricDao.RUBRICS, RubricDao.fetchRubricsForCollectionAsJsonArray(context.oaId()));
+    return new ExecutionResult<>(MessageResponseFactory.createOkayResponse(response),
+        ExecutionResult.ExecutionStatus.SUCCESSFUL);
+
+
   }
 
   @Override

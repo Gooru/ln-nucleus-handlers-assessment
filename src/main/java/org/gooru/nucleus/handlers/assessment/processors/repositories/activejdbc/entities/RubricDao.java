@@ -1,11 +1,14 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities;
 
+import io.vertx.core.json.JsonArray;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import org.gooru.nucleus.handlers.assessment.processors.OAProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.JsonFormatterBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.ModelErrorFormatter;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.javalite.activejdbc.Base;
@@ -34,6 +37,12 @@ public final class RubricDao {
           + "    ?::uuid, ?::uuid, ?::uuid, ?::uuid, is_rubric, scoring, increment, ?, primary_language, max_score "
           + "FROM rubric WHERE id = ?::uuid AND is_deleted = false AND is_rubric = true";
 
+  private static final List<String> FETCH_FIELDS = Arrays
+      .asList("id", "title", "url", "is_remote", "description", "categories", "feedback_guidance",
+          "overall_feedback_required", "metadata", "taxonomy", "gut_codes", "thumbnail", "scoring",
+          "increment", "grader", "primary_language", "max_score");
+
+  public static final String RUBRICS = "rubrics";
   private static final Logger LOGGER = LoggerFactory.getLogger(RubricDao.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
@@ -67,6 +76,16 @@ public final class RubricDao {
 
   public static List<AJEntityRubric> fetchRubricsForCollection(String collectionId) {
     return AJEntityRubric.where(RUBRIC_FETCH_FOR_COLLECTION, collectionId);
+  }
+
+  public static JsonArray fetchRubricsForCollectionAsJsonArray(String collectionId) {
+    List<AJEntityRubric> rubrics = AJEntityRubric.where(RUBRIC_FETCH_FOR_COLLECTION, collectionId);
+    if (rubrics != null && !rubrics.isEmpty()) {
+      return new JsonArray(JsonFormatterBuilder.buildSimpleJsonFormatter(false, FETCH_FIELDS)
+          .toJsonFromList(rubrics));
+    } else {
+      return new JsonArray();
+    }
   }
 
   public static void deleteTeacherRubricAssociatedWithCollection(String collectionId, String user) {

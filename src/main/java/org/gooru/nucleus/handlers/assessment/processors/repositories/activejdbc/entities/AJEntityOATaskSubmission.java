@@ -1,6 +1,8 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities;
 
 import java.sql.Date;
+import java.util.Arrays;
+import java.util.List;
 import org.javalite.activejdbc.Model;
 import org.javalite.activejdbc.annotations.Table;
 
@@ -15,9 +17,14 @@ public class AJEntityOATaskSubmission extends Model {
   private static final String OA_TASK_SUBMISSION_SUBTYPE = "oa_task_submission_subtype";
   private static final String CREATED_AT = "created_at";
   private static final String UPDATED_AT = "updated_at";
+  private static final String ID = "id";
 
-  public String getOaTaskId() {
-    return this.getString(OA_TASK_ID);
+  public static final List<String> FETCH_LIST = Arrays
+      .asList(ID, OA_TASK_ID, OA_TASK_SUBMISSION_TYPE, OA_TASK_SUBMISSION_SUBTYPE, CREATED_AT,
+          UPDATED_AT);
+
+  public Long getOaTaskId() {
+    return this.getLong(OA_TASK_ID);
   }
 
   public String getOaTaskSubmissionType() {

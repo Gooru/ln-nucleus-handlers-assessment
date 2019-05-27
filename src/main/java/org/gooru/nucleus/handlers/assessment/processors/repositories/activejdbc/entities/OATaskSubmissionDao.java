@@ -1,10 +1,13 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities;
 
 import io.vertx.core.json.JsonObject;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageResponseWrapperException;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhandlers.oa.oatasksubmissioncreate.OATaskSubmissionCreateCommand;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhelpers.DbHelperUtil;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.ModelErrorFormatter;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.javalite.activejdbc.Base;
@@ -21,6 +24,8 @@ public final class OATaskSubmissionDao {
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private static final String FETCH_QUERY_FILTER = "oa_task_id = ? and id = ?";
   private static final String DELETE_TASK_SUBMISSION = "delete from oa_tasks_submissions where id = ?";
+  private static final String FETCH_SUBMISSIONS_FOR_TASKS = "oa_task_id = any(?::bigint[])";
+  public static final String OA_TASKS_SUBMISSIONS = "oa_tasks_submissions";
 
   private OATaskSubmissionDao() {
     throw new AssertionError();
@@ -63,5 +68,20 @@ public final class OATaskSubmissionDao {
           MessageResponseFactory.createValidationErrorResponse(errors));
     }
     return (Long) submission.getId();
+  }
+
+  public static List<AJEntityOATaskSubmission> fetchOATaskSubmissionsForSpecifiedTasks(
+      List<AJEntityOATask> tasks) {
+    if (tasks != null && !tasks.isEmpty()) {
+      List<Long> taskIds = new ArrayList<>(tasks.size());
+      for (AJEntityOATask task : tasks) {
+        taskIds.add((Long) task.getId());
+      }
+      return AJEntityOATaskSubmission
+          .where(FETCH_SUBMISSIONS_FOR_TASKS, DbHelperUtil.toPostgresArrayLong(taskIds))
+          .orderBy("oa_task_id");
+
+    }
+    return Collections.emptyList();
   }
 }
