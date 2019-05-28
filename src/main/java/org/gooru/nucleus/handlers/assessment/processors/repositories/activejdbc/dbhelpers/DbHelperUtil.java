@@ -29,4 +29,24 @@ public final class DbHelperUtil {
     }
   }
 
+  public static String toPostgresArrayLong(Collection<Long> input) {
+    int approxSize = ((input.size() + 1) * 16); // Length of UUID is around
+    // 36 chars
+    Iterator<Long> it = input.iterator();
+    if (!it.hasNext()) {
+      return "{}";
+    }
+
+    StringBuilder sb = new StringBuilder(approxSize);
+    sb.append('{');
+    for (; ; ) {
+      Long s = it.next();
+      sb.append(s);
+      if (!it.hasNext()) {
+        return sb.append('}').toString();
+      }
+      sb.append(',');
+    }
+  }
+
 }

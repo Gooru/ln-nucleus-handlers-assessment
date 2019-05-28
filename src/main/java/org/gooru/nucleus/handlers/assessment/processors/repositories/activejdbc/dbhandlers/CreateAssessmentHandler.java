@@ -10,6 +10,7 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbutils.GUTCodeLookupHelper;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbutils.LicenseUtil;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entitybuilders.EntityBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
@@ -52,8 +53,8 @@ class CreateAssessmentHandler implements DBHandler {
     }
     // Our validators should certify this
     JsonObject errors = new DefaultPayloadValidator()
-        .validatePayload(context.request(), AJEntityAssessment.createFieldSelector(),
-            AJEntityAssessment.getValidatorRegistry());
+        .validatePayload(context.request(), AssessmentDao.createFieldSelector(),
+            AssessmentDao.getValidatorRegistry());
     if ((errors != null) && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors),
@@ -74,7 +75,7 @@ class CreateAssessmentHandler implements DBHandler {
     autoPopulateFields(assessment);
 
     new DefaultAJEntityAssessmentEntityBuilder()
-        .build(assessment, context.request(), AJEntityAssessment.getConverterRegistry());
+        .build(assessment, context.request(), AssessmentDao.getConverterRegistry());
 
     JsonObject newTags = this.context.request().getJsonObject(AJEntityAssessment.TAXONOMY);
     if (newTags != null && !newTags.isEmpty()) {

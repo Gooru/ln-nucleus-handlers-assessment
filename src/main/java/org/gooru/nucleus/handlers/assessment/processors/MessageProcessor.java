@@ -2,7 +2,6 @@ package org.gooru.nucleus.handlers.assessment.processors;
 
 import static org.gooru.nucleus.handlers.assessment.processors.utils.ValidationUtils.validateUser;
 
-import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import java.util.ResourceBundle;
@@ -49,11 +48,7 @@ class MessageProcessor implements Processor {
   }
 
   private ProcessorContext createContext() {
-    MultiMap headers = message.headers();
-    String assessmentId = headers.get(MessageConstants.ASSESSMENT_ID);
-    String questionId = request.getString(MessageConstants.ID);
-
-    return new ProcessorContext(userId, session, request, assessmentId, questionId, headers);
+    return new ProcessorContext(userId, session, request, message.headers());
   }
 
   private ExecutionResult<MessageResponse> validateAndInitialize() {

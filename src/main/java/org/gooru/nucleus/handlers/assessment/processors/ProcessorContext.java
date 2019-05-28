@@ -2,6 +2,7 @@ package org.gooru.nucleus.handlers.assessment.processors;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonObject;
+import org.gooru.nucleus.handlers.assessment.constants.MessageConstants;
 
 /**
  * Created by ashish on 7/1/16.
@@ -17,8 +18,7 @@ public class ProcessorContext {
   private final TenantContext tenantContext;
 
   public ProcessorContext(String userId, JsonObject session, JsonObject request,
-      String assessmentId,
-      String questionId, MultiMap headers) {
+      MultiMap headers) {
     if (session == null || userId == null || session.isEmpty() || headers == null || headers
         .isEmpty()) {
       throw new IllegalStateException(
@@ -30,8 +30,8 @@ public class ProcessorContext {
     // Assessment id and question id can be null in case of create and hence can't validate them unless we know
     // the op type also Do not want to build dependency on op for this context to work and hence is open ended.
     // Worst case would be RTE, so beware
-    this.assessmentId = assessmentId;
-    this.questionId = questionId;
+    this.assessmentId = headers.get(MessageConstants.ASSESSMENT_ID);
+    this.questionId = request != null ? request.getString(MessageConstants.ID) : null;
     this.requestHeaders = headers;
     this.tenantContext = new TenantContext(session);
   }

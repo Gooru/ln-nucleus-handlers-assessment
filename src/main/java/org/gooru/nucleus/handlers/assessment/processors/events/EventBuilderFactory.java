@@ -20,6 +20,10 @@ public final class EventBuilderFactory {
   private static final String EVT_EX_ASSESSMENT_DELETE = "event.external.assessment.delete";
   private static final String EVT_EX_ASSESSMENT_UPDATE = "event.external.assessment.update";
   private static final String EVT_EX_ASSESSMENT_CREATE = "event.external.assessment.create";
+  private static final String EVT_OA_DELETE = "event.oa.delete";
+  private static final String EVT_OA_UPDATE = "event.oa.update";
+  private static final String EVT_OA_COLLABORATOR_UPDATE = "event.oa.collaborator.update";
+  private static final String EVT_OA_CREATE = "event.oa.create";
 
   private EventBuilderFactory() {
     throw new AssertionError();
@@ -30,8 +34,18 @@ public final class EventBuilderFactory {
         new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 
+  public static EventBuilder getDeleteOAEventBuilder(String oaId) {
+    return () -> new JsonObject().put(EVENT_NAME, EVT_OA_DELETE).put(EVENT_BODY,
+        new JsonObject().put(ASSESSMENT_ID, oaId));
+  }
+
   public static EventBuilder getCreateAssessmentEventBuilder(String assessmentId) {
     return () -> new JsonObject().put(EVENT_NAME, EVT_ASSESSMENT_CREATE).put(EVENT_BODY,
+        new JsonObject().put(ASSESSMENT_ID, assessmentId));
+  }
+
+  public static EventBuilder getUpdateOAEventBuilder(String assessmentId) {
+    return () -> new JsonObject().put(EVENT_NAME, EVT_OA_UPDATE).put(EVENT_BODY,
         new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 
@@ -58,6 +72,12 @@ public final class EventBuilderFactory {
             collaborators.put(ASSESSMENT_ID, assessmentId));
   }
 
+  public static EventBuilder getUpdateCollaboratorForOAEventBuilder(String oaId,
+      JsonObject collaborators) {
+    return () -> new JsonObject().put(EVENT_NAME, EVT_OA_COLLABORATOR_UPDATE)
+        .put(EVENT_BODY, collaborators.put(ASSESSMENT_ID, oaId));
+  }
+
   public static EventBuilder getDeleteExAssessmentEventBuilder(String assessmentId) {
     return () -> new JsonObject().put(EVENT_NAME, EVT_EX_ASSESSMENT_DELETE).put(EVENT_BODY,
         new JsonObject().put(ASSESSMENT_ID, assessmentId));
@@ -73,4 +93,8 @@ public final class EventBuilderFactory {
         new JsonObject().put(ASSESSMENT_ID, assessmentId));
   }
 
+  public static EventBuilder getCreateOfflineActivityEventBuilder(String id) {
+    return () -> new JsonObject().put(EVENT_NAME, EVT_OA_CREATE).put(EVENT_BODY,
+        new JsonObject().put(ASSESSMENT_ID, id));
+  }
 }

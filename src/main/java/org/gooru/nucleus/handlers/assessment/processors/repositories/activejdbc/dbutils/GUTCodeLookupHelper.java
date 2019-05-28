@@ -28,10 +28,8 @@ public final class GUTCodeLookupHelper {
         .findBySQL(AJEntityTaxonomyCodeMapping.GUT_LOOKUP, toPostgresArrayString(taxonomyCodes));
 
     Map<String, String> gutMapping = new HashMap<>();
-    taxonomyCodeMappings.forEach(codeMapping -> {
-      gutMapping.put(codeMapping.getString(AJEntityTaxonomyCodeMapping.SOURCE_TAXONOMY_CODE_ID),
-          codeMapping.getString(AJEntityTaxonomyCodeMapping.TARGET_TAXONOMT_CODE_ID));
-    });
+    taxonomyCodeMappings.forEach(codeMapping -> gutMapping.put(codeMapping.getString(AJEntityTaxonomyCodeMapping.SOURCE_TAXONOMY_CODE_ID),
+        codeMapping.getString(AJEntityTaxonomyCodeMapping.TARGET_TAXONOMT_CODE_ID)));
 
     return gutMapping;
   }

@@ -1,6 +1,7 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.javalite.activejdbc.Model;
 import org.javalite.activejdbc.annotations.Table;
@@ -51,6 +52,7 @@ public class AJEntityQuestion extends Model {
   public static final String SEQUENCE_ID = "sequence_id";
   public static final String MAX_SCORE = "max_score";
   public static final String ID = "id";
-  public static final List<String> RUBRIC_ASSOCIATION_ALLOWED_TYPES = Arrays.asList("open_ended_question"); 
+  public static final List<String> RUBRIC_ASSOCIATION_ALLOWED_TYPES = Collections
+      .singletonList("open_ended_question");
   public static final String CONTENT_SUBFORMAT = "content_subformat";
 }

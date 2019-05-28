@@ -40,7 +40,7 @@ class SimpleJsonFormatter implements JsonFormatter {
   }
 
   @Override
-  public <T extends Model> String toJson(LazyList<T> modelList) {
+  public <T extends Model> String toJsonFromList(List<T> modelList) {
     StringBuilder sb = new StringBuilder(CAPACITY);
     sb.append('[');
     if (pretty) {
@@ -63,6 +63,11 @@ class SimpleJsonFormatter implements JsonFormatter {
     sb.append(']');
     return sb.toString();
 
+  }
+
+  @Override
+  public <T extends Model> String toJson(LazyList<T> modelList) {
+    return toJsonFromList(modelList);
   }
 
   private <T extends Model> void modelToJson(T model, StringBuilder sb, String indent) {

@@ -10,6 +10,7 @@ import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFacto
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
@@ -65,7 +66,7 @@ class AddQuestionToAssessmentHandler implements DBHandler {
     }
     // Our validators should certify this
     JsonObject errors = new DefaultPayloadValidator().validatePayload(context.request(),
-        AJEntityAssessment.addQuestionFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+        AssessmentDao.addQuestionFieldSelector(), AssessmentDao.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors),
@@ -82,7 +83,7 @@ class AddQuestionToAssessmentHandler implements DBHandler {
     // already and id is specified id
 
     LazyList<AJEntityAssessment> assessments = AJEntityAssessment
-        .findBySQL(AJEntityAssessment.AUTHORIZER_QUERY,
+        .findBySQL(AssessmentDao.AUTHORIZER_QUERY,
             AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {
@@ -109,19 +110,15 @@ class AddQuestionToAssessmentHandler implements DBHandler {
         sequenceId = currentSequence + 1;
       }
       long count = Base.exec(AJEntityQuestion.ADD_QUESTION_QUERY, this.context.assessmentId(),
-          this.assessment.getString(AJEntityAssessment.COURSE_ID),
-          this.assessment.getString(AJEntityAssessment.UNIT_ID),
-          this.assessment.getString(AJEntityAssessment.LESSON_ID), this.context.userId(),
-          sequenceId,
-          this.context.questionId(), this.context.userId());
+          this.assessment.getCourseId(), this.assessment.getUnitId(), this.assessment.getLessonId(),
+          this.context.userId(), sequenceId, this.context.questionId(), this.context.userId());
 
       if (count == 1) {
         // Add rubric in CULA
         Base.exec(AJEntityQuestion.ADD_RUBRIC_QUERY, this.context.assessmentId(),
-            this.assessment.getString(AJEntityAssessment.COURSE_ID),
-            this.assessment.getString(AJEntityAssessment.UNIT_ID),
-            this.assessment.getString(AJEntityAssessment.LESSON_ID), this.context.userId(),
-            this.context.questionId(), this.context.userId());
+            this.assessment.getCourseId(), this.assessment.getUnitId(),
+            this.assessment.getLessonId(), this.context.userId(), this.context.questionId(),
+            this.context.userId());
 
         return updateGrading();
       } else if (count == 0) {

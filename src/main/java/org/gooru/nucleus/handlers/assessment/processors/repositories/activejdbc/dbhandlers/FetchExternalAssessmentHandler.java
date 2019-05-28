@@ -6,6 +6,8 @@ import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentExDao;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.JsonFormatterBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
@@ -55,7 +57,7 @@ class FetchExternalAssessmentHandler implements DBHandler {
   public ExecutionResult<MessageResponse> validateRequest() {
     LazyList<AJEntityAssessment> assessments =
         AJEntityAssessment
-            .findBySQL(AJEntityAssessment.FETCH_EXTERNAL_ASSSESSMENT_QUERY, context.assessmentId());
+            .findBySQL(AssessmentExDao.FETCH_EXTERNAL_ASSSESSMENT_QUERY, context.assessmentId());
     if (assessments.isEmpty()) {
       LOGGER.warn("Not able to find assessment '{}'", this.context.assessmentId());
       return new ExecutionResult<>(
@@ -71,18 +73,18 @@ class FetchExternalAssessmentHandler implements DBHandler {
     // First create response from Assessment
     JsonObject response = new JsonObject(
         JsonFormatterBuilder
-            .buildSimpleJsonFormatter(false, AJEntityAssessment.FETCH_EA_QUERY_FIELD_LIST)
+            .buildSimpleJsonFormatter(false, AssessmentExDao.FETCH_EA_QUERY_FIELD_LIST)
             .toJson(this.assessment));
     // Now collaborator, we need to know if we want to get it from course
     // else no collaboration on external assessment
-    String courseId = this.assessment.getString(AJEntityAssessment.COURSE_ID);
+    String courseId = this.assessment.getCourseId();
     if (courseId == null || courseId.isEmpty()) {
       response.put(AJEntityAssessment.COLLABORATOR, new JsonArray());
     } else {
       try {
         // Need to fetch collaborators
         Object courseCollaboratorObject =
-            Base.firstCell(AJEntityAssessment.COURSE_COLLABORATOR_QUERY, courseId);
+            Base.firstCell(AssessmentDao.COURSE_COLLABORATOR_QUERY, courseId);
         if (courseCollaboratorObject != null) {
           response.put(AJEntityAssessment.COLLABORATOR,
               new JsonArray(courseCollaboratorObject.toString()));

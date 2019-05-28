@@ -1,29 +1,28 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators;
 
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import java.util.UUID;
-
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbhelpers.LanguageValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 
 /**
  * Created by ashish on 28/1/16.
  */
 public interface FieldValidator {
-    
+
   Logger LOGGER = LoggerFactory.getLogger(FieldValidator.class);
-    
+
   static boolean validateStringIfPresent(Object o, int len) {
     return o == null || (o instanceof String && !((String) o).trim().isEmpty()
         && ((String) o).length() < len);
   }
 
   static boolean validateString(Object o, int len) {
-    return !(o == null || !(o instanceof String) || ((String) o).trim().isEmpty() || (((String) o).length()
-        > len));
+    return !(o == null || !(o instanceof String) || ((String) o).trim().isEmpty() || (
+        ((String) o).length()
+            > len));
   }
 
   static boolean validateJsonIfPresent(Object o) {
@@ -74,7 +73,7 @@ public interface FieldValidator {
   static boolean validateBoolean(Object o) {
     return o != null && o instanceof Boolean;
   }
-  
+
   static boolean validateBooleanIfPresent(Object o) {
     return o == null || o instanceof Boolean;
   }
@@ -92,7 +91,7 @@ public interface FieldValidator {
   static boolean validateUuidIfPresent(String o) {
     return o == null || validateUuid(o);
   }
-  
+
   static boolean validateLanguageIfPresent(Object o) {
     try {
       return o == null || LanguageValidator.isValidLanguage((Integer) o);
@@ -100,6 +99,10 @@ public interface FieldValidator {
       LOGGER.warn("Passed language id is not of Long type");
       return false;
     }
+  }
+
+  static boolean validateOptionalInteger(Object o) {
+    return o == null || o instanceof Integer;
   }
 
   boolean validateField(Object value);
