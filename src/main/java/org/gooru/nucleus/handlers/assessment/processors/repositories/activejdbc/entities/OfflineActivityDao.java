@@ -132,6 +132,10 @@ public final class OfflineActivityDao {
     }
         .build(offlineActivity, context.request(), AssessmentDao.getConverterRegistry());
 
+    if (offlineActivity.getMaxScore() == null || offlineActivity.getMaxScore() == 0) {
+      offlineActivity.setDefaultMaxScore();
+    }
+
     populateGutCodes(offlineActivity, context.request());
 
     boolean result = offlineActivity.save();
@@ -169,6 +173,22 @@ public final class OfflineActivityDao {
           MessageResponseFactory.createInternalErrorResponse());
     }
   }
+
+  public static void updateMaxScore(AJEntityAssessment offlineActivity, Integer maxScore) {
+    offlineActivity.setMaxScore(maxScore);
+    boolean result = offlineActivity.save();
+    if (!result) {
+      LOGGER.error("Offline activity '{}' failed to save max score", offlineActivity.getId());
+      if (offlineActivity.hasErrors()) {
+        throw new MessageResponseWrapperException(
+            MessageResponseFactory.createValidationErrorResponse(
+                ModelErrorFormatter.formattedError(offlineActivity)));
+      }
+      throw new MessageResponseWrapperException(
+          MessageResponseFactory.createInternalErrorResponse());
+    }
+  }
+
 
   private static void populateGutCodes(AJEntityAssessment offlineActivity, JsonObject request) {
     JsonObject newTags = request.getJsonObject(AJEntityAssessment.TAXONOMY);

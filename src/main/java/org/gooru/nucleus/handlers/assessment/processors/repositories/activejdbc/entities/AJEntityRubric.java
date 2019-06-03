@@ -84,4 +84,7 @@ public class AJEntityRubric extends Model {
     return GRADER_STUDENT;
   }
 
+  public Integer getMaxScore() {
+    return this.getInteger(MAX_SCORE);
+  }
 }
