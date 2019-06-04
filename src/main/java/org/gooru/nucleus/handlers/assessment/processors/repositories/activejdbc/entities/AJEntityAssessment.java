@@ -272,6 +272,14 @@ public class AJEntityAssessment extends Model {
     return this.getInteger(MAX_SCORE);
   }
 
+  public void setMaxScore(Integer maxScore) {
+    this.setInteger(MAX_SCORE, maxScore);
+  }
+
+  public void setDefaultMaxScore() {
+    this.setMaxScore(1);
+  }
+
   public String getExemplar() {
     return this.getString(EXEMPLAR);
   }

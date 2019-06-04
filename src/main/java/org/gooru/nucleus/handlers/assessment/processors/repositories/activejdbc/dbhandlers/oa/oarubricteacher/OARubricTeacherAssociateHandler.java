@@ -65,6 +65,7 @@ public class OARubricTeacherAssociateHandler implements DBHandler {
   public ExecutionResult<MessageResponse> executeRequest() {
     try {
       RubricDao.associateTeacherRubricToOA(context, offlineActivity, rubricToAssociate);
+      OfflineActivityDao.updateMaxScore(offlineActivity, rubricToAssociate.getMaxScore());
       return new ExecutionResult<>(
           MessageResponseFactory
               .createNoContentResponse(RESOURCE_BUNDLE.getString("updated"),
