@@ -50,18 +50,18 @@ public final class RubricDao {
     throw new AssertionError();
   }
 
-  public static void associateTeacherRubricToOA(OAProcessorContext context,
+  public static String associateTeacherRubricToOA(OAProcessorContext context,
       AJEntityAssessment offlineActivity, AJEntityRubric sourceRubric) {
     deleteTeacherRubricAssociatedWithCollection(context.oaId(), context.userId());
-    copySpecifiedRubricAsTeacherRubricForSpecifiedOA(context.processorContext(), offlineActivity,
-        sourceRubric);
+    return copySpecifiedRubricAsTeacherRubricForSpecifiedOA(context.processorContext(),
+        offlineActivity, sourceRubric);
   }
 
-  public static void associateStudentRubricToOA(OAProcessorContext context,
+  public static String associateStudentRubricToOA(OAProcessorContext context,
       AJEntityAssessment offlineActivity, AJEntityRubric sourceRubric) {
     deleteStudentRubricAssociatedWithCollection(context.oaId(), context.userId());
-    copySpecifiedRubricAsStudentRubricForSpecifiedOA(context.processorContext(), offlineActivity,
-        sourceRubric);
+    return copySpecifiedRubricAsStudentRubricForSpecifiedOA(context.processorContext(),
+        offlineActivity, sourceRubric);
   }
 
   public static AJEntityRubric fetchRubricById(String rubricId) {
@@ -110,27 +110,27 @@ public final class RubricDao {
     }
   }
 
-  public static void copySpecifiedRubricAsTeacherRubricForSpecifiedOA(ProcessorContext context,
+  public static String copySpecifiedRubricAsTeacherRubricForSpecifiedOA(ProcessorContext context,
       AJEntityAssessment collection, AJEntityRubric sourceRubric) {
-    copyRubric(context.userId(), sourceRubric.getId().toString(), context.tenant(),
+    return copyRubric(context.userId(), sourceRubric.getId().toString(), context.tenant(),
         context.tenantRoot(), collection.getCourseId(), collection.getUnitId(),
         collection.getLessonId(), collection.getId().toString(),
         AJEntityRubric.getTeacherGraderValue());
   }
 
-  public static void copySpecifiedRubricAsStudentRubricForSpecifiedOA(ProcessorContext context,
+  public static String copySpecifiedRubricAsStudentRubricForSpecifiedOA(ProcessorContext context,
       AJEntityAssessment collection, AJEntityRubric sourceRubric) {
-    copyRubric(context.userId(), sourceRubric.getId().toString(), context.tenant(),
+    return copyRubric(context.userId(), sourceRubric.getId().toString(), context.tenant(),
         context.tenantRoot(), collection.getCourseId(), collection.getUnitId(),
         collection.getLessonId(), collection.getId().toString(),
         AJEntityRubric.getStudentGraderValue());
   }
 
-  private static UUID copyRubric(String user, String sourceRubricId, String userTenant,
+  private static String copyRubric(String user, String sourceRubricId, String userTenant,
       String userTenantRoot, String courseId, String unitId, String lessonId, String collectionId,
       String grader) {
-    UUID copiedRubricId = UUID.randomUUID();
-    Base.exec(RUBRIC_COPY, copiedRubricId.toString(), user, user, sourceRubricId, sourceRubricId,
+    String copiedRubricId = UUID.randomUUID().toString();
+    Base.exec(RUBRIC_COPY, copiedRubricId, user, user, sourceRubricId, sourceRubricId,
         userTenant, userTenantRoot,
         courseId, unitId, lessonId, collectionId, grader, sourceRubricId);
     return copiedRubricId;
