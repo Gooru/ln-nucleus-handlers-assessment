@@ -1,6 +1,7 @@
 package org.gooru.nucleus.handlers.assessment.app.components;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public final class DataSourceRegistry implements Initializer, Finalizer {
     // All the elements in this array are supposed to be present in config file
     // as keys as we are going to initialize them with the value associated with
     // that key
-    private final List<String> datasources = Arrays.asList(DEFAULT_DATA_SOURCE);
+    private final List<String> datasources = Collections.singletonList(DEFAULT_DATA_SOURCE);
     private final Map<String, DataSource> registry = new HashMap<>();
     private volatile boolean initialized;
 
@@ -122,10 +123,11 @@ public final class DataSourceRegistry implements Initializer, Finalizer {
                 config.setMaximumPoolSize((Integer) entry.getValue());
                 break;
             case "metricRegistry":
-                throw new UnsupportedOperationException(entry.getKey());
-            case "healthCheckRegistry":
-                throw new UnsupportedOperationException(entry.getKey());
-            case "poolName":
+                case "threadFactory":
+                case "healthCheckRegistry":
+                case "dataSource":
+                    throw new UnsupportedOperationException(entry.getKey());
+                case "poolName":
                 config.setPoolName((String) entry.getValue());
                 break;
             case "isolationInternalQueries":
@@ -158,11 +160,7 @@ public final class DataSourceRegistry implements Initializer, Finalizer {
             case "leakDetectionThreshold":
                 config.setLeakDetectionThreshold((Long) entry.getValue());
                 break;
-            case "dataSource":
-                throw new UnsupportedOperationException(entry.getKey());
-            case "threadFactory":
-                throw new UnsupportedOperationException(entry.getKey());
-            case "datasource":
+                case "datasource":
                 for (Map.Entry<String, Object> key : ((JsonObject) entry.getValue())) {
                     config.addDataSourceProperty(key.getKey(), key.getValue());
                 }

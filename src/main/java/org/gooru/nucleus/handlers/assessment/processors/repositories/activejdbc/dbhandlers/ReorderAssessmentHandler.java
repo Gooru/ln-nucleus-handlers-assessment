@@ -14,6 +14,7 @@ import org.gooru.nucleus.handlers.assessment.processors.events.EventBuilderFacto
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbauth.AuthorizerBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.PayloadValidator;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
@@ -66,7 +67,7 @@ class ReorderAssessmentHandler implements DBHandler {
           ExecutionResult.ExecutionStatus.FAILED);
     }
     JsonObject errors = new DefaultPayloadValidator().validatePayload(context.request(),
-        AJEntityAssessment.reorderFieldSelector(), AJEntityAssessment.getValidatorRegistry());
+        AssessmentDao.reorderFieldSelector(), AssessmentDao.getValidatorRegistry());
     if (errors != null && !errors.isEmpty()) {
       LOGGER.warn("Validation errors for request");
       return new ExecutionResult<>(MessageResponseFactory.createValidationErrorResponse(errors),
@@ -81,7 +82,7 @@ class ReorderAssessmentHandler implements DBHandler {
     // Fetch the assessment where type is assessment and it is not deleted
     // already and id is specified id
     LazyList<AJEntityAssessment> assessments = AJEntityAssessment
-        .findBySQL(AJEntityAssessment.AUTHORIZER_QUERY,
+        .findBySQL(AssessmentDao.AUTHORIZER_QUERY,
             AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {

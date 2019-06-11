@@ -36,6 +36,12 @@ public final class AuthorizerBuilder {
         ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
   }
 
+  public static Authorizer<AJEntityAssessment> buildAuthenticatedAuthorizer(
+      ProcessorContext context) {
+    return model -> new ExecutionResult<>(null,
+        ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
+  }
+
   public static Authorizer<AJEntityAssessment> buildAddQuestionToAssessmentAuthorizer(
       ProcessorContext context) {
     return new AddQuestionToAssessmentAuthorizer(context);

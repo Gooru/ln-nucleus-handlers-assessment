@@ -3,6 +3,7 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 import java.util.ResourceBundle;
 import org.gooru.nucleus.handlers.assessment.processors.ProcessorContext;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
@@ -54,7 +55,7 @@ class TenantAuthorizer implements Authorizer<AJEntityAssessment> {
     if (courseId != null) {
       try {
         long published =
-            Base.count(AJEntityAssessment.TABLE_COURSE, AJEntityAssessment.PUBLISHED_FILTER,
+            Base.count(AJEntityAssessment.TABLE_COURSE, AssessmentDao.PUBLISHED_FILTER,
                 courseId);
         if (published >= 1) {
           // It is published, check that if assessment was already published in which case nothing to check

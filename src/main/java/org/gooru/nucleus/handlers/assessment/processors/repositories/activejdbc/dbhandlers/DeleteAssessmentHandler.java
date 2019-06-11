@@ -10,6 +10,7 @@ import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityAssessment;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityQuestion;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AJEntityRubric;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entities.AssessmentDao;
 import org.gooru.nucleus.handlers.assessment.processors.responses.ExecutionResult;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponse;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
@@ -61,7 +62,7 @@ class DeleteAssessmentHandler implements DBHandler {
     // already and id is specified id
 
     LazyList<AJEntityAssessment> assessments = AJEntityAssessment
-        .findBySQL(AJEntityAssessment.AUTHORIZER_QUERY,
+        .findBySQL(AssessmentDao.AUTHORIZER_QUERY,
             AJEntityAssessment.ASSESSMENT, context.assessmentId(), false);
     // Assessment should be present in DB
     if (assessments.size() < 1) {
@@ -74,7 +75,7 @@ class DeleteAssessmentHandler implements DBHandler {
     }
     AJEntityAssessment assessment = assessments.get(0);
     // Log a warning is assessment to be deleted is published
-    if (assessment.getDate(AJEntityAssessment.PUBLISH_DATE) != null) {
+    if (assessment.getPublishDate() != null) {
       LOGGER.warn("Assessment with id '{}' is published assessment and is being deleted",
           context.assessmentId());
     }
@@ -87,7 +88,7 @@ class DeleteAssessmentHandler implements DBHandler {
     // deleting it but We do not reset the sequence id right now
     AJEntityAssessment assessmentToDelete = new AJEntityAssessment();
     assessmentToDelete.setIdWithConverter(context.assessmentId());
-    assessmentToDelete.setBoolean(AJEntityAssessment.IS_DELETED, true);
+    assessmentToDelete.setIsDeleted(true);
     assessmentToDelete.setModifierId(context.userId());
 
     boolean result = assessmentToDelete.save();

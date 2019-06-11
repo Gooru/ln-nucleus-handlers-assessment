@@ -1,6 +1,8 @@
 package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter;
 
 import io.vertx.core.impl.StringEscapeUtils;
+import java.sql.Array;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +42,7 @@ class SimpleJsonFormatter implements JsonFormatter {
   }
 
   @Override
-  public <T extends Model> String toJson(LazyList<T> modelList) {
+  public <T extends Model> String toJsonFromList(List<T> modelList) {
     StringBuilder sb = new StringBuilder(CAPACITY);
     sb.append('[');
     if (pretty) {
@@ -63,6 +65,11 @@ class SimpleJsonFormatter implements JsonFormatter {
     sb.append(']');
     return sb.toString();
 
+  }
+
+  @Override
+  public <T extends Model> String toJson(LazyList<T> modelList) {
+    return toJsonFromList(modelList);
   }
 
   private <T extends Model> void modelToJson(T model, StringBuilder sb, String indent) {
@@ -97,6 +104,24 @@ class SimpleJsonFormatter implements JsonFormatter {
         sb.append('"').append(Convert.toIsoString((Date) v)).append('"');
       } else if (v instanceof PGobject && ((PGobject) v).getType().equalsIgnoreCase(JSONB_TYPE)) {
         sb.append(Convert.toString(v));
+      } else if (v instanceof java.sql.Array) {
+        try {
+          if (((java.sql.Array) v).getArray() instanceof String[]) {
+            String[] strings = (String[]) ((Array) v).getArray();
+            sb.append('[');
+            for (int strArrayIndex = 0; strArrayIndex < strings.length; strArrayIndex++) {
+              sb.append('"').append(strings[strArrayIndex]).append('"');
+              if (strings.length - strArrayIndex != 1) {
+                sb.append(',');
+              }
+            }
+            sb.append(']');
+          }
+        } catch (SQLException e) {
+          sb.append('"');
+          sb.append(Convert.toString(v));
+          sb.append('"');
+        }
       } else if (v instanceof String) {
         sb.append('"');
         try {
