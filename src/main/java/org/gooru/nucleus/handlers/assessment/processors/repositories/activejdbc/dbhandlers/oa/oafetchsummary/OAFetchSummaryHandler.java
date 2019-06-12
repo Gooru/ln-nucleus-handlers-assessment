@@ -39,7 +39,7 @@ public class OAFetchSummaryHandler implements DBHandler {
   @Override
   public ExecutionResult<MessageResponse> checkSanity() {
     try {
-      SanityValidators.validateUser(context);
+      SanityValidators.validateUserAllowAnonymous(context);
       SanityValidators.validateOAId(context);
       return new ExecutionResult<>(null, ExecutionResult.ExecutionStatus.CONTINUE_PROCESSING);
     } catch (MessageResponseWrapperException mrwe) {
