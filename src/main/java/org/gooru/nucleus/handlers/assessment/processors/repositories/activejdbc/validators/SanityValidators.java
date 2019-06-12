@@ -24,12 +24,12 @@ public final class SanityValidators {
   }
 
   public static void validateUser(ProcessorContext context) {
-    validateUser(context.userId());
+    validateUser(context.userId(), true);
   }
 
-  private static void validateUser(String userId) {
-    if ((userId == null) || userId.isEmpty() || MessageConstants.MSG_USER_ANONYMOUS
-        .equalsIgnoreCase(userId)) {
+  private static void validateUser(String userId, boolean allowAnonymous) {
+    if ((userId == null) || userId.isEmpty() || (
+        MessageConstants.MSG_USER_ANONYMOUS.equalsIgnoreCase(userId) && !allowAnonymous)) {
       LOGGER.warn("Invalid user");
       throw new MessageResponseWrapperException(
           MessageResponseFactory.createForbiddenResponse(RESOURCE_BUNDLE.getString("not.allowed")));
@@ -37,7 +37,11 @@ public final class SanityValidators {
   }
 
   public static void validateUser(OAProcessorContext context) {
-    validateUser(context.userId());
+    validateUser(context.userId(), false);
+  }
+
+  public static void validateUserAllowAnonymous(OAProcessorContext context) {
+    validateUser(context.userId(), true);
   }
 
   public static void validateAssessmentId(String assessmentId) {
