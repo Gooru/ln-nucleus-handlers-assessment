@@ -31,9 +31,11 @@ public final class CollaboratorHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(CollaboratorHelper.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
-  public static JsonObject calculateDiffOfCollaborators(JsonArray collaboratorsFromPayload,
+  public static JsonObject calculateDiffOfCollaborators(JsonArray collaboratorsInRequest,
       JsonArray currentCollaborators) {
 
+    JsonArray collaboratorsFromPayload =
+        collaboratorsInRequest != null ? collaboratorsInRequest : new JsonArray();
     JsonObject result = new JsonObject();
     if (currentCollaborators.isEmpty() && !collaboratorsFromPayload.isEmpty()) {
       // Adding all
