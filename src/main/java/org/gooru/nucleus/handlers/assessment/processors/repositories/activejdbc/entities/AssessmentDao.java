@@ -109,7 +109,7 @@ public final class AssessmentDao {
     return new FieldSelector() {
       @Override
       public Set<String> mandatoryFields() {
-        return Collections.unmodifiableSet(COLLABORATOR_FIELDS);
+        return Collections.emptySet();
       }
 
       @Override
