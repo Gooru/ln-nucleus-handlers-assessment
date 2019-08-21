@@ -61,8 +61,8 @@ public class AJEntityAssessment extends Model {
   public static final String GRADING_TYPE_SYSTEM = "system";
   public static final String REORDER_PAYLOAD_KEY = "order";
   private static final String LICENSE = "license";
-  private static final String TENANT = "tenant";
-  private static final String TENANT_ROOT = "tenant_root";
+  public static final String TENANT = "tenant";
+  public static final String TENANT_ROOT = "tenant_root";
   private static final String PUBLISH_STATUS = "publish_status";
   private static final String PUBLISH_STATUS_PUBLISHED = "published";
   private static final String GUT_CODES = "gut_codes";
