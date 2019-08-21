@@ -38,7 +38,8 @@ public class OAUpdateHandler implements DBHandler {
       SanityValidators.validatePayloadNotEmpty(context.request());
       SanityValidators.validateOAId(context);
       SanityValidators.validateWithDefaultPayloadValidator(context.request(),
-          OfflineActivityDao.editFieldSelector(), OfflineActivityDao.getValidatorRegistry());
+          OfflineActivityDao.editFieldSelector(),
+          OfflineActivityDao.getOACustomValidatorRegistry());
     } catch (MessageResponseWrapperException mrwe) {
       return new ExecutionResult<>(mrwe.getMessageResponse(),
           ExecutionResult.ExecutionStatus.FAILED);
