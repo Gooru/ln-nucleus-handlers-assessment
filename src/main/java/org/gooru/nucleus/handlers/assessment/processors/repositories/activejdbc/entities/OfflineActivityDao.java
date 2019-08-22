@@ -3,6 +3,7 @@ package org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc
 import io.vertx.core.json.JsonObject;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +15,12 @@ import org.gooru.nucleus.handlers.assessment.processors.exceptions.MessageRespon
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.converters.ConverterRegistry;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.converters.FieldConverter;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbutils.GUTCodeLookupHelper;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.dbutils.OASubformatValidationUtil;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.entitybuilders.EntityBuilder;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.formatter.ModelErrorFormatter;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.FieldSelector;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.FieldValidator;
+import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.ReorderFieldValidator;
 import org.gooru.nucleus.handlers.assessment.processors.repositories.activejdbc.validators.ValidatorRegistry;
 import org.gooru.nucleus.handlers.assessment.processors.responses.MessageResponseFactory;
 import org.gooru.nucleus.handlers.assessment.processors.utils.CommonUtils;
@@ -55,6 +58,48 @@ public final class OfflineActivityDao {
   private static final Set<String> MANDATORY_FIELDS = new HashSet<>(Arrays.asList(
       AJEntityAssessment.TITLE, AJEntityAssessment.TAXONOMY, AJEntityAssessment.SUBFORMAT));
 
+  private static final Map<String, FieldValidator> oaCustomFieldValidators;
+
+  static {
+    oaCustomFieldValidators = initializeValidators();
+  }
+
+  private static Map<String, FieldValidator> initializeValidators() {
+    Map<String, FieldValidator> validatorMap = new HashMap<>();
+
+    validatorMap.put(AJEntityAssessment.ID, (FieldValidator::validateUuid));
+    validatorMap
+        .put(AJEntityAssessment.TITLE, (value) -> FieldValidator.validateString(value, 1000));
+    validatorMap.put(AJEntityAssessment.THUMBNAIL,
+        (value) -> FieldValidator.validateStringIfPresent(value, 2000));
+    validatorMap
+        .put(AJEntityAssessment.LEARNING_OBJECTIVE,
+            (value) -> FieldValidator.validateStringIfPresent(value, 20000));
+    validatorMap.put(AJEntityAssessment.METADATA, FieldValidator::validateJsonIfPresent);
+    validatorMap.put(AJEntityAssessment.TAXONOMY, FieldValidator::validateJson);
+    validatorMap.put(AJEntityAssessment.TAXONOMY_TO_BUILD, FieldValidator::validateJsonIfPresent);
+    validatorMap.put(AJEntityAssessment.SETTING, FieldValidator::validateJsonIfPresent);
+    validatorMap.put(AJEntityAssessment.URL,
+        (value) -> FieldValidator.validateStringIfPresent(value, 2000));
+    validatorMap.put(AJEntityAssessment.LOGIN_REQUIRED, FieldValidator::validateBooleanIfPresent);
+    validatorMap
+        .put(AJEntityAssessment.VISIBLE_ON_PROFILE, FieldValidator::validateBooleanIfPresent);
+    validatorMap.put(AJEntityAssessment.MAX_SCORE, FieldValidator::validateOptionalInteger);
+    validatorMap.put(AJEntityAssessment.DURATION_HOURS, FieldValidator::validateOptionalInteger);
+    validatorMap.put(AJEntityAssessment.COLLABORATOR,
+        (value) -> FieldValidator
+            .validateDeepJsonArrayIfPresent(value, FieldValidator::validateUuid));
+    validatorMap.put(AJEntityAssessment.REORDER_PAYLOAD_KEY, new ReorderFieldValidator());
+    validatorMap.put(AJEntityAssessment.TENANT, (FieldValidator::validateUuid));
+    validatorMap.put(AJEntityAssessment.TENANT_ROOT, (FieldValidator::validateUuid));
+    validatorMap
+        .put(AJEntityAssessment.PRIMARY_LANGUAGE, FieldValidator::validateLanguageIfPresent);
+    validatorMap.put(AJEntityAssessment.SUBFORMAT, OASubformatValidationUtil::validateOASubformat);
+    return Collections.unmodifiableMap(validatorMap);
+
+  }
+
+
   private OfflineActivityDao() {
     throw new AssertionError();
   }
@@ -88,12 +133,24 @@ public final class OfflineActivityDao {
     };
   }
 
+  public static ValidatorRegistry getOACustomValidatorRegistry() {
+    return new OACustomValidationRegistry();
+  }
+
   public static ValidatorRegistry getValidatorRegistry() {
     return new AssessmentValidationRegistry();
   }
 
   public static ConverterRegistry getConverterRegistry() {
     return new AssessmentConverterRegistry();
+  }
+
+  public static class OACustomValidationRegistry implements ValidatorRegistry {
+
+    @Override
+    public FieldValidator lookupValidator(String fieldName) {
+      return oaCustomFieldValidators.get(fieldName);
+    }
   }
 
   private static class AssessmentValidationRegistry implements ValidatorRegistry {
